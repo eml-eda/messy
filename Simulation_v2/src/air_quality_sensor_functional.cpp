@@ -25,7 +25,7 @@ while (true)
         }
 
     } else {
-        std::cout << "The sensor is not enable!" << endl;
+        //std::cout << "The sensor is not enable!" << endl;
         power_signal.write(0);
     }
     wait();

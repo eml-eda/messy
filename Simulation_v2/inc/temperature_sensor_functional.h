@@ -11,6 +11,7 @@ SC_MODULE(temperature_sensor_functional)
     //Output Port
     sc_core::sc_out <int> data_out;
     //Power Port
+    sc_core::sc_out <int> power_signal;
     //Therm Port
     
     SC_CTOR(temperature_sensor_functional):
@@ -18,7 +19,8 @@ SC_MODULE(temperature_sensor_functional)
     address("Address"),
     data_in("Data_in"),
     flag_wr("Flag"),
-    data_out("Data_out")
+    data_out("Data_out"),
+    power_signal("Func_to_Power_signal")
     {
         SC_THREAD(sensor_logic);
         sensitive << enable 
