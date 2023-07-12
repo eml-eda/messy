@@ -1,0 +1,5 @@
+
+*.o
+*.x
+Simulation_v2/power_trace.txt
+Simulation_v2/funtional_trace.txt
