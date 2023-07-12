@@ -11,9 +11,9 @@ void functional_bus::processing_data(){
         add_s = address_in_M.read();
         flag_s = flag_in_M.read();
 
-        if (Air_Base_Address <= add_s && add_s <= (Air_Base_Address + Air_Reg_Dimension)) 
+        if (AIR_BASE_ADDRESS <= add_s && add_s <= (AIR_BASE_ADDRESS + AIR_REG_DIMENSION)) 
         {
-            reg_s = add_s - Air_Base_Address;
+            reg_s = add_s - AIR_BASE_ADDRESS;
             data_s = data_in_M.read();
             //cout << data_s << endl;
 
@@ -23,9 +23,9 @@ void functional_bus::processing_data(){
             selected_slave = 1;
         }
 
-        if (Temp_Base_Address <= add_s && add_s <= (Temp_Base_Address + Temp_Reg_Dimension))
+        if (TEMPERATURE_BASE_ADDRESS <= add_s && add_s <= (TEMPERATURE_BASE_ADDRESS + TEMPERATURE_REG_DIMENSION))
         {
-            reg_s = add_s - Temp_Base_Address;
+            reg_s = add_s - TEMPERATURE_BASE_ADDRESS;
             data_s = data_in_M.read();
             //cout << data_s << endl;
 

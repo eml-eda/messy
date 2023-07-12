@@ -3,21 +3,36 @@
 #include "core.h"
 #include "sys_functional_bus.h"
 #include "sys_power_bus.h"
+#include "load_converter.h"
 #include "temperature_sensor_functional.h"
 #include "temperature_sensor_power.h"
 #include "air_quality_sensor_functional.h"
 #include "air_quality_sensor_power.h"
+#include "methane_sensor_functional.h"
+#include "methane_sensor_power.h"
+#include "mic_click_sensor_functional.h"
+#include "mic_click_sensor_power.h"
+#include "rf_functional.h"
+#include "rf_power.h"
 
+#include "battery.h"
+#include "battery_converter.h"
+#include "battery_peukert.h"
 
 int sc_main(int argc, char* argv[])
 {
-    Core Master("Master");
-    functional_bus Func("Func");
-    power_bus Pwr("Power");
+    Core                          Master("Master");
+    functional_bus                Func("Func");
+    power_bus                     Pwr("Power");
     temperature_sensor_functional Temp("T_Sensor");
     temperature_sensor_power      Temp_P("T_Power");
+    load_converter                Temp_conv("Temp_Converter");
     air_quality_sensor_functional Air("Air_Sensor");
     air_quality_sensor_power      Air_P("Air_Power");
+    load_converter                Air_conv("Air_Converter");
+    battery                       Bat("Battery");
+    battery_converter             Batt_Conv("Battery_Converter");
+    //battery_peukert               P_Batt("Peukert_Battery");
     
     //Functional Bus
     sc_signal <bool> Enable_Temp;
@@ -30,7 +45,7 @@ int sc_main(int argc, char* argv[])
     //Data from Functional Bus to Slave
     sc_signal <int>  A_B_to_S[NS];
     sc_signal <int>  D_B_to_S[NS];
-    sc_signal <bool>  F_B_to_S[NS];
+    sc_signal <bool> F_B_to_S[NS];
     //Data from Slave to Functional Bus
     sc_signal <int> Fake;
     Func.data_in_S[0](Fake);
@@ -39,14 +54,8 @@ int sc_main(int argc, char* argv[])
     //Signals from Slave to Bus
     sca_tdf::sca_signal <double> V_S_to_B[NP];
     sca_tdf::sca_signal <double> I_S_to_B[NP];
-    //Signals from Battery to Bus
-    sca_tdf::sca_signal <double> V_Batt_to_B;
-    sca_tdf::sca_signal <double> SoC_Batt_to_B;
-    //Signals from Bus to Battery
-    sca_tdf::sca_signal <double> I_B_to_Batt;
     //Output Traces from Power Bus
     sca_tdf::sca_signal <double> Tot_Voltage;
-    sca_tdf::sca_signal <double> Tot_Current;
 
     //Air Quality Data
     sc_signal <int> Air_Data;
@@ -54,6 +63,8 @@ int sc_main(int argc, char* argv[])
     sc_signal <int> Air_F_to_P;
     sca_tdf::sca_signal <double> Air_V_State;
     sca_tdf::sca_signal <double> Air_I_State;
+    //Air Converter
+    sca_tdf::sca_signal <double> Air_I_S_to_C;
     
     //Temperature Data
     sc_signal <int>  Temp_Data;
@@ -61,6 +72,15 @@ int sc_main(int argc, char* argv[])
     sc_signal <int> Tmp_F_to_P;
     sca_tdf::sca_signal <double> Tmp_V_State;
     sca_tdf::sca_signal <double> Tmp_I_State;
+    //Temperature Converter
+    sca_tdf::sca_signal <double> Tmp_I_S_to_C;
+
+    //Battery Signals
+    sca_tdf::sca_signal <double> SoC_Batt;
+    sca_tdf::sca_signal <double> V_Batt;
+    sca_tdf::sca_signal <double> I_Batt;
+    //Battery Converter Signals
+    sca_tdf::sca_signal <double> I_Bus_to_C;
 
     //Binding Master's signals
     Master.A_Out(A_M_to_B);
@@ -93,9 +113,8 @@ int sc_main(int argc, char* argv[])
     //Pwr.battery_in_voltage(V_Batt_to_B);
     //Pwr.battery_in_SoC(SoC_Batt_to_B);
     //Binding Power Bus's Output Signal
-    //Pwr.battery_out_current(I_B_to_Batt);
+    Pwr.battery_out_current(I_Bus_to_C);
     Pwr.voltage_out_sum(Tot_Voltage);
-    Pwr.current_out_sum(Tot_Current);
 
     //Binding Air Quality Sensor's signals
     Air.enable(Enable_Temp);
@@ -107,7 +126,13 @@ int sc_main(int argc, char* argv[])
     //Binding Air Quality Power signals
     Air_P.func_signal(Air_F_to_P);
     Air_P.voltage_state(V_S_to_B[0]);
-    Air_P.current_state(I_S_to_B[0]);
+    Air_P.current_state(Air_I_S_to_C);
+    //Binding Air Converter signals
+    Air_conv.current_in(Air_I_S_to_C);
+    Air_conv.voltage_in(V_S_to_B[0]);
+    Air_conv.current_out(I_S_to_B[0]);
+    //Set-Up Air Converter Efficency
+    Air_conv.set_efficency(0.5);
 
     //Binding Temperature Sensor's signals
     Temp.enable(Enable_Temp);
@@ -119,17 +144,36 @@ int sc_main(int argc, char* argv[])
     //Binding Temperature Power signals
     Temp_P.func_signal(Tmp_F_to_P);
     Temp_P.voltage_state(V_S_to_B[1]);
-    Temp_P.current_state(I_S_to_B[1]);
+    Temp_P.current_state(Tmp_I_S_to_C);
+    //Binding Temperature Converter signals
+    Temp_conv.current_in(Tmp_I_S_to_C);
+    Temp_conv.voltage_in(V_S_to_B[1]);
+    Temp_conv.current_out(I_S_to_B[1]);
+    //Set-Up Temperature Converter Efficency
+    Temp_conv.set_efficency(1.0);
+
+    //Binding Battery Converter signals
+    Batt_Conv.current_in(I_Bus_to_C);
+    Batt_Conv.voltage_in(V_Batt);
+    Batt_Conv.current_out(I_Batt);
+
+    //Binding Battery signals
+    Bat.i_batt(I_Batt);
+    Bat.v_batt(V_Batt);
+    Bat.soc(SoC_Batt);
     
     //Define Power Simulation File
     sca_util::sca_trace_file* ptf = sca_util::sca_create_tabular_trace_file("power_trace.txt");
     //Power Traces
-    sca_util::sca_trace(ptf, Tot_Voltage, "Total_Voltage");
-    sca_util::sca_trace(ptf, Tot_Current, "Total_Current");
-    sca_util::sca_trace(ptf, V_S_to_B[0], "Air_Voltage");
-    sca_util::sca_trace(ptf, Air_P.current_state, "Air_Current");
-    sca_util::sca_trace(ptf, Temp_P.voltage_state, "Temp_Voltage");
-    sca_util::sca_trace(ptf, I_S_to_B[1], "Temp_Current");
+    sca_util::sca_trace(ptf, SoC_Batt, "SoC_Batt");
+    //sca_util::sca_trace(ptf, V_Batt, "Batt_Voltage");
+    //sca_util::sca_trace(ptf, Tot_Voltage, "Total_Voltage_Post_Conv");
+    //sca_util::sca_trace(ptf, Air_V_S_to_C, "Air_Voltage_Pre_Conv");
+    sca_util::sca_trace(ptf, Air_P.current_state, "Air_Current_Pre_Conv");
+    sca_util::sca_trace(ptf, I_S_to_B[0], "Air_Current_Post_Conv");
+    //sca_util::sca_trace(ptf, Temp_P.voltage_state, "Temp_Voltage");
+    sca_util::sca_trace(ptf, Tmp_I_S_to_C, "Temp_Current_Pre_Conv");
+    sca_util::sca_trace(ptf, I_S_to_B[1], "Temp_Current_Post_Conv");
 
     //Define Functional Simulation File
     sca_util::sca_trace_file* ftf = sca_util::sca_create_tabular_trace_file("funtional_trace.txt");

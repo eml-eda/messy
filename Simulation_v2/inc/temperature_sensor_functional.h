@@ -34,5 +34,5 @@ SC_MODULE(temperature_sensor_functional)
     temperature_sensor_functional(){}
     //Register Map
     private: 
-    int Register[Temp_Reg_Dimension];
+    int Register[TEMPERATURE_REG_DIMENSION];
 };

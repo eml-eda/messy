@@ -20,5 +20,5 @@ void power_bus::processing(){
     std::cout << total_voltage << " V " << sc_time_stamp() << endl;
     std::cout << total_current << " A " << sc_time_stamp() << endl;
     voltage_out_sum.write(total_voltage);
-    current_out_sum.write(total_current);
+    battery_out_current.write(total_current);
 }

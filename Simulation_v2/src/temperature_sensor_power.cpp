@@ -15,16 +15,16 @@ void temperature_sensor_power::processing()
 {
     if(func_signal.read() == 1){
         std::cout << "Temperature in ON state READ MODE" << std::endl;
-        voltage_state.write(3.5);
-        current_state.write(0.5);
+        voltage_state.write(13.5);
+        current_state.write(50);
         //power_to_therm.write(5.0);
         return;
     }
 
     if(func_signal.read() == 2){
         std::cout << "Temperature in ON state WRITE MODE" << std::endl;
-        voltage_state.write(5.5);
-        current_state.write(1);
+        voltage_state.write(15.5);
+        current_state.write(10);
         //power_to_therm.write(5.0);
         return;
     }
