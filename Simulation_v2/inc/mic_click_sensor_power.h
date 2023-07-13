@@ -1,5 +1,6 @@
 #include <systemc.h>
 #include <systemc-ams.h>
+#include "config.h"
 
 SCA_TDF_MODULE(mic_click_sensor_power)
 {

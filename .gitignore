@@ -3,3 +3,9 @@
 *.x
 Simulation_v2/power_trace.txt
 Simulation_v2/funtional_trace.txt
+Simulation_v2/.vscode/settings.json
+Simulation_v2/.vscode/tasks.json
+Simulation_v2/.vscode/launch.json
+Simulation_v2/.vscode/c_cpp_properties.json
+*.o
+Simulation_v2/bin/run.x
