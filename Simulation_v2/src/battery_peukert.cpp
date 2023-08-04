@@ -4,18 +4,18 @@
 
 void battery_peukert::set_attributes()
 {
-  out.set_timestep(1, sc_core::SC_SEC);
+  Vbatt.set_timestep(1, sc_core::SC_SEC);
 	
-  out2.set_timestep(1, sc_core::SC_SEC);
+  Soc.set_timestep(1, sc_core::SC_SEC);
 	
-  out3.set_timestep(1, sc_core::SC_SEC);
+  Lt.set_timestep(1, sc_core::SC_SEC);
 
 
 }
 
 void battery_peukert::initialize()
 {
- //out.initialize(4.2);
+ //Vbatt.initialize(4.2);
  k = 1.1;	
  Vnom=4.2;
 }
@@ -51,9 +51,9 @@ void battery_peukert::processing()
   // Cprev=C;
   Iprev=in.read();
 
-  out.write(4.2);
+  Vbatt.write(4.2);
 
-  out2.write(soc);
+  Soc.write(soc);
 
-  out3.write(tmp_lt);
+  Lt.write(tmp_lt);
 }

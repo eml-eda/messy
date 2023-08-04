@@ -2,8 +2,10 @@
 
 SCA_TDF_MODULE (battery_peukert)
 {
-  sca_tdf::sca_in<double> in;// Ib
-  sca_tdf::sca_out<double> out,out2,out3;// Vbatt,Soc,Lt
+  sca_tdf::sca_in  <double> in;  // Ib
+  sca_tdf::sca_out <double> Vbatt; // Vbatt
+  sca_tdf::sca_out <double> Soc;// Soc
+  sca_tdf::sca_out <double> Lt;// Lt
   sc_signal<double> soc,C;
   
   double k,Vnom;

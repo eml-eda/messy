@@ -20,6 +20,9 @@
 #include "battery_converter.h"
 #include "battery_peukert.h"
 
+#include "pv_panel.h"
+#include "converter_pv.h"
+
 int sc_main(int argc, char* argv[])
 {
     Core                          Master("Master");
@@ -42,8 +45,10 @@ int sc_main(int argc, char* argv[])
     rf_power                      RF_P("Radio_Power");
     load_converter                RF_conv("Radio_Converter");
     battery                       Bat("Battery");
-    battery_converter             Batt_Conv("Battery_Converter");
+    battery_converter             Batt_conv("Battery_Converter");
     //battery_peukert               P_Batt("Peukert_Battery");
+    pv_panel                      Pv("Solar_Panel");
+    converter_pv                  Pv_conv("Solar_Converter");
     
     //Master Functional Signal
     sc_signal <int> Master_F_to_P;
@@ -132,8 +137,16 @@ int sc_main(int argc, char* argv[])
     sca_tdf::sca_signal <double> SoC_Batt;
     sca_tdf::sca_signal <double> V_Batt;
     sca_tdf::sca_signal <double> I_Batt;
+    //Peukert Battery Signals
+    sca_tdf::sca_signal <double> Lifetime;
     //Battery Converter Signals
     sca_tdf::sca_signal <double> I_Bus_to_C_Batt;
+
+    //Solar Panel Signals
+    sca_tdf::sca_signal <double> PV_I;
+    sca_tdf::sca_signal <double> PV_V;
+    //Solar Converter Signal
+    sca_tdf::sca_signal <double> PV_I_C_to_Bus;
 
     //Binding Functional Master's signals
     Master.A_Out(A_M_to_B);
@@ -182,13 +195,14 @@ int sc_main(int argc, char* argv[])
     //Binding Power Bus's Input Signal
     Pwr.CPU_V(V_M_to_B);
     Pwr.CPU_I(I_M_to_B);
+    Pwr.PV_I(PV_I_C_to_Bus);
+
     for (size_t i = 0; i < NP; i++) {
         Pwr.voltage_in_S[i](V_S_to_B[i]);
         Pwr.current_in_S[i](I_S_to_B[i]);
     }
     //Binding Power Bus's Output Signal
     Pwr.battery_out_current(I_Bus_to_C_Batt);
-    Pwr.voltage_out_sum(Tot_Voltage);
 
     //Binding Air Quality Sensor's signals
     Air.enable(Enable_Temp);
@@ -291,14 +305,27 @@ int sc_main(int argc, char* argv[])
     RF_conv.set_efficency(1.0);
 
     //Binding Battery Converter signals
-    Batt_Conv.current_in(I_Bus_to_C_Batt);
-    Batt_Conv.voltage_in(V_Batt);
-    Batt_Conv.current_out(I_Batt);
+    Batt_conv.current_in(I_Bus_to_C_Batt);
+    Batt_conv.voltage_in(V_Batt);
+    Batt_conv.current_out(I_Batt);
 
     //Binding Battery signals
     Bat.i_batt(I_Batt);
     Bat.v_batt(V_Batt);
     Bat.soc(SoC_Batt);
+    //Binding Peukert Battery signals
+//    P_Batt.in(I_Batt);
+//    P_Batt.Vbatt(V_Batt);
+//    P_Batt.Soc(SoC_Batt);
+//    P_Batt.Lt(Lifetime);
+    
+    //Binding Solar Panel signals
+    Pv.i(PV_I);
+    Pv.v(PV_V);
+    //Binding Solar Converter signals
+    Pv_conv.i_in(PV_I);
+    Pv_conv.v_in(PV_V);
+    Pv_conv.i_out(PV_I_C_to_Bus);
     
     //Define Power Simulation File
     sca_util::sca_trace_file* ptf = sca_util::sca_create_tabular_trace_file("power_trace.txt");

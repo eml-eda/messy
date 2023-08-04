@@ -35,12 +35,12 @@ EXE := $(MODULE).x
 $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@echo "Compiling source $< into object $@"
 	@mkdir -p '$(@D)'
-	$(GCC_PATH)$(CC) $(CFLAGS) $(INCDIR) $< -o $@
+	$(GCC_PATH)$(CC) $(CFLAGS) $(INCDIR) -std=c++14 $< -o $@
 
 $(TARGETDIR)/$(EXE): $(OBJECTS)
 	@echo "Building $@ from $<"
 	@mkdir -p '$(@D)'
-	$(GCC_PATH)$(CC) -g $(INCDIR) -o $@ $(OBJECTS) \
+	$(GCC_PATH)$(CC) -g $(INCDIR) -std=c++14 -o $@ $(OBJECTS) \
 	$(AMS_HOME)/lib-linux64/libsystemc-ams.a \
 	$(SYSTEMC_HOME)/lib-linux64/libsystemc.a -lpthread 2>&1 | c++filt 
 

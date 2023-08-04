@@ -57,6 +57,8 @@ void Core::Simulation(){
         wait();
         Ready.write(false);
         wait();
+
+        wait(12, sc_core::SC_SEC);
 //        std::cout << "Fifth Instruction " << sc_time_stamp() << endl;
 //        std::cout << "Read Status Register from Temperature sensor: " << Data_in.read() << endl;
 //        wait(1, sc_core::SC_SEC);
