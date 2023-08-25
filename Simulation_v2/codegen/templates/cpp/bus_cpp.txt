@@ -1,0 +1,23 @@
+#include "bus.h"
+
+
+void bus::set_attributes() {}
+
+void bus::initialize() {}
+
+void bus::processing()
+{
+    // Compute total current consumption
+    double tot_consumed = i_mcu.read() + i_rf.read()
+                          {% for sensor_id in active_sensors -%}
+                          + i_{{sensor_id}}.read()
+                          {% endfor -%}
+                          ;
+
+    double tot_scavenged = real_i_pv.read();
+
+    double tot_requested = tot_consumed - tot_scavenged;
+
+    i_tot.write(tot_requested); // tot_requested >= 0 ? pow_from_battery : pow_to_battery
+}
+

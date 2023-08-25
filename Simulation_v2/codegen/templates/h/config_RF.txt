@@ -1,0 +1,8 @@
+
+// params for RF
+{% for state in states -%}
+#define RF_{{state.name}}_I_ON {{state.current}}
+#define RF_{{state.name}}_T_ON {{state.time_on}}
+{% endfor -%}
+#define RF_I_IDLE {{rf_i_idle}}
+

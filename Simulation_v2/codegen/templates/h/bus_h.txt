@@ -1,0 +1,28 @@
+#include <systemc-ams.h>
+
+#include "config.h"
+
+
+SCA_TDF_MODULE(bus)
+{
+    sca_tdf::sca_in<double> i_mcu; // Requested current from MCU
+    sca_tdf::sca_in<double> i_rf; // Requested current from RF module
+    {% for sensor_id in active_sensors -%}
+    sca_tdf::sca_in<double> i_{{sensor_id}}; // Requested current from {{sensor_id}}
+    {% endfor -%}
+    sca_tdf::sca_in<double> real_i_pv; // Provided current from pv panel after conversion
+
+    sca_tdf::sca_out<double> i_tot;
+
+    SCA_CTOR(bus): i_tot("i_tot"),
+                   i_mcu("i_mcu"),
+                   i_rf("i_rf"),
+                   {% for sensor_id in active_sensors -%}
+                   i_{{sensor_id}}("i_{{sensor_id}}"),
+                   {% endfor -%}
+                   real_i_pv("real_i_pv") {};
+
+    void set_attributes();
+    void initialize();
+    void processing();
+};

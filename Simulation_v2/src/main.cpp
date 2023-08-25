@@ -314,10 +314,9 @@ int sc_main(int argc, char* argv[])
     Bat.v_batt(V_Batt);
     Bat.soc(SoC_Batt);
     //Binding Peukert Battery signals
-//    P_Batt.in(I_Batt);
-//    P_Batt.Vbatt(V_Batt);
-//    P_Batt.Soc(SoC_Batt);
-//    P_Batt.Lt(Lifetime);
+//    P_Batt.i_batt(I_Batt);
+//    P_Batt.v_batt(V_Batt);
+//    P_Batt.soc(SoC_Batt);
     
     //Binding Solar Panel signals
     Pv.i(PV_I);

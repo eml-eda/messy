@@ -1,0 +1,26 @@
+#include "mcu.h"
+
+
+void mcu::set_attributes()
+{
+    i.set_timestep(SIM_STEP, sc_core::SC_SEC);
+}
+
+void mcu::initialize() {}
+
+void mcu::processing()
+{
+    {% for state in states -%}
+        if(cnt >= MCU_T_ACT && cnt < MCU_T_ACT + MCU_{{state.name.upper()}}_T_ON)
+        {
+            i.write(MCU_{{state.name.upper()}}_I_ON);
+            cnt = (cnt + 1) % PERIOD;
+        }
+        else
+        {
+            i.write(MCU_I_IDLE);
+            cnt = (cnt + 1) % PERIOD;
+        }
+    {%- endfor %}
+}
+

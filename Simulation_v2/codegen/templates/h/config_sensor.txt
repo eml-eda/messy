@@ -1,0 +1,6 @@
+
+// params for sensor {{sensor_name}}
+#define {{sensor_name.upper()}}_I_ON {{current_on}}
+#define {{sensor_name.upper()}}_T_ON {{time_on}}
+#define {{sensor_name.upper()}}_I_IDLE {{current_idle}}
+#define {{sensor_name.upper()}}_T_ACT {{activation_time}}

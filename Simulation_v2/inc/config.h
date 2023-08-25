@@ -1,3 +1,6 @@
+//General Parameters
+#define NS 6
+#define NP 5
 // params for CPU
 #define CPU_I_IDLE 0.002
 #define CPU_T_ACT 31
@@ -6,8 +9,10 @@
 // params for sensor air_quality_sensor
 #define AIR_BASE_ADDRESS 100
 #define AIR_REG_DIMENSION 50
-#define AIR_QUALITY_SENSOR_I_ON 48.2
-#define AIR_QUALITY_SENSOR_T_ON 30
+#define AIR_QUALITY_SENSOR_I_ON_READ 48.2
+#define AIR_QUALITY_SENSOR_T_ON_READ 30
+#define AIR_QUALITY_SENSOR_I_ON_WRITE 49.2
+#define AIR_QUALITY_SENSOR_T_ON_WRITE 30
 #define AIR_QUALITY_SENSOR_I_IDLE 0.002
 #define AIR_QUALITY_SENSOR_T_ACT 0
 // params for sensor temperature_sensor

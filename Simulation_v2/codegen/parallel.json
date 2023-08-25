@@ -1,0 +1,58 @@
+{
+    "sim_step" : 1,
+    "sim_len": 7736400,
+    "vref_bus" : 3.3,
+    "soc_init" : 1.0,
+    "selfdisch_factor" : 0.0,
+    "battery" : "peukert",
+    "sensors" : [
+        {
+            "power"  : true,
+            "name"   : "air_quality_sensor",
+            "reg"    : "AIR_REG_DIMENSION",
+            "states" : [
+                {
+                    "name"    : "ON_READ",
+                    "current" : "49.2",
+                    "time_on" : "30",
+                    "number"  : "1"
+                },
+                {
+                    "name"    : "ON_WRITE",
+                    "current" : "48.2",
+                    "time_on" : "30",
+                    "number"  : "2"
+                },
+                {
+                    "name"    : "IDLE",
+                    "current" : "0.002",
+                    "number"  : "3"
+                }
+            ]
+        },
+        {
+            "power"  : true,
+            "name"   : "temperature_sensor",
+            "reg"    : "TEMPERATURE_DIMENSION",
+            "states" : [
+                {
+                    "name"    : "ON_WRITE",
+                    "current" : "0.35",
+                    "time_on" : "6",
+                    "number"  : "1"
+                },
+                {
+                    "name"    : "ON_READ",
+                    "current" : "0.3",
+                    "time_on" : "6",
+                    "number"  : "2"
+                },
+                {
+                    "name"    : "IDLE",
+                    "current" : "0.002",
+                    "number"  : "3"
+                }
+            ]
+        }
+    ]
+}

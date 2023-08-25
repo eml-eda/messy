@@ -1,0 +1,36 @@
+#include "{{sensor['name']}}_power.h"
+
+void {{sensor['name']}}_power::set_attributes()
+{
+    func_signal.set_rate(1);
+    func_signal.set_timestep(1, sc_core::SC_SEC);
+    //power_to_therm.set_timestep(0.5, sc_core::SC_SEC);
+    //power_to_therm.set_rate(1);
+    //power_to_therm.set_delay(1);
+}
+
+void {{sensor['name']}}_power::initialize() {}
+
+void {{sensor['name']}}_power::processing()
+{
+    {% for state in sensor['states'] -%}
+    if(func_signal.read() == {{state['number']}} ){
+        //std::cout << "{{sensor['name']}} in {{state['name']}} state!" << std::endl;
+        voltage_state.write(VREF_BUS);
+        current_state.write({{sensor['name'].upper()}}_I_{{state['name']}});
+        //power_to_therm.write(5.0);
+        return;
+    }
+
+    {% endfor -%}
+    if(func_signal.read() == 0){
+        //std::cout << "{{sensor['name']}} in OFF state" << std::endl;
+        voltage_state.write(0.0);
+        current_state.write(0.0);
+        //power_to_therm.write(0.0);
+        return;
+    }
+
+    std::cout << "{{sensor['name']}} in an Unknown state!" << std::endl;
+    //power_to_therm.write(0.0);       
+}

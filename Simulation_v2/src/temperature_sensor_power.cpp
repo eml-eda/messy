@@ -23,7 +23,7 @@ void temperature_sensor_power::processing()
 
     if(func_signal.read() == 2){
         //std::cout << "Temperature in ON state WRITE MODE" << std::endl;
-        voltage_state.write(15.5);
+        voltage_state.write(VREF_BUS);
         current_state.write(10);
         //power_to_therm.write(5.0);
         return;

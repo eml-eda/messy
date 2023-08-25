@@ -1,0 +1,13 @@
+
+
+// params for MCU
+#define MCU_I_IDLE {{mcu_i_idle}}
+#define MCU_T_ACT {{mcu_act_time}}
+{% for state in states -%}
+#define MCU_{{state.name.upper()}}_I_ON {{state.current}}
+#define MCU_{{state.name.upper()}}_T_ON {{state.time_on}}
+{% endfor %}
+// params from MCU for RF
+{% for state, act_time in act_times.items() -%}
+#define RF_T_ACT_{{state.upper()}} {{act_time}}
+{% endfor %}
