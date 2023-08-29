@@ -248,3 +248,74 @@ def battery_circuit_cpp_gen(template_dir, output_dir):
         template = Template(temp.read())
         with open(output_dir / 'battery.cpp', 'w') as f:
             f.write(template.render())
+
+#Battery Converter Methods
+
+def battery_converter_h_gen(template_dir, output_dir):
+    with open(template_dir / 'h' / 'battery_converter_h.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'battery_converter.h', 'w') as f:
+            f.write(template.render())
+
+    with open(template_dir / 'h' / 'config_converter_battery_h.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'config_converter_battery.h', 'w') as f:
+            f.write(template.render())
+
+def battery_converter_cpp_gen(template_dir, output_dir):
+    with open(template_dir / 'cpp' / 'battery_converter_cpp.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'battery_converter.cpp', 'w') as f:
+            f.write(template.render())
+
+#PV Panel Methods
+
+def pv_panel_h_gen(template_dir, output_dir):
+    with open(template_dir / 'h' / 'pv_panel_h.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'pv_panel.h', 'w') as f:
+            f.write(template.render())
+
+    with open(template_dir / 'h' / 'config_pv_h.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'config_pv.h', 'w') as f:
+            f.write(template.render())
+
+def pv_panel_cpp_gen(template_dir, output_dir):
+    with open(template_dir / 'cpp' / 'pv_panel_cpp.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'pv_panel.cpp', 'w') as f:
+            f.write(template.render())
+
+#PV Panel Converter Methods
+
+def converter_pv_h_gen(template_dir, output_dir):
+    with open(template_dir / 'h' / 'converter_pv_h.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'converter_pv.h', 'w') as f:
+            f.write(template.render())
+
+    with open(template_dir / 'h' / 'config_converter_pv_h.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'config_converter_pv.h', 'w') as f:
+            f.write(template.render())
+
+def converter_pv_cpp_gen(template_dir, output_dir):
+    with open(template_dir / 'cpp' / 'converter_pv_cpp.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'converter_pv.cpp', 'w') as f:
+            f.write(template.render())
+
+#LUT Methods
+
+def lut_h_gen(template_dir, output_dir):
+    with open(template_dir / 'h' / 'lut_h.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'lut.h', 'w') as f:
+            f.write(template.render())
+
+def lut_cpp_gen(template_dir, output_dir):
+    with open(template_dir / 'cpp' / 'lut_cpp.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'lut.cpp', 'w') as f:
+            f.write(template.render())

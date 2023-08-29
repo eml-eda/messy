@@ -17,7 +17,7 @@ def main(input_file, template_dir, output_dir):
     src_dir.mkdir(parents=True, exist_ok=True)
 
     #Battery selection statement 
-    if settings["battery"] == "peukert" :
+    if settings["battery"] == "peukert":
         codegen_func.battery_peukert_h_gen(template_dir, header_dir)
         codegen_func.battery_peukert_cpp_gen(template_dir,src_dir)
     elif settings["battery"] == "circuit":
@@ -25,22 +25,21 @@ def main(input_file, template_dir, output_dir):
         codegen_func.battery_circuit_cpp_gen(template_dir,src_dir)
     
     #Battery converter statement 
+    codegen_func.battery_converter_h_gen(template_dir, header_dir)
+    codegen_func.battery_converter_cpp_gen(template_dir, src_dir)
 
-    # Generate Load_converter files
-    codegen_func.load_converter_h_gen(template_dir, header_dir)
-    codegen_func.load_converter_cpp_gen(template_dir, src_dir)
-
-#    # Generate `X_sensor.h` file
-#    codegen_func.sensor_h_gen(settings, template_dir, header_dir)
-#    # Generate `X_sensor.cpp` file
-#    codegen_func.sensor_cpp_gen(settings, template_dir, src_dir)
-    
+    #Sensor statement
     #for sensor in settings['sensors']:
         #codegen_func.sensor_func_h_gen(sensor, template_dir, header_dir)
         #codegen_func.sensor_func_cpp_gen(sensor, template_dir, src_dir)
         #if sensor['power'] == True:
             #codegen_func.sensor_power_h_gen(sensor, template_dir, header_dir)
             #codegen_func.sensor_power_cpp_gen(sensor, template_dir, src_dir)
+
+    # Generate Load_converter files
+    codegen_func.load_converter_h_gen(template_dir, header_dir)
+    codegen_func.load_converter_cpp_gen(template_dir, src_dir)
+
     print ("OK!")
 
 
