@@ -31,7 +31,6 @@
 #define MIC_CLICK_SENSOR_T_ON 12
 #define MIC_CLICK_SENSOR_I_IDLE 0.002
 #define MIC_CLICK_SENSOR_T_ACT 0
-
 // params for RF
 #define RF_BASE_ADDRESS 500
 #define RF_REG_DIMENSION 10
