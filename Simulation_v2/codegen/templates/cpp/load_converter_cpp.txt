@@ -24,7 +24,7 @@ void load_converter::processing(){
     if (v_tmp == 0) {
         i_out = 0.0;
     } else {
-        i_out = ( (v_tmp*i_tmp)*efficency_factor ) / v_tmp;
+        i_out = ( (v_tmp*i_tmp)*efficency_factor ) / VREF_BUS;
     }
 
     current_out.write(i_out);

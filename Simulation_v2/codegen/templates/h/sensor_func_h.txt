@@ -36,5 +36,5 @@ SC_MODULE({{sensor['name']}})
     {{sensor['name']}}(){}
     //Register Map
     private: 
-    int Register[{{sensor['reg']}}];
+    int Register[{{sensor['reg_name']}}];
 };

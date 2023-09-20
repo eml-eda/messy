@@ -14,9 +14,9 @@ void {{sensor['name']}}_power::initialize() {}
 void {{sensor['name']}}_power::processing()
 {
     {% for state in sensor['states'] -%}
-    if(func_signal.read() == {{state['number']}} ){
+    if(func_signal.read() == {{loop.index}} ){
         //std::cout << "{{sensor['name']}} in {{state['name']}} state!" << std::endl;
-        voltage_state.write(VREF_BUS);
+        voltage_state.write({{sensor['v_name']}});
         current_state.write({{sensor['name'].upper()}}_I_{{state['name']}});
         //power_to_therm.write(5.0);
         return;

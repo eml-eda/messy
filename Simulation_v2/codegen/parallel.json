@@ -9,48 +9,44 @@
         {
             "power"  : true,
             "name"   : "air_quality_sensor",
-            "reg"    : "AIR_REG_DIMENSION",
+            "voltage": 3.3,
+            "reg" : 25,
             "states" : [
                 {
                     "name"    : "ON_READ",
                     "current" : "49.2",
-                    "time_on" : "30",
-                    "number"  : "1"
+                    "time_on" : "30"
                 },
                 {
                     "name"    : "ON_WRITE",
                     "current" : "48.2",
-                    "time_on" : "30",
-                    "number"  : "2"
+                    "time_on" : "30"
                 },
                 {
                     "name"    : "IDLE",
-                    "current" : "0.002",
-                    "number"  : "3"
+                    "current" : "0.002"
                 }
             ]
         },
         {
             "power"  : true,
             "name"   : "temperature_sensor",
-            "reg"    : "TEMPERATURE_DIMENSION",
+            "voltage": 3.3,
+            "reg" : 20,
             "states" : [
                 {
                     "name"    : "ON_WRITE",
                     "current" : "0.35",
-                    "time_on" : "6",
-                    "number"  : "1"
+                    "time_on" : "6"
                 },
                 {
                     "name"    : "ON_READ",
                     "current" : "0.3",
-                    "time_on" : "6",
-                    "number"  : "2"
+                    "time_on" : "6"
                 },
                 {
                     "name"    : "IDLE",
-                    "current" : "0.002",
-                    "number"  : "3"
+                    "current" : "0.002"
                 }
             ]
         }

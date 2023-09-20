@@ -1,6 +1,14 @@
-
-// params for sensor {{sensor_name}}
-#define {{sensor_name.upper()}}_I_ON {{current_on}}
-#define {{sensor_name.upper()}}_T_ON {{time_on}}
-#define {{sensor_name.upper()}}_I_IDLE {{current_idle}}
-#define {{sensor_name.upper()}}_T_ACT {{activation_time}}
+{% for sensor in sensors -%}
+//Parameters for sensor {{sensor['name']}}
+#define {{sensor['name'].upper()}}_BASE_ADDRESS 
+#define {{sensor['reg_name']}} {{sensor['reg']}}
+#define {{sensor['v_name']}} {{sensor['voltage']}}
+{% for state in sensor['states'] -%}
+{% if state['name'] != 'IDLE' -%}
+#define {{sensor['name'].upper()}}_I_{{state['name']}} {{state['current']}}
+#define {{sensor['name'].upper()}}_T_{{state['name']}} {{state['time_on']}}
+{% else -%}
+#define {{sensor['name'].upper()}}_I_{{state['name']}} {{state['current']}}
+{% endif -%}
+{% endfor -%}
+{% endfor -%}
