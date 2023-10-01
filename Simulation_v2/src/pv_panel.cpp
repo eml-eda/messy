@@ -3,8 +3,8 @@
 
 void pv_panel::set_attributes()
 {
-    i.set_timestep(1, sc_core::SC_SEC);
-    v.set_timestep(1, sc_core::SC_SEC);
+    i.set_timestep(1, SIM_RESOLUTION);
+    v.set_timestep(1, SIM_RESOLUTION);
 }
 
 void pv_panel::initialize()

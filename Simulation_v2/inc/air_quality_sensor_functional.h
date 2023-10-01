@@ -1,20 +1,8 @@
 #include <config.h>
 #include <systemc.h>
-#include <gv/gvsoc.hpp>
-#include <cstring>
-#include <string.h>
 
-class air_quality_sensor_functional : public gv::Io_user, public sc_module
+SC_MODULE(air_quality_sensor_functional)
 {
-    public:
-
-    // This gets called when an access from gvsoc side is reaching us
-    void access(gv::Io_request *req);
-    // This gets called when one of our access gets granted
-    void grant(gv::Io_request *req);
-    // This gets called when one of our access gets its response
-    void reply(gv::Io_request *req);
-
     //Input Port
     sc_core::sc_in <bool> enable;
     sc_core::sc_in <int>  address;
@@ -49,5 +37,4 @@ class air_quality_sensor_functional : public gv::Io_user, public sc_module
     //Register Map
     private: 
     int Register[AIR_REG_DIMENSION];
-    gv::Io_binding *axi;
 };

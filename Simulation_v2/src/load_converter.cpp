@@ -3,9 +3,9 @@
 void load_converter::set_attributes(){
 
     current_in.set_rate(1);
-    current_in.set_timestep(1, sc_core::SC_SEC);
+    current_in.set_timestep(1, SIM_RESOLUTION);
     voltage_in.set_rate(1);
-    voltage_in.set_timestep(1, sc_core::SC_SEC);
+    voltage_in.set_timestep(1, SIM_RESOLUTION);
 }
 
 void load_converter::initialize() {}

@@ -1,7 +1,7 @@
 #include "methane_sensor_functional.h"
 
 void methane_sensor_functional::sensor_logic(){
-    Register[1] = 1;
+    Register[1] = 55;
     Register[3] = 20;
     Register[6] = 15;
     while (true)
@@ -15,7 +15,7 @@ void methane_sensor_functional::sensor_logic(){
                     //data_out.write(rnd);
                     data_out.write(Register[address.read()]);
                     power_signal.write(1);
-                    wait(METHANE_SENSOR_T_ON,sc_core::SC_SEC);
+                    wait(METHANE_SENSOR_T_ON,SIM_RESOLUTION);
                     power_signal.write(3);
                     go.write(true);
                 } else {

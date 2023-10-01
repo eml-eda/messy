@@ -4,11 +4,11 @@
 
 void battery_peukert::set_attributes()
 {
-  Vbatt.set_timestep(1, sc_core::SC_SEC);
+  Vbatt.set_timestep(1, SIM_RESOLUTION);
 	
-  Soc.set_timestep(1, sc_core::SC_SEC);
+  Soc.set_timestep(1, SIM_RESOLUTION);
 	
-  Lt.set_timestep(1, sc_core::SC_SEC);
+  Lt.set_timestep(1, SIM_RESOLUTION);
 
 
 }

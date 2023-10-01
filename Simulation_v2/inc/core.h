@@ -43,4 +43,5 @@ class Core : public gv::Io_user, public sc_module
 
     private:
     gv::Io_binding *axi;
+    gv::Gvsoc *gvsoc;
 };

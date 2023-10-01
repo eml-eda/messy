@@ -15,7 +15,7 @@ void mic_click_sensor_functional::sensor_logic(){
                     //data_out.write(rnd);
                     data_out.write(Register[address.read()]);
                     power_signal.write(1);
-                    wait(MIC_CLICK_SENSOR_T_ON,sc_core::SC_SEC);
+                    wait(MIC_CLICK_SENSOR_T_ON,SIM_RESOLUTION);
                     power_signal.write(3);
                     go.write(true);
                 } else {

@@ -1,3 +1,5 @@
+#include <systemc.h>
+
 // params for CPU
 #define CPU_I_IDLE 0.002
 #define CPU_T_ACT 31
@@ -40,3 +42,4 @@
 
 #define VREF_BUS 3.3
 #define SIM_LEN 7736400
+#define SIM_RESOLUTION sc_core::SC_PS

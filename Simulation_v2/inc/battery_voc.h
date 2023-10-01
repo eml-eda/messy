@@ -1,4 +1,5 @@
 #include <systemc-ams.h>
+#include "config.h"
 
 SCA_TDF_MODULE(battery_voc)
 {

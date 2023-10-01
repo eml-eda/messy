@@ -1,7 +1,7 @@
 #include "temperature_sensor_functional.h"
 
 void temperature_sensor_functional::sensor_logic(){
-    Register[1] = 1;
+    Register[1] = 13;
     Register[3] = 15;
     Register[6] = 75;
     while (true)
@@ -15,7 +15,7 @@ void temperature_sensor_functional::sensor_logic(){
                     //data_out.write(rnd);
                     data_out.write(Register[address.read()]);
                     power_signal.write(1);
-                    wait(TEMPERATURE_SENSOR_T_ON,sc_core::SC_SEC);
+                    wait(TEMPERATURE_SENSOR_T_ON,SIM_RESOLUTION);
                     power_signal.write(3);
                     go.write(true);
                 } else {
@@ -23,6 +23,8 @@ void temperature_sensor_functional::sensor_logic(){
                     Register[address.read()] = data_in.read();
                     data_out.write(data_in.read());
                     power_signal.write(2);
+                    wait(TEMPERATURE_SENSOR_T_ON,SIM_RESOLUTION);
+                    power_signal.write(3);
                     go.write(true);
                 }
             } else {
