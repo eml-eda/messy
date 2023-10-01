@@ -24,23 +24,33 @@ void Core::run()
     //gvsoc->step(5000000000);
     // Wait for simulation termination and exit code returned by simulated test
 
+    // Run for 10ms to let the chip boot as it is not accessible before it is powered-up
+    //    gvsoc->step(10000000000);
+
     while(1){
+
+        double old_time = double(sc_time_stamp().to_double());
+
+        int64_t next_timestamp = gvsoc->step_until(old_time);
 
         double time = double(sc_time_stamp().to_double());
 
-        //std::cout << time << std::endl;
-        
-        int64_t next_timestamp = gvsoc->step_until(time);
-
-        //std::cout << next_timestamp << std::endl;
-
-        if(next_timestamp == -1){
+        if (next_timestamp == -1){
             break;
         } else {
-            wait(next_timestamp - time, sc_core::SC_PS);
+            if (old_time != time){
+                next_timestamp = gvsoc->step_until(time);
+                printf("%d, %lx, %lx \n", *(req_global->data), req_global->addr, req_global->size);
+                this->axi->reply(req_global);
+            } else {
+                //Update CPU Consumption
+                wait(next_timestamp - time, sc_core::SC_PS);
+                //Restore CPU State
+            }
         }
     }
 
+    // Wait for simulation termination and exit code returned by simulated test
     int retval = gvsoc->join();
     std::cout << sc_time_stamp().to_double() << std::endl;
     std::cout << gvsoc->stop() << std::endl;
@@ -54,10 +64,10 @@ void Core::run()
 void Core::access(gv::Io_request *req)
 {
     //Here connect the GvSoc signals with SystemC simulator signals   
- 
+    std::cout << sc_time_stamp().to_double() << std::endl;
     if (req->type == gv::Io_request_read)
     {
-        printf("Received request (is_read: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_read, req->addr, req->size , *(req->data));
+        printf("Received request (is_read: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
         D_Out.write(1);
         F_Out.write(true);
         Ready.write(true);
@@ -123,13 +133,14 @@ void Core::access(gv::Io_request *req)
         wait();
         
     }
-
     *((uint32_t*)req->data) = Data_in.read();
+
+    req_global = req;
+
+    printf("%d, %lx, %lx \n", *(req_global->data), req_global->addr, req_global->size);
     
-    printf("%d , %lx , %lx \n", *(req->data), req->addr, req->size);
-    
-    this->axi->reply(req);
-    
+    std::cout << sc_time_stamp().to_double() << std::endl;
+    //this->axi->reply(req);
 }
 
 void Core::grant(gv::Io_request *req)

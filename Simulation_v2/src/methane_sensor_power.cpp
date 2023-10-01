@@ -24,7 +24,7 @@ void methane_sensor_power::processing()
     if(func_signal.read() == 2){
         //std::cout << "Methane in ON state WRITE MODE" << std::endl;
         voltage_state.write(VREF_BUS);
-        current_state.write(10);
+        current_state.write(19);
         //power_to_therm.write(5.0);
         return;
     }

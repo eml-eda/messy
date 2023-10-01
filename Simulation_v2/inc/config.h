@@ -42,4 +42,4 @@
 
 #define VREF_BUS 3.3
 #define SIM_LEN 7736400
-#define SIM_RESOLUTION sc_core::SC_PS
+#define SIM_RESOLUTION sc_core::SC_MS

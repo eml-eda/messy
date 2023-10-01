@@ -18,7 +18,7 @@ void power_bus::processing(){
     tmp_i = CPU_I.read();
     tmp_pv = PV_I.read();
 
-    total_current = total_current + tmp_i - tmp_pv;
+    total_current = total_current + tmp_i; //- tmp_pv;
 
     //std::cout << total_current << " A " << sc_time_stamp() << endl;
     battery_out_current.write(total_current);
