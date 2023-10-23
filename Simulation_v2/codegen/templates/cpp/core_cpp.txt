@@ -65,13 +65,17 @@ void Core::access(gv::Io_request *req)
 {
     //Here connect the GvSoc signals with SystemC simulator signals   
     std::cout << sc_time_stamp().to_double() << std::endl;
+    int tmpaddr;
     if (req->type == gv::Io_request_read)
     {
         printf("Received request (is_read: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
         D_Out.write(1);
         F_Out.write(true);
         Ready.write(true);
-        A_Out.write(req->addr);
+        tmpaddr = req->addr;
+        //std::cout << tmpaddr << std::endl;
+
+        A_Out.write(tmpaddr);
 
         wait();
         Ready.write(false);
@@ -84,7 +88,10 @@ void Core::access(gv::Io_request *req)
         D_Out.write(*(req->data));
         F_Out.write(false);
         Ready.write(true);
-        A_Out.write(req->addr);
+        tmpaddr = req->addr;
+        //std::cout << tmpaddr << std::endl;
+
+        A_Out.write(tmpaddr);
 
         wait();
         Ready.write(false);
