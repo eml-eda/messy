@@ -40,11 +40,13 @@ void Core::run()
         } else {
             if (old_time != time){
                 next_timestamp = gvsoc->step_until(time);
-                printf("%d, %lx, %lx \n", *(req_global->data), req_global->addr, req_global->size);
+                //printf("%d, %lx, %lx \n", *(req_global->data), req_global->addr, req_global->size);
                 this->axi->reply(req_global);
             } else {
                 //Update CPU Consumption
+                power_signal.write(1);
                 wait(next_timestamp - time, sc_core::SC_PS);
+                power_signal.write(3);
                 //Restore CPU State
             }
         }
@@ -64,10 +66,10 @@ void Core::run()
 void Core::access(gv::Io_request *req)
 {
     //Here connect the GvSoc signals with SystemC simulator signals   
-    std::cout << sc_time_stamp().to_double() << std::endl;
+    //std::cout << sc_time_stamp().to_double() << std::endl;
     if (req->type == gv::Io_request_read)
     {
-        printf("Received request (is_read: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
+        //printf("Received request (is_read: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
         D_Out.write(1);
         F_Out.write(true);
         Ready.write(true);
@@ -101,7 +103,7 @@ void Core::access(gv::Io_request *req)
     }
     else
     {
-        printf("Received request (is_write: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
+        //printf("Received request (is_write: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
         D_Out.write(*(req->data));
         F_Out.write(false);
         Ready.write(true);
@@ -137,9 +139,9 @@ void Core::access(gv::Io_request *req)
 
     req_global = req;
 
-    printf("%d, %lx, %lx \n", *(req_global->data), req_global->addr, req_global->size);
+    //printf("%d, %lx, %lx \n", *(req_global->data), req_global->addr, req_global->size);
     
-    std::cout << sc_time_stamp().to_double() << std::endl;
+    //std::cout << sc_time_stamp().to_double() << std::endl;
     //this->axi->reply(req);
 }
 

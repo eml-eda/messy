@@ -23,6 +23,8 @@ void mic_click_sensor_functional::sensor_logic(){
                     Register[address.read()] = data_in.read();
                     data_out.write(data_in.read());
                     power_signal.write(2);
+                    wait(MIC_CLICK_SENSOR_T_ON,SIM_RESOLUTION);
+                    power_signal.write(3);
                     go.write(true);
                 }
             } else {
