@@ -23,6 +23,12 @@ def config_gen(settings, template_dir, output_dir):
         f.write(f'#define SELFDISCH_FACTOR {settings["selfdisch_factor"]}\n')
         f.write(f'#define NS {nsensor + 1}\n')
         f.write(f'#define NP {nsensor}\n')
+        #Temporary Lines #
+        f.write(f'// params for CPU\n')
+        f.write(f'#define CPU_I_IDLE 0.002\n')
+        f.write(f'#define CPU_T_ON 6\n')
+        f.write(f'#define CPU_ON_I_ON 13\n')
+        # End temporary Lines #
 
     # define sensors' params
     with open(template_dir / 'h' / 'config_sensor.txt') as temp:
@@ -30,15 +36,40 @@ def config_gen(settings, template_dir, output_dir):
         with open(output_dir / 'config.h', 'a') as f:
             f.write(template.render(sensors = settings["sensors"]))
 
+# Main Methods
+
 def main_cpp_gen(settings, template_dir, output_dir):
     with open(template_dir / 'cpp' / 'main_cpp.txt') as temp:
         template = Template(temp.read())
         with open(output_dir / 'main.cpp', 'w') as f:
-            active_sensors = settings['sensors']
-            sensor_names = []
-            for sensor in active_sensors:
-                sensor_names.append(sensor['name'])
-            f.write(template.render(active_sensors=sensor_names))
+            f.write(template.render(settings=settings))
+
+# Core Mehods
+
+def core_h_gen(template_dir, output_dir):
+    with open(template_dir / 'h' / 'core_h.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'core.h', 'w') as f:
+            f.write(template.render())
+
+def core_cpp_gen(settings, template_dir, output_dir):
+    with open(template_dir / 'cpp' / 'core_cpp.txt') as temp:
+        template = Template(temp.read())
+        tmp_data = dict(settings)
+        with open(output_dir / 'core.cpp', 'w') as f:
+            f.write(template.render(data=tmp_data))
+
+def core_power_h_gen(template_dir, output_dir):
+    with open(template_dir / 'h' / 'core_power_h.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'core_power.h', 'w') as f:
+            f.write(template.render())
+
+def core_power_cpp_gen(template_dir, output_dir):
+    with open(template_dir / 'cpp' / 'core_power_cpp.txt') as temp:
+        template = Template(temp.read())
+        with open(output_dir / 'core_power.cpp', 'w') as f:
+            f.write(template.render())
 
 # Functional System Bus Methods
 

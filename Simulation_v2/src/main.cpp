@@ -336,13 +336,11 @@ int sc_main(int argc, char* argv[])
     //sca_util::sca_trace(ptf, Air_P.current_state, "Air_Current_Pre_Conv");
     sca_util::sca_trace(ptf, I_Bus_to_C_Batt, "I_Tot_Bus");
     sca_util::sca_trace(ptf, I_Batt, "I_to_Batt");
+    sca_util::sca_trace(ptf, I_M_to_B, "CPU");
     sca_util::sca_trace(ptf, I_S_to_B[0], "Air");
-    //sca_util::sca_trace(ptf, Temp_P.voltage_state, "Temp_Voltage");
-    //sca_util::sca_trace(ptf, Tmp_I_S_to_C, "Temp_Current_Pre_Conv");
     sca_util::sca_trace(ptf, I_S_to_B[1], "Temp");
     sca_util::sca_trace(ptf, I_S_to_B[2], "Meth");
     sca_util::sca_trace(ptf, I_S_to_B[3], "Mic");
-    sca_util::sca_trace(ptf, I_M_to_B, "CPU");
     sca_util::sca_trace(ptf, I_S_to_B[4], "RF");
 
     //Define Functional Simulation File

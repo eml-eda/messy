@@ -1,6 +1,6 @@
 {% for sensor in sensors -%}
 //Parameters for sensor {{sensor['name']}}
-#define {{sensor['name'].upper()}}_BASE_ADDRESS 
+#define {{sensor['name'].upper()}}_BASE_ADDRESS {{sensor['base']}}
 #define {{sensor['reg_name']}} {{sensor['reg']}}
 #define {{sensor['v_name']}} {{sensor['voltage']}}
 {% for state in sensor['states'] -%}

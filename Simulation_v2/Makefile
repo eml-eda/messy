@@ -28,7 +28,8 @@ INCDIR = -I./inc -I./src \
 		 -I$(AMS_HOME)/include \
 		 -I$(SYSTEMC_HOME)/include \
 		 -I$(SYSTEMC_HOME)/src/sysc/libs \
-		 -I$(SYSTEMC_HOME)/src/sysc/kernel
+		 -I$(SYSTEMC_HOME)/src/sysc/kernel \
+		 -I$(GAP_HOME)/gvsoc/gvsoc/engine/include
 
 EXE := $(MODULE).x
 
@@ -40,9 +41,9 @@ $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 $(TARGETDIR)/$(EXE): $(OBJECTS)
 	@echo "Building $@ from $<"
 	@mkdir -p '$(@D)'
-	$(GCC_PATH)$(CC) -g $(INCDIR) -std=c++14 -o $@ $(OBJECTS) \
+	$(GCC_PATH)$(CC) -g $(INCDIR) -std=c++14 -o $@ $(OBJECTS) -L$(GAP_HOME)/install/workstation/lib -lpulpvp \
 	$(AMS_HOME)/lib-linux64/libsystemc-ams.a \
-	$(SYSTEMC_HOME)/lib-linux64/libsystemc.a -lpthread 2>&1 | c++filt 
+	$(SYSTEMC_HOME)/lib-linux64/libsystemc.a -lpthread 2>&1 | c++filt \
 
 clean:
 	rm -rf $(BUILDDIR)
