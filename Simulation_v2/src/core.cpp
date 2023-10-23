@@ -67,34 +67,17 @@ void Core::access(gv::Io_request *req)
 {
     //Here connect the GvSoc signals with SystemC simulator signals   
     //std::cout << sc_time_stamp().to_double() << std::endl;
+    int tmpaddr;
     if (req->type == gv::Io_request_read)
     {
         //printf("Received request (is_read: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
         D_Out.write(1);
         F_Out.write(true);
         Ready.write(true);
-        switch (req->addr)
-        {
-            case 0x00:
-            A_Out.write(101);
-            break;
+        tmpaddr = req->addr;
+        //std::cout << tmpaddr << std::endl;
 
-            case 0x04:
-            A_Out.write(201);
-            break;
-
-            case 0x08:
-            A_Out.write(301);
-            break;
-
-            case 0x0C:
-            A_Out.write(401);
-            break;
-
-            case 0x10:
-            A_Out.write(501);
-            break;
-        }
+        A_Out.write(tmpaddr);
 
         wait();
         Ready.write(false);
@@ -107,28 +90,10 @@ void Core::access(gv::Io_request *req)
         D_Out.write(*(req->data));
         F_Out.write(false);
         Ready.write(true);
-        switch (req->addr)
-        {
-            case 0x00:
-            A_Out.write(101);
-            break;
+        tmpaddr = req->addr;
+        //std::cout << tmpaddr << std::endl;
 
-            case 0x04:
-            A_Out.write(201);
-            break;
-
-            case 0x08:
-            A_Out.write(301);
-            break;
-
-            case 0x0C:
-            A_Out.write(401);
-            break;
-
-            case 0x10:
-            A_Out.write(501);
-            break;
-        }
+        A_Out.write(tmpaddr);
 
         wait();
         Ready.write(false);
