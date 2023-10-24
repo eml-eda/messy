@@ -10,3 +10,6 @@ Simulation_v2/.vscode/c_cpp_properties.json
 *.o
 Simulation_v2/bin/run.x
 Simulation_v2/funtional_trace_good.txt
+
+deps/gap_sdk_private_correct.zip
+.vscode
