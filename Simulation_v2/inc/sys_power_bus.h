@@ -1,31 +1,29 @@
-#include <systemc.h>
-#include <systemc-ams.h>
 #include "config.h"
+#include <systemc-ams.h>
+#include <systemc.h>
 
-SCA_TDF_MODULE(power_bus){
-    //Rate 1ms
-    //Input Port
-    sca_tdf::sca_in <double>  CPU_I;
-    sca_tdf::sca_in <double>  CPU_V;
-    sca_tdf::sca_in <double>  PV_I;
-    sca_tdf::sca_in <double>  voltage_in_S[NP];
-    sca_tdf::sca_in <double>  current_in_S[NP];
+SCA_TDF_MODULE(power_bus) {
+    // Rate 1ms
+    // Input Port
+    sca_tdf::sca_in<double> CPU_I;
+    sca_tdf::sca_in<double> CPU_V;
+    sca_tdf::sca_in<double> PV_I;
+    sca_tdf::sca_in<double> voltage_in_S[NP];
+    sca_tdf::sca_in<double> current_in_S[NP];
 
-    //Output Port
-    sca_tdf::sca_out <double>  battery_out_current;
+    // Output Port
+    sca_tdf::sca_out<double> battery_out_current;
 
-    SCA_CTOR(power_bus):
-    CPU_I("Current_of_CPU"),
-    CPU_V("Voltage_of_CPU"),
-    battery_out_current("Current_to_Battery")
-    {}
+    SCA_CTOR(power_bus) : CPU_I("Current_of_CPU"),
+                          CPU_V("Voltage_of_CPU"),
+                          battery_out_current("Current_to_Battery") {}
 
     void set_attributes();
     void initialize();
     void processing();
 
-    private:
+  private:
     double total_current = 0;
 
-    power_bus(){}
+    power_bus() {}
 };

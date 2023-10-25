@@ -1,4 +1,4 @@
-//General Parameters
+// General Parameters
 #define NS 6
 #define NP 5
 // params for CPU

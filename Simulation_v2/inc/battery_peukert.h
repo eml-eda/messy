@@ -1,25 +1,22 @@
 #include "systemc-ams.h"
 
-SCA_TDF_MODULE (battery_peukert)
-{
-  sca_tdf::sca_in  <double> i_batt;    // Battery current
-  sca_tdf::sca_out <double> v_batt; // Battery Voltage
-  sca_tdf::sca_out <double> soc;   // Soc
-  sc_signal<double> soc_tmp,C;
-  
-  double k,Vnom;
-  double /*Cprev,*/Iprev;
-  
-	
-  SCA_CTOR(battery_peukert) {
-  soc_tmp=1.0;
-  C=2.52;// 0.0007 Ah * 3600 s
-  }
+SCA_TDF_MODULE(battery_peukert) {
+    sca_tdf::sca_in<double> i_batt;  // Battery current
+    sca_tdf::sca_out<double> v_batt; // Battery Voltage
+    sca_tdf::sca_out<double> soc;    // Soc
+    sc_signal<double> soc_tmp, C;
 
-  void set_attributes();
+    double k, Vnom;
+    double /*Cprev,*/ Iprev;
 
-  void initialize();
+    SCA_CTOR(battery_peukert) {
+        soc_tmp = 1.0;
+        C = 2.52; // 0.0007 Ah * 3600 s
+    }
 
-  void processing();
+    void set_attributes();
 
+    void initialize();
+
+    void processing();
 };
