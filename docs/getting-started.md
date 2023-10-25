@@ -32,3 +32,32 @@ docker run -it sysc-sim:latest
 
 For addition details on what the Dockerfile does, see [docs/docker.md](docs/docker.md).
 
+
+## Run the codegen
+
+The first step to run this project is to run the codegen. Since they are python script, we first have to create a virtual envinroment. This is done with the command:
+
+```bash
+python3 -m venv venv
+```
+
+Then we have to activate the virtual envinroment:
+
+```bash
+source venv/bin/activate
+```
+
+Now we can install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Now we can run the codegen:
+
+```bash
+cd Simulation_v2/codegen
+python3 codgen.py -f ../parallel.json
+```
+
+This command will generate the code for the simulation. The code will be generated in the `Simulation_v2/codegen/src` and `Simulation_v2/codegen/inc` folders.

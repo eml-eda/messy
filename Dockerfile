@@ -150,4 +150,12 @@ RUN pip3 install -r requirements.txt
 RUN pip3 install -r doc/requirements.txt
 # RUN pip3 install -r tools/nntool/requirements.txt
 
+# Mount the current directory to the container
+VOLUME /home
+
+# Set the default shell to bash
+SHELL ["/bin/bash", "-c"]
+
+# Set the default working directory to /home
+WORKDIR /home
 
