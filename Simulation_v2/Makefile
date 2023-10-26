@@ -17,7 +17,9 @@ BUILDDIR := obj
 TARGETDIR := bin
 SRCEXT := cpp
 OBJEXT := o
-
+SYSTEMC_HOME := /usr/local/systemc
+AMS_HOME := /usr/local/systemc-ams
+GAP_HOME := /home/deps/gap_sdk_private_correct
 MODULE := run
 
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))

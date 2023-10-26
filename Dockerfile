@@ -5,8 +5,7 @@ FROM ubuntu:22.04
 RUN apt-get update && apt-get upgrade -y
 
 # Install all the needed dependencies
-RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt update && \
-    DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
+RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
     autoconf \
     automake \
     bison \
@@ -43,14 +42,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt update && \
     unzip \
     sudo
 
-# Install python3 and pip3
-RUN apt-get install -y python3
-
-# Install C++ compiler
-RUN apt-get install -y g++
-
-# Install make
-RUN apt-get install -y make
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
 # Pass the current directory to the container
 COPY deps/systemc-2.3.3.tar /systemc.tar 
@@ -68,7 +60,7 @@ RUN rm systemc.tar
 WORKDIR systemc
 
 # Configure SystemC
-RUN ./configure --prefix=/usr/local/systemc
+RUN ./configure --prefix=/usr/local/systemc CXXFLAGS="-DSC_CPLUSPLUS=201402L"
 
 # Build SystemC 2.3.3
 RUN make
@@ -98,13 +90,13 @@ RUN rm systemc-ams.tar
 WORKDIR systemc-ams
 
 # # Configure SystemC AMS
-# RUN ./configure --with-systemc=/usr/local/systemc --prefix=/usr/local/systemc-ams --disable-systemc_compile_check
+RUN ./configure --with-systemc=/usr/local/systemc --prefix=/usr/local/systemc-ams --disable-systemc_compile_check CXXFLAGS="-DSC_CPLUSPLUS=201402L"
 
-# # Build SystemC AMS
-# RUN make
+# Build SystemC AMS
+RUN make
 
-# # Install SystemC AMS
-# RUN make install
+# Install SystemC AMS
+RUN make install
 
 # Change directory to /
 WORKDIR /
@@ -116,46 +108,42 @@ RUN git clone https://github.com/GreenWaves-Technologies/gap_riscv_toolchain_ubu
 WORKDIR gap_riscv_toolchain_ubuntu
 
 # Install the gap_riscv_toolchain_ubuntu
-RUN ./install.sh
+RUN ./install.sh /usr/lib/gap_riscv_toolchain
 
 # Change directory to /
 WORKDIR /
 
-# Copy the gap_sdk_private_correct.zip file to the container
+# # Copy the gap_sdk_private_correct.zip file to the container
 COPY deps/gap_sdk_private_correct.zip /gap_sdk.zip
 
-# Extract the gap_sdk.zip file
-RUN unzip gap_sdk.zip
+# # Extract the gap_sdk.zip file
+RUN unzip gap_sdk.zip 
 
-# Remove the gap_sdk.zip file
+# # Remove the gap_sdk.zip file
 RUN rm gap_sdk.zip
 
-# Clone the gap_sdk repository
-RUN git clone https://github.com/GreenWaves-Technologies/gap_sdk.git
+# Rename gap_sdk_private_correct to gap_sdk
+RUN mv gap_sdk_private_correct gap_sdk 
 
 # Change directory to gap_sdk
 WORKDIR gap_sdk
 
 # Make the sourceme.sh file executable
-RUN chmod +x sourceme.sh
+# RUN chmod +x sourceme.sh
 
-# Set the default shell to bash
-SHELL ["/bin/bash", "-c"] 
-
-# Install the gap_sdk
-RUN ./sourceme.sh 1
 
 # Install the python3 requirements for the gap_sdk
 RUN pip3 install -r requirements.txt
 RUN pip3 install -r doc/requirements.txt
-# RUN pip3 install -r tools/nntool/requirements.txt
+RUN pip3 install -r tools/nntool/requirements.txt
+RUN pip3 install -r utils/gapy_v2/requirements.txt
 
-# Mount the current directory to the container
-VOLUME /home
-
+# RUN . /gap_sdk/sourceme.sh 1 && make all
 # Set the default shell to bash
 SHELL ["/bin/bash", "-c"]
 
-# Set the default working directory to /home
-WORKDIR /home
+# Install the requirements for the sysc-sim
+RUN pip3 install -r requirements.txt
 
+# Set working directory to /
+WORKDIR /
