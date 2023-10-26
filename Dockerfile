@@ -129,7 +129,7 @@ RUN mv gap_sdk_private_correct gap_sdk
 WORKDIR gap_sdk
 
 # Make the sourceme.sh file executable
-# RUN chmod +x sourceme.sh
+RUN chmod +x sourceme.sh
 
 
 # Install the python3 requirements for the gap_sdk
@@ -138,7 +138,6 @@ RUN pip3 install -r doc/requirements.txt
 RUN pip3 install -r tools/nntool/requirements.txt
 RUN pip3 install -r utils/gapy_v2/requirements.txt
 
-# RUN . /gap_sdk/sourceme.sh 1 && make all
 # Set the default shell to bash
 SHELL ["/bin/bash", "-c"]
 
