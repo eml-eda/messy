@@ -12,6 +12,18 @@ __all__ = [
 
 
 def config_gen(settings, template_dir, output_dir):
+    """
+    Generate config.h file
+
+    Parameters
+    ----------
+    settings : dict
+        Dictionary containing the simulation settings
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
     nsensor = 0
     for sensor in settings["sensors"]:
         nsensor += 1
@@ -44,6 +56,18 @@ def config_gen(settings, template_dir, output_dir):
 
 
 def main_cpp_gen(settings, template_dir, output_dir):
+    """
+    Generate main.cpp file
+
+    Parameters
+    ----------
+    settings : dict
+        Dictionary containing the simulation settings
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
     with open(template_dir / "cpp" / "main_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "main.cpp", "w") as f:
@@ -54,6 +78,17 @@ def main_cpp_gen(settings, template_dir, output_dir):
 
 
 def core_h_gen(template_dir, output_dir):
+    """
+    Generate core.h file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "h" / "core_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "core.h", "w") as f:
@@ -61,6 +96,19 @@ def core_h_gen(template_dir, output_dir):
 
 
 def core_cpp_gen(settings, template_dir, output_dir):
+    """
+    Generate core.cpp file
+
+    Parameters
+    ----------
+    settings : dict
+        Dictionary containing the simulation settings
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "cpp" / "core_cpp.txt") as temp:
         template = Template(temp.read())
         tmp_data = dict(settings)
@@ -69,6 +117,17 @@ def core_cpp_gen(settings, template_dir, output_dir):
 
 
 def core_power_h_gen(template_dir, output_dir):
+    """
+    Generate core_power.h file
+    
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "h" / "core_power_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "core_power.h", "w") as f:
@@ -76,6 +135,17 @@ def core_power_h_gen(template_dir, output_dir):
 
 
 def core_power_cpp_gen(template_dir, output_dir):
+    """
+    Generate core_power.cpp file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "cpp" / "core_power_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "core_power.cpp", "w") as f:
@@ -86,6 +156,17 @@ def core_power_cpp_gen(template_dir, output_dir):
 
 
 def sys_functional_bus_h_gen(template_dir, output_dir):
+    """
+    Generate sys_functional_bus.h file
+    
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "h" / "sys_functional_bus_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "sys_functional_bus.h", "w") as f:
@@ -93,6 +174,19 @@ def sys_functional_bus_h_gen(template_dir, output_dir):
 
 
 def sys_functional_bus_cpp_gen(settings, template_dir, output_dir):
+    """
+    Generate sys_functional_bus.cpp file
+
+    Parameters
+    ----------
+    settings : dict
+        Dictionary containing the simulation settings
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "cpp" / "sys_functional_bus_cpp.txt") as temp:
         template = Template(temp.read())
         tmp_data = dict(settings)
@@ -104,6 +198,17 @@ def sys_functional_bus_cpp_gen(settings, template_dir, output_dir):
 
 
 def sys_power_bus_h_gen(template_dir, output_dir):
+    """
+    Generate sys_power_bus.h file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "h" / "sys_power_bus_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "sys_power_bus.h", "w") as f:
@@ -111,6 +216,17 @@ def sys_power_bus_h_gen(template_dir, output_dir):
 
 
 def sys_power_bus_cpp_gen(template_dir, output_dir):
+    """
+    Generate sys_power_bus.cpp file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "cpp" / "sys_power_bus_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "sys_power_bus.cpp", "w") as f:
@@ -121,6 +237,19 @@ def sys_power_bus_cpp_gen(template_dir, output_dir):
 
 
 def sensor_func_h_gen(sensor, template_dir, output_dir):
+    """
+    Generate sensor.h file
+
+    Parameters
+    ----------
+    sensor : dict
+        Dictionary containing the sensor settings
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "h" / "sensor_func_h.txt") as temp:
         template = Template(temp.read())
         tmp_sensor = dict(sensor)
@@ -130,6 +259,19 @@ def sensor_func_h_gen(sensor, template_dir, output_dir):
 
 
 def sensor_func_cpp_gen(sensor, template_dir, output_dir):
+    """
+    Generate sensor.cpp file
+    
+    Parameters
+    ----------
+    sensor : dict
+        Dictionary containing the sensor settings
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "cpp" / "sensor_functional_cpp.txt") as temp:
         template = Template(temp.read())
         tmp_sensor = dict(sensor)
@@ -138,6 +280,19 @@ def sensor_func_cpp_gen(sensor, template_dir, output_dir):
 
 
 def sensor_power_h_gen(sensor, template_dir, output_dir):
+    """
+    Generate sensor.h file
+
+    Parameters
+    ----------  
+    sensor : dict
+        Dictionary containing the sensor settings
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "h" / "sensor_power_h.txt") as temp:
         template = Template(temp.read())
         tmp_sensor = dict(sensor)
@@ -147,6 +302,19 @@ def sensor_power_h_gen(sensor, template_dir, output_dir):
 
 
 def sensor_power_cpp_gen(sensor, template_dir, output_dir):
+    """
+    Generate sensor.cpp file
+
+    Parameters
+    ----------
+    sensor : dict
+        Dictionary containing the sensor settings
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "cpp" / "sensor_power_cpp.txt") as temp:
         template = Template(temp.read())
         tmp_sensor = dict(sensor)
@@ -158,6 +326,17 @@ def sensor_power_cpp_gen(sensor, template_dir, output_dir):
 
 
 def load_converter_h_gen(template_dir, output_dir):
+    """
+    Generate load_converter.h file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "h" / "load_converter_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "load_converter.h", "w") as f:
@@ -165,6 +344,17 @@ def load_converter_h_gen(template_dir, output_dir):
 
 
 def load_converter_cpp_gen(template_dir, output_dir):
+    """
+    Generate load_converter.cpp file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "cpp" / "load_converter_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "load_converter.cpp", "w") as f:
@@ -175,6 +365,17 @@ def load_converter_cpp_gen(template_dir, output_dir):
 
 
 def battery_peukert_h_gen(template_dir, output_dir):
+    """
+    Generate battery_peukert.h file
+    
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "h" / "battery_peukert_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "battery_peukert.h", "w") as f:
@@ -182,6 +383,17 @@ def battery_peukert_h_gen(template_dir, output_dir):
 
 
 def battery_peukert_cpp_gen(template_dir, output_dir):
+    """
+    Generate battery_peukert.cpp file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "cpp" / "battery_peukert_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "battery_peukert.cpp", "w") as f:
@@ -192,6 +404,16 @@ def battery_peukert_cpp_gen(template_dir, output_dir):
 
 
 def battery_circuit_h_gen(template_dir, output_dir):
+    """
+    Generate battery_circuit.h file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
     with open(template_dir / "h" / "battery_char_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "battery_char.h", "w") as f:
@@ -209,6 +431,17 @@ def battery_circuit_h_gen(template_dir, output_dir):
 
 
 def battery_circuit_cpp_gen(template_dir, output_dir):
+    """
+    Generate battery_circuit.cpp file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "cpp" / "battery_char_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "battery_char.cpp", "w") as f:
@@ -229,6 +462,17 @@ def battery_circuit_cpp_gen(template_dir, output_dir):
 
 
 def battery_converter_h_gen(template_dir, output_dir):
+    """
+    Generate battery_converter.h file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+
     with open(template_dir / "h" / "battery_converter_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "battery_converter.h", "w") as f:
@@ -241,6 +485,16 @@ def battery_converter_h_gen(template_dir, output_dir):
 
 
 def battery_converter_cpp_gen(template_dir, output_dir):
+    """
+    Generate battery_converter.cpp file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
     with open(template_dir / "cpp" / "battery_converter_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "battery_converter.cpp", "w") as f:
@@ -251,6 +505,16 @@ def battery_converter_cpp_gen(template_dir, output_dir):
 
 
 def pv_panel_h_gen(template_dir, output_dir):
+    """
+    Generate pv_panel.h file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
     with open(template_dir / "h" / "pv_panel_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "pv_panel.h", "w") as f:
@@ -263,6 +527,16 @@ def pv_panel_h_gen(template_dir, output_dir):
 
 
 def pv_panel_cpp_gen(template_dir, output_dir):
+    """
+    Generate pv_panel.cpp file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
     with open(template_dir / "cpp" / "pv_panel_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "pv_panel.cpp", "w") as f:
@@ -273,6 +547,17 @@ def pv_panel_cpp_gen(template_dir, output_dir):
 
 
 def converter_pv_h_gen(template_dir, output_dir):
+    """
+    Generate converter_pv.h file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
+    
     with open(template_dir / "h" / "converter_pv_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "converter_pv.h", "w") as f:
@@ -285,6 +570,16 @@ def converter_pv_h_gen(template_dir, output_dir):
 
 
 def converter_pv_cpp_gen(template_dir, output_dir):
+    """
+    Generate converter_pv.cpp file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+    """
     with open(template_dir / "cpp" / "converter_pv_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "converter_pv.cpp", "w") as f:
@@ -295,6 +590,18 @@ def converter_pv_cpp_gen(template_dir, output_dir):
 
 
 def lut_h_gen(template_dir, output_dir):
+    """
+    Generate lut.h file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+
+    """
+
     with open(template_dir / "h" / "lut_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "lut.h", "w") as f:
@@ -302,6 +609,18 @@ def lut_h_gen(template_dir, output_dir):
 
 
 def lut_cpp_gen(template_dir, output_dir):
+    """
+    Generate lut.cpp file
+
+    Parameters
+    ----------
+    template_dir : pathlib.Path
+        Path to templates directory
+    output_dir : pathlib.Path
+        Path where code will be generated
+
+    """
+    
     with open(template_dir / "cpp" / "lut_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "lut.cpp", "w") as f:

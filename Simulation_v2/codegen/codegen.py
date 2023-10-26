@@ -7,6 +7,19 @@ import codegen_func
 
 
 def main(input_file, template_dir, output_dir):
+    """
+    Main function for code generation
+
+    Parameters
+    ----------
+    input_file : Path
+        Path to JSON input simulation settings
+    template_dir : Path
+        Path to templates directory
+    output_dir : Path
+        Path where code will be generated
+    """
+
     # Load input settings file
     with open(input_file, "r") as f:
         settings = json.load(f)
@@ -87,8 +100,12 @@ def main(input_file, template_dir, output_dir):
     print("OK!")
 
 
+# This code will be executed if the script is run directly and not imported as a module
 if __name__ == "__main__":
+    # Create an argument parser with a description
     parser = argparse.ArgumentParser(description="Generate src code")
+
+    # Add an argument for the input file path
     parser.add_argument(
         "-f",
         "--input-file",
@@ -96,6 +113,8 @@ if __name__ == "__main__":
         metavar="PATH",
         help="Path to JSON input simulation settings",
     )
+
+    # Add an argument for the template directory path
     parser.add_argument(
         "-t",
         "--template-dir",
@@ -104,6 +123,8 @@ if __name__ == "__main__":
         default="./templates",
         help="Path to templates directory",
     )
+
+    # Add an argument for the output directory path
     parser.add_argument(
         "-o",
         "--output-dir",
@@ -112,10 +133,18 @@ if __name__ == "__main__":
         default=".",
         help="Path where code will be generated",
     )
+
+    # Parse the command line arguments
     args = parser.parse_args()
 
+    # Convert the input file path to a Path object
     input_file = Path(args.input_file)
+
+    # Convert the template directory path to a Path object
     template_dir = Path(args.template_dir)
+
+    # Convert the output directory path to a Path object
     output_dir = Path(args.output_dir)
 
-    main(input_file, template_dir, output_dir)
+    # Call the main function with the parsed arguments
+    main(input_file=input_file, template_dir=template_dir, output_dir=output_dir)
