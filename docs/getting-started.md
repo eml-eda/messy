@@ -1,6 +1,6 @@
 # Getting Started
 
-To simplify the process of getting started, we have provided a docker image that contains all the dependencies needed to run the code. This is the recommended way to get started.
+This document will guide you through the steps to get started with the project.
 
 ## Clone the repository
 
@@ -18,19 +18,7 @@ cd sysc-sim
 
 ## Build the docker image
 
-To get started, you need to build the docker image. This can be done by running the following command:
-
-```bash
-docker build -t sysc-sim:latest .
-```
-
-This will build the image and tag it with the name you specify. You can then run the image with the following command:
-
-```bash
-docker run -it sysc-sim:latest
-```
-
-For addition details on what the Dockerfile does, see [docs/docker.md](docs/docker.md).
+For details on what the Dockerfile does and how to build the image, please refer to the [Docker gettin started](docker.md) file.
 
 
 ## Run the codegen
