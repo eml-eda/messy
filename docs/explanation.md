@@ -65,6 +65,3 @@ Grazie mille e buona serata.
 N.B. Va esposta la variabile GAP_HOME in .bashrc che contiene il 
 percorso dell' SDK di gvsoc, inoltre prima di avviare il simulatore va 
 impostata la board nella shell dalla quale si avvia il simulatore
-
-
-{ BasedOnStyle: LLVM, IndentWidth: 4, ColumnLimit: 0}

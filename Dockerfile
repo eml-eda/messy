@@ -1,6 +1,10 @@
 # Start with a base image of ubuntu
 FROM ubuntu:22.04
 
+# Add a user that is the same as the host user
+ARG USER_ID
+ARG GROUP_ID
+
 # Update and upgrade the system
 RUN apt-get update && apt-get upgrade -y
 
@@ -113,7 +117,7 @@ RUN ./install.sh /usr/lib/gap_riscv_toolchain
 # Change directory to /
 WORKDIR /
 
-# # Copy the gap_sdk_private_correct.zip file to the container
+# Copy the gap_sdk_private_correct.zip file to the container
 COPY deps/gap_sdk_private_correct.zip /gap_sdk.zip
 
 # # Extract the gap_sdk.zip file
@@ -145,4 +149,11 @@ SHELL ["/bin/bash", "-c"]
 RUN pip3 install -r requirements.txt
 
 # Set working directory to /
-WORKDIR /
+WORKDIR /home/sysc-sim
+
+# Create the user
+RUN groupadd -g ${GROUP_ID} giovanni_docker
+RUN useradd -m -u ${USER_ID} -g ${GROUP_ID} giovanni_docker
+
+# Switch to the user
+USER giovanni_docker

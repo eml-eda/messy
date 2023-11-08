@@ -5,6 +5,8 @@
 site_name: Sysc-Sim
 theme:
   name: material
+  features:
+    - content.code.copy
   theme:
   icon:
     admonition:
