@@ -50,8 +50,8 @@ This command will generate the code for the simulation. The code will be generat
 Now, before moving on, we need to move the `src` and `inc` folder into the `Simulation_v2` folder:
 
 ```bash
-mv src ../
-mv inc ../
+cp -r src ../
+cp -r inc ../
 ```
 
 ## Build the GAP SDK
@@ -107,9 +107,9 @@ This command will take some time to complete. Once it is done, we should see a n
 We need to copy these files in the `Simulation_v2/bin` folder:
 
 ```bash
-cp gvsoc_config.json /home/sysc-sim/Simulation_v2/bin
-cp chip.soc.mram.bin /home/sysc-sim/Simulation_v2/bin
-cp efuse_preload.data /home/sysc-sim/Simulation_v2/bin
+cp gvsoc_config.json /home/sysc-sim/Simulation_v2/
+cp chip.soc.mram.bin /home/sysc-sim/Simulation_v2/
+cp efuse_preload.data /home/sysc-sim/Simulation_v2/
 ```
 
 ## Build the simulation
@@ -141,11 +141,16 @@ First we have to make the `run.x` file executable:
 ```bash
 chmod +x run.x
 ```
+Then we have to up one level:
+
+```bash
+cd ..
+```
 
 Then we can run the `run.x` file:
 
 ```bash
-./run.x
+./bin/run.x
 ```
 
 

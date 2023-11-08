@@ -118,7 +118,7 @@ RUN ./install.sh /usr/lib/gap_riscv_toolchain
 WORKDIR /
 
 # Copy the gap_sdk_private_correct.zip file to the container
-COPY deps/gap_sdk_private_correct.zip /gap_sdk.zip
+COPY deps/gap_sdk_private_tesi_calice.zip /gap_sdk.zip
 
 # # Extract the gap_sdk.zip file
 RUN unzip gap_sdk.zip 
@@ -151,9 +151,15 @@ RUN pip3 install -r requirements.txt
 # Set working directory to /
 WORKDIR /home/sysc-sim
 
-# Create the user
-RUN groupadd -g ${GROUP_ID} giovanni_docker
-RUN useradd -m -u ${USER_ID} -g ${GROUP_ID} giovanni_docker
+# # Create the user
+# RUN groupadd -g ${GROUP_ID} giovanni_docker
+# RUN useradd -m -u ${USER_ID} -g ${GROUP_ID} giovanni_docker
 
-# Switch to the user
-USER giovanni_docker
+# # Make the user sudo
+# RUN usermod -aG sudo giovanni_docker
+
+# # Add none root user
+# RUN echo "giovanni_docker ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# # Switch to the user
+# USER giovanni_docker
