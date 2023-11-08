@@ -8,7 +8,7 @@ Simulation_v2/.vscode
 Simulation_v2/bin/run.x
 Simulation_v2/funtional_trace_good.txt
 
-deps/gap_sdk_private_correct*
+deps
 .vscode
 venv
 Simulation_v2/codegen/__pycache__
