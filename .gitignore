@@ -3,10 +3,7 @@
 *.x
 Simulation_v2/power_trace.txt
 Simulation_v2/funtional_trace.txt
-Simulation_v2/.vscode/settings.json
-Simulation_v2/.vscode/tasks.json
-Simulation_v2/.vscode/launch.json
-Simulation_v2/.vscode/c_cpp_properties.json
+Simulation_v2/.vscode
 *.o
 Simulation_v2/bin/run.x
 Simulation_v2/funtional_trace_good.txt
@@ -15,3 +12,13 @@ deps/gap_sdk_private_correct*
 .vscode
 venv
 Simulation_v2/codegen/__pycache__
+Simulation_v2/inc
+Simulation_v2/src
+Simulation_v2/gvsoc_config.json
+Simulation_v2/chip.soc.mram.bin
+Simulation_v2/efuse_preload.data
+Simulation_v2/flash.bin
+Simulation_v2/codegen/inc
+Simulation_v2/codegen/src
+Simulation_v2/bin
+Simulation_v2/obj

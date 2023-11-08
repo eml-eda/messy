@@ -1,0 +1,31 @@
+{
+    "sim_step" : 1,
+    "sim_len": 7736400,
+    "vref_bus" : 3.3,
+    "soc_init" : 1.0,
+    "selfdisch_factor" : 0.0,
+    "battery" : "circuit",
+    "sensors" : [
+        {
+            "power"  : true,
+            "name"   : "air_quality_sensor",
+            "voltage": 3.3,
+            "reg" : 50,
+            "states" : [
+                {
+                    "name"    : "ON_READ",
+                    "current" : "48.2",
+                    "time_on" : "30"
+                },
+                {
+                    "name"    : "ON_WRITE",
+                    "current" : "49.2",
+                    "time_on" : "30"
+                },
+                {
+                    "name"    : "IDLE",
+                    "current" : "0.002"
+                }
+            ]
+        }]
+}
