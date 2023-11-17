@@ -3,7 +3,7 @@
 
 void battery_converter::set_attributes()
 {
-    current_out.set_timestep(1, sc_core::SC_SEC);
+    current_out.set_timestep(1, SIM_RESOLUTION);
     current_out.set_delay(1);
 }
 

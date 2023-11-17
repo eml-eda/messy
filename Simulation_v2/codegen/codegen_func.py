@@ -33,6 +33,7 @@ def config_gen(settings, template_dir, output_dir):
         f.write("//General Parameters\n")
         f.write(f'#define SIM_STEP {settings["sim_step"]}\n')
         f.write(f'#define SIM_LEN {settings["sim_len"]}\n')
+        f.write(f'#define SIM_RESOLUTION sc_core::SC_MS\n')
         f.write(f'#define SOC_INIT {settings["soc_init"]}\n')
         f.write(f'#define VREF_BUS {settings["vref_bus"]}\n')
         f.write(f'#define SELFDISCH_FACTOR {settings["selfdisch_factor"]}\n')

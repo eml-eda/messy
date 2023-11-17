@@ -3,8 +3,8 @@
 void {{sensor['name']}}_power::set_attributes()
 {
     func_signal.set_rate(1);
-    func_signal.set_timestep(1, sc_core::SC_SEC);
-    //power_to_therm.set_timestep(0.5, sc_core::SC_SEC);
+    func_signal.set_timestep(1, SIM_RESOLUTION);
+    //power_to_therm.set_timestep(0.5, SIM_RESOLUTION);
     //power_to_therm.set_rate(1);
     //power_to_therm.set_delay(1);
 }

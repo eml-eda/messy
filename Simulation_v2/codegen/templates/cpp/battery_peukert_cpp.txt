@@ -3,9 +3,9 @@
 
 void battery_peukert::set_attributes()
 {
-  v_batt.set_timestep(1, sc_core::SC_SEC);
+  v_batt.set_timestep(1, SIM_RESOLUTION);
 	
-  soc.set_timestep(1, sc_core::SC_SEC);
+  soc.set_timestep(1, SIM_RESOLUTION);
 }
 
 void battery_peukert::initialize()

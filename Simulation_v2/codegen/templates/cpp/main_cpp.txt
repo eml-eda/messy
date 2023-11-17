@@ -219,7 +219,7 @@ int sc_main(int argc, char* argv[])
     Enable_Temp.write(true);
     std::cout <<"The simulation starts!"<<endl;
 
-    sc_start(SIM_LEN , sc_core::SC_SEC); // Set the simulation length
+    sc_start(SIM_LEN , SIM_RESOLUTION); // Set the simulation length
 
     std::cout <<"The simulation ends @ "<<sc_time_stamp()<<endl;
 

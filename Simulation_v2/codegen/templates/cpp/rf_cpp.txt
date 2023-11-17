@@ -3,7 +3,7 @@
 
 void rf::set_attributes()
 {
-    i.set_timestep(SIM_STEP, sc_core::SC_SEC);
+    i.set_timestep(SIM_STEP, SIM_RESOLUTION);
 }
 
 void rf::initialize() {}

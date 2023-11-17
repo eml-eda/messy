@@ -1,5 +1,5 @@
 {
-    "sim_step" : 1,
+    "sim_step" : 1000,
     "sim_len": 7736400,
     "vref_bus" : 3.3,
     "soc_init" : 1.0,

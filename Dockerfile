@@ -118,7 +118,8 @@ RUN ./install.sh /usr/lib/gap_riscv_toolchain
 WORKDIR /
 
 # Copy the gap_sdk_private_correct.zip file to the container
-COPY deps/gap_sdk_private_tesi_calice.zip /gap_sdk.zip
+# COPY deps/gap_sdk_private_tesi_calice.zip /gap_sdk.zip
+COPY deps/gap_sdk_private-5.14_dev.zip /gap_sdk.zip
 
 # # Extract the gap_sdk.zip file
 RUN unzip gap_sdk.zip 
@@ -127,14 +128,14 @@ RUN unzip gap_sdk.zip
 RUN rm gap_sdk.zip
 
 # Rename gap_sdk_private_correct to gap_sdk
-RUN mv gap_sdk_private_correct gap_sdk 
+# RUN mv gap_sdk_private_correct gap_sdk 
+RUN mv gap_sdk_private-5.14_dev gap_sdk 
 
 # Change directory to gap_sdk
 WORKDIR gap_sdk
 
 # Make the sourceme.sh file executable
 RUN chmod +x sourceme.sh
-
 
 # Install the python3 requirements for the gap_sdk
 RUN pip3 install -r requirements.txt
