@@ -4,7 +4,7 @@
     "vref_bus" : 3.3,
     "soc_init" : 1.0,
     "selfdisch_factor" : 0.0,
-    "battery" : "circuit_model",
+    "battery" : "circuit",
     "sensors" : [
         {
             "power"  : true,
