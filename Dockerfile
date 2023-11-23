@@ -75,6 +75,9 @@ RUN make check
 # Install SystemC 2.3.3
 RUN make install
 
+# Change the permissions of the systemc folder
+RUN chmod -R 777 /usr/local/systemc
+
 # Change directory to /
 WORKDIR /
 
@@ -102,6 +105,9 @@ RUN make
 # Install SystemC AMS
 RUN make install
 
+# Change the permissions of the systemc-ams folder
+RUN chmod -R 777 /usr/local/systemc-ams
+
 # Change directory to /
 WORKDIR /
 
@@ -113,6 +119,9 @@ WORKDIR gap_riscv_toolchain_ubuntu
 
 # Install the gap_riscv_toolchain_ubuntu
 RUN ./install.sh /usr/lib/gap_riscv_toolchain
+
+# Change the permissions of the gap_riscv_toolchain_ubuntu folder
+RUN chmod -R 777 /usr/lib/gap_riscv_toolchain
 
 # Change directory to /
 WORKDIR /
@@ -134,33 +143,45 @@ RUN mv gap_sdk_private_correct gap_sdk
 # Change directory to gap_sdk
 WORKDIR gap_sdk
 
-# Make the sourceme.sh file executable
-RUN chmod +x sourceme.sh
-
 # Install the python3 requirements for the gap_sdk
 RUN pip3 install -r requirements.txt
 RUN pip3 install -r doc/requirements.txt
 RUN pip3 install -r tools/nntool/requirements.txt
 RUN pip3 install -r utils/gapy_v2/requirements.txt
 
-# Set the default shell to bash
-SHELL ["/bin/bash", "-c"]
 
 # Install the requirements for the sysc-sim
 RUN pip3 install -r requirements.txt
 
+# Copy the custom sourceme.sh file to the container
+COPY custom_sourceme.sh sourceme.sh
+
+# Make the sourceme.sh file executable
+RUN chmod +x sourceme.sh
+
+# Source the sourceme.sh file
+RUN /bin/bash -c "source sourceme.sh && make all"
+
+# Copy the custom folder containing the custom .c examples files to /gap_sdk/examples/gap9
+COPY custom /gap_sdk/examples/gap9
+
+# Change the permissions of the gap_sdk folder
+RUN chmod -R 777 /gap_sdk
+
 # Set working directory to /
 WORKDIR /home/sysc-sim
 
-# # Create the user
-# RUN groupadd -g ${GROUP_ID} giovanni_docker
-# RUN useradd -m -u ${USER_ID} -g ${GROUP_ID} giovanni_docker
+# Copy a custom entrypoint script into the container
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# # Make the user sudo
-# RUN usermod -aG sudo giovanni_docker
+# Set the custom entrypoint script as the entry point for the container
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# # Add none root user
-# RUN echo "giovanni_docker ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# Give the user the permission to run the custom entrypoint script
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# # Switch to the user
-# USER giovanni_docker
+# Set the default command to launch the desired shell (bash in this case)
+CMD ["/bin/bash"]
+
+# Create a user with the same user id and group id as the host user
+RUN groupadd -g 1000 docker_group && useradd -u 1000 -g docker_group docker_user
