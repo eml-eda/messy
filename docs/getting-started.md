@@ -31,52 +31,21 @@ The shell inside the container should be in the `/home/sysc-sim` directory. From
 cd Simulation_v2/codegen
 ```
 
-Now we can run the codegen:
+The codegen has been simplified thanks to the use of Makefiles. To run the codegen, you just need to run the `make` command:
 
 ```bash
-python3 codegen.py -f easy.json
+make codegen file=filename.json
 ```
 
-If everything went well, you should see the following output:
+For example, if you want to run the codegen on the `easy.json` file, you need to run the following command:
 
 ```bash
-OK!
-```
-
-It is important to specify the JSON file, since it contains the configuration for the simulator. 
-
-This command will generate the code for the simulation. The code will be generated in the `Simulation_v2/codegen/src` and `Simulation_v2/codegen/inc` folders.
-
-Now, before moving on, we need to move the `src` and `inc` folder into the `Simulation_v2` folder:
-
-```bash
-cp -r src ../
-cp -r inc ../
+make codegen file=easy.json
 ```
 
 ## Build the GAP SDK
 
-Now we need to build the GAP SDK. To do so, we need to change into the `gap_sdk` directory:
-
-```bash
-cd /gap_sdk
-```
-
-Then we need to run the command:
-
-```bash
-source sourceme.sh
-```
-
-and select 1 as the option.
-
-Now we are ready to run the `make` command:
-
-```bash
-make all
-```
-
-This command will take some time to complete. Once it is done, we can move on to the next step.
+The building of the GAP_SDK has been directly embedded into the docker image. So you don't need to build it. However, if for some reason you want to build it from scratch, please refer to the [Build the GAP SDK](build-gap-sdk.md) file.
 
 ## Compiling the GAP application
 
@@ -112,45 +81,12 @@ cp chip.soc.mram.bin /home/sysc-sim/Simulation_v2/
 cp efuse_preload.data /home/sysc-sim/Simulation_v2/
 ```
 
-## Build the simulation
+## Simulator
 
-Now we can build the simulation. To do so, we need to change into the `Simulation_v2` directory:
-
-```bash
-cd /home/sysc-sim/Simulation_v2
-```
-
-Then we can run the `make` command:
+Also for this step, everything has been embedded into the Makefile. So we just need to run the `make run` command:
 
 ```bash
-make
+make run
 ```
 
-This command will take some time to complete. Once it is done, it creates a `run.x` file in the `Simulation_v2/bin` folder. This is the executable file of the simulation.
-
-## Run the simulation
-
-Now we can run the simulation. To do so, we need to change into the `Simulation_v2/bin` directory:
-
-```bash
-cd /home/sysc-sim/Simulation_v2/bin
-```
-
-First we have to make the `run.x` file executable:
-
-```bash
-chmod +x run.x
-```
-Then we have to up one level:
-
-```bash
-cd ..
-```
-
-Then we can run the `run.x` file:
-
-```bash
-./bin/run.x
-```
-
-
+This command will clean, compile and run the simulation. Once it is done, you should see the simulation running.

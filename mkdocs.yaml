@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 site_name: Sysc-Sim
+repo_url: https://github.com/eml-eda/sysc-sim
+repo_name: eml-eda/sysc-sim
 theme:
   name: material
   features:
@@ -22,6 +24,8 @@ theme:
       bug: octicons/bug-16
       example: octicons/beaker-16
       quote: octicons/quote-16
+  icon:
+    repo: fontawesome/brands/github
   palette: 
     # Palette toggle for light mode
     - scheme: default
