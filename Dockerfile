@@ -1,12 +1,15 @@
 # Start with a base image of ubuntu
 FROM ubuntu:22.04
 
+# Add a user that is the same as the host user
+ARG USER_ID
+ARG GROUP_ID
+
 # Update and upgrade the system
 RUN apt-get update && apt-get upgrade -y
 
 # Install all the needed dependencies
-RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt update && \
-    DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
+RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
     autoconf \
     automake \
     bison \
@@ -43,14 +46,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt update && \
     unzip \
     sudo
 
-# Install python3 and pip3
-RUN apt-get install -y python3
-
-# Install C++ compiler
-RUN apt-get install -y g++
-
-# Install make
-RUN apt-get install -y make
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
 # Pass the current directory to the container
 COPY deps/systemc-2.3.3.tar /systemc.tar 
@@ -68,7 +64,7 @@ RUN rm systemc.tar
 WORKDIR systemc
 
 # Configure SystemC
-RUN ./configure --prefix=/usr/local/systemc
+RUN ./configure --prefix=/usr/local/systemc CXXFLAGS="-DSC_CPLUSPLUS=201402L"
 
 # Build SystemC 2.3.3
 RUN make
@@ -78,6 +74,9 @@ RUN make check
 
 # Install SystemC 2.3.3
 RUN make install
+
+# Change the permissions of the systemc folder
+RUN chmod -R 777 /usr/local/systemc
 
 # Change directory to /
 WORKDIR /
@@ -98,13 +97,16 @@ RUN rm systemc-ams.tar
 WORKDIR systemc-ams
 
 # # Configure SystemC AMS
-# RUN ./configure --with-systemc=/usr/local/systemc --prefix=/usr/local/systemc-ams --disable-systemc_compile_check
+RUN ./configure --with-systemc=/usr/local/systemc --prefix=/usr/local/systemc-ams --disable-systemc_compile_check CXXFLAGS="-DSC_CPLUSPLUS=201402L"
 
-# # Build SystemC AMS
-# RUN make
+# Build SystemC AMS
+RUN make
 
-# # Install SystemC AMS
-# RUN make install
+# Install SystemC AMS
+RUN make install
+
+# Change the permissions of the systemc-ams folder
+RUN chmod -R 777 /usr/local/systemc-ams
 
 # Change directory to /
 WORKDIR /
@@ -116,38 +118,70 @@ RUN git clone https://github.com/GreenWaves-Technologies/gap_riscv_toolchain_ubu
 WORKDIR gap_riscv_toolchain_ubuntu
 
 # Install the gap_riscv_toolchain_ubuntu
-RUN ./install.sh
+RUN ./install.sh /usr/lib/gap_riscv_toolchain
+
+# Change the permissions of the gap_riscv_toolchain_ubuntu folder
+RUN chmod -R 777 /usr/lib/gap_riscv_toolchain
 
 # Change directory to /
 WORKDIR /
 
 # Copy the gap_sdk_private_correct.zip file to the container
-COPY deps/gap_sdk_private_correct.zip /gap_sdk.zip
+COPY deps/gap_sdk_private_tesi_calice.zip /gap_sdk.zip
+# COPY deps/gap_sdk_private-5.14_dev.zip /gap_sdk.zip
 
-# Extract the gap_sdk.zip file
-RUN unzip gap_sdk.zip
+# # Extract the gap_sdk.zip file
+RUN unzip gap_sdk.zip 
 
-# Remove the gap_sdk.zip file
+# # Remove the gap_sdk.zip file
 RUN rm gap_sdk.zip
 
-# Clone the gap_sdk repository
-RUN git clone https://github.com/GreenWaves-Technologies/gap_sdk.git
+# Rename gap_sdk_private_correct to gap_sdk
+RUN mv gap_sdk_private_correct gap_sdk 
+# RUN mv gap_sdk_private-5.14_dev gap_sdk 
 
 # Change directory to gap_sdk
 WORKDIR gap_sdk
 
-# Make the sourceme.sh file executable
-RUN chmod +x sourceme.sh
-
-# Set the default shell to bash
-SHELL ["/bin/bash", "-c"] 
-
-# Install the gap_sdk
-RUN ./sourceme.sh 1
-
 # Install the python3 requirements for the gap_sdk
 RUN pip3 install -r requirements.txt
 RUN pip3 install -r doc/requirements.txt
-# RUN pip3 install -r tools/nntool/requirements.txt
+RUN pip3 install -r tools/nntool/requirements.txt
+RUN pip3 install -r utils/gapy_v2/requirements.txt
 
 
+# Install the requirements for the sysc-sim
+RUN pip3 install -r requirements.txt
+
+# Copy the custom sourceme.sh file to the container
+COPY utils/gap_sdk/custom_sourceme.sh sourceme.sh
+
+# Make the sourceme.sh file executable
+RUN chmod +x sourceme.sh
+
+# Source the sourceme.sh file
+RUN /bin/bash -c "source sourceme.sh && make all"
+
+# Copy the custom folder containing the custom .c examples files to /gap_sdk/examples/gap9
+COPY custom /gap_sdk/examples/gap9
+
+# Change the permissions of the gap_sdk folder
+RUN chmod -R 777 /gap_sdk
+
+# Set working directory to /
+WORKDIR /home/sysc-sim
+
+# Copy a custom entrypoint script into the container
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Set the custom entrypoint script as the entry point for the container
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+# Give the user the permission to run the custom entrypoint script
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Set the default command to launch the desired shell (bash in this case)
+CMD ["/bin/bash"]
+
+# Create a user with the same user id and group id as the host user
+RUN groupadd -g 1000 docker_group && useradd -u 1000 -g docker_group docker_user

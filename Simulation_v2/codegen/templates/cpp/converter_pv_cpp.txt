@@ -3,7 +3,7 @@
 
 void converter_pv::set_attributes()
 {
-    i_out.set_timestep(1, sc_core::SC_SEC);
+    i_out.set_timestep(1, SIM_RESOLUTION);
     // i_out.set_delay(1);
 }
 

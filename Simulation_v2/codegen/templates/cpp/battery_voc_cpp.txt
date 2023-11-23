@@ -3,9 +3,9 @@
 
 void battery_voc::set_attributes()
 {
-    v_oc.set_timestep(1, sc_core::SC_SEC);
-    r_s.set_timestep(1, sc_core::SC_SEC);
-    soc.set_timestep(1, sc_core::SC_SEC);
+    v_oc.set_timestep(1, SIM_RESOLUTION);
+    r_s.set_timestep(1, SIM_RESOLUTION);
+    soc.set_timestep(1, SIM_RESOLUTION);
     r_s.set_delay(1);
     soc.set_delay(1);
 }
