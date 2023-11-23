@@ -154,7 +154,7 @@ RUN pip3 install -r utils/gapy_v2/requirements.txt
 RUN pip3 install -r requirements.txt
 
 # Copy the custom sourceme.sh file to the container
-COPY custom_sourceme.sh sourceme.sh
+COPY utils/gap_sdk/custom_sourceme.sh sourceme.sh
 
 # Make the sourceme.sh file executable
 RUN chmod +x sourceme.sh
@@ -172,7 +172,7 @@ RUN chmod -R 777 /gap_sdk
 WORKDIR /home/sysc-sim
 
 # Copy a custom entrypoint script into the container
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Set the custom entrypoint script as the entry point for the container
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
