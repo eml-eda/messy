@@ -6,7 +6,7 @@ ARG USER_ID
 ARG GROUP_ID
 
 # Update and upgrade the system
-RUN apt-get update && apt-get upgrade -y
+RUN apt update && apt upgrade -y
 
 # Install all the needed dependencies
 RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
@@ -44,7 +44,8 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
     libqt6serialport6-dev \
     libgl1-mesa-dev \
     unzip \
-    sudo
+    sudo \
+    gdb
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
@@ -174,14 +175,17 @@ WORKDIR /home/sysc-sim
 # Copy a custom entrypoint script into the container
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# Set the custom entrypoint script as the entry point for the container
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# # Set the custom entrypoint script as the entry point for the container
+# ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# Give the user the permission to run the custom entrypoint script
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# # Give the user the permission to run the custom entrypoint script
+# RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set the default command to launch the desired shell (bash in this case)
 CMD ["/bin/bash"]
+
+# Copy the custom .bashrc file to the container
+COPY docker/.bashrc /home/docker_user/.bashrc
 
 # Create a user with the same user id and group id as the host user
 RUN groupadd -g 1000 docker_group && useradd -u 1000 -g docker_group docker_user

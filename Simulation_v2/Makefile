@@ -91,4 +91,5 @@ help:
 	@echo "  clean     : Remove build and generated files"
 	@echo "  codegen   : Generate code"
 	@echo "  ultraclean: Perform a clean and remove additional files"
+	@echo "  run       : Build the executable and run it"
 	@echo "  help      : Display this help message"
