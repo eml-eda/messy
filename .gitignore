@@ -3,13 +3,11 @@
 *.x
 Simulation_v2/power_trace.txt
 Simulation_v2/funtional_trace.txt
-Simulation_v2/.vscode
 *.o
 Simulation_v2/bin/run.x
 Simulation_v2/funtional_trace_good.txt
 
 deps
-.vscode
 venv
 Simulation_v2/codegen/__pycache__
 Simulation_v2/inc
