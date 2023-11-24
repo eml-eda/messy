@@ -42,3 +42,14 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.superfences
 
+nav:
+  - Home: index.md
+  - "Getting started": getting-started.md
+  - "Docker": docker.md
+  - "Build GAP SDK": build-gap-sdk.md
+  - "Codegen": codegen.md
+  - "Sensors": sensors.md
+  - "Simulator": simulator.md
+  - "Custom Code GAP SDK": custom-code-gap-sdk.md
+
+
