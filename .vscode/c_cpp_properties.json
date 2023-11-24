@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/systemc/include",
+                "/systemc-ams/include",
+                "/gap_sdk",
+                "/gap_sdk/gvsoc/gvsoc/engine/include",
+                "/gap_sdk/rtos/pmsis/os/freeRTOS/vendors/gwt/pmsis/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerArgs": []
+        }
+    ],
+    "version": 4
+}
