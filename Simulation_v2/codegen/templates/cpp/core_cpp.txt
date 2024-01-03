@@ -5,8 +5,12 @@ void Core::run()
     char config_path[18] = "gvsoc_config.json";
 
     gv::GvsocConf conf = { .config_path=config_path, .api_mode=gv::Api_mode::Api_mode_sync };
-    gvsoc = gv::gvsoc_new(&conf);
+    gvsoc = (Gvsoc_launcher*) gv::gvsoc_new(&conf);
     gvsoc->open();
+    // register this core as an executor notifier
+    gvsoc->register_exec_notifier(this);
+    // set is async
+    is_async=conf.api_mode == gv::Api_mode::Api_mode_async;
 
     // Get a connection to the main soc AXI. This will allow us to inject accesses
     // and could also be used to received accesses from simulated test
@@ -114,4 +118,16 @@ void Core::grant(gv::Io_request *req)
 
 void Core::reply(gv::Io_request *req)
 {
+}
+
+void Core::notify_stop(int64_t time)
+{
+    if(!this->is_async && !this->gvsoc->retain_count())
+        this->gvsoc->release();
+}
+
+void Core::notify_run(int64_t time)
+{
+    if(!this->is_async && !this->gvsoc->retain_count())
+        this->gvsoc->retain();
 }

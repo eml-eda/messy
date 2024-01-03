@@ -3,12 +3,15 @@
 #include <gv/gvsoc.hpp>
 #include <cstring>
 #include <string.h>
+#include <vp/launcher.hpp>
 
-class Core : public gv::Io_user, public sc_module
+class Core : public gv::Io_user, public sc_module, public vp::Notifier
 {
     public:
     void run();
-
+    // notif
+    void notify_stop(int64_t time);
+    void notify_run(int64_t time);
     // This gets called when an access from gvsoc side is reaching us
     void access(gv::Io_request *req);
     // This gets called when one of our access gets granted
@@ -43,6 +46,7 @@ class Core : public gv::Io_user, public sc_module
 
     private:
     gv::Io_binding *axi;
-    gv::Gvsoc *gvsoc;
+    Gvsoc_launcher *gvsoc;
     gv::Io_request *req_global;
+    bool is_async;
 };
