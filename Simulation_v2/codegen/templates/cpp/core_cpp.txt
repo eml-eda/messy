@@ -109,7 +109,7 @@ void Core::access(gv::Io_request *req)
     printf("%d, %lx, %lx \n", *(req_global->data), req_global->addr, req_global->size);
     
     std::cout << sc_time_stamp().to_double() << std::endl;
-    //this->axi->reply(req);
+    this->axi->reply(req);
 }
 
 void Core::grant(gv::Io_request *req)
