@@ -31,7 +31,7 @@ void Core::run()
     // Run for 10ms to let the chip boot as it is not accessible before it is powered-up
     //    gvsoc->step(10000000000);
 
-    while(1){
+    while(!this->gvsoc->top_get()->time_engine->finished_get()){
 
         double old_time = double(sc_time_stamp().to_double());
 
