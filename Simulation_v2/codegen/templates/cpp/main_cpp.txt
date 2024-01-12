@@ -43,7 +43,7 @@ int sc_main(int argc, char* argv[])
     {% endif -%}
     {% endfor %}
     //Master Functional Signal
-    sc_signal <int> Master_F_to_P;
+    sc_signal <double> Master_F_to_P;
     //Master Poweer Signal
     sca_tdf::sca_signal <double> V_M_to_B;
     sca_tdf::sca_signal <double> I_M_to_B;

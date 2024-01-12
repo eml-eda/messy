@@ -26,7 +26,7 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
     sc_core::sc_in  <bool> Go;
     sc_core::sc_in  <int> Data_in;
     //Power Port
-    sc_core::sc_out <int> power_signal;
+    sc_core::sc_out <double> power_signal;
 
     SC_CTOR(Core):
     A_Out("Address_From_Core_to_Func_Bus"),

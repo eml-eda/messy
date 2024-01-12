@@ -31,28 +31,39 @@ void Core::run()
     // Run for 10ms to let the chip boot as it is not accessible before it is powered-up
     //    gvsoc->step(10000000000);
 
+    double x=0,y=0,inst_power=0,time=0,old_time=0;
+    int64_t next_timestamp=0;
+    double tot_power=0;
+    int64_t sim_resolution_val=1000000000;
     while(!this->gvsoc->top_get()->time_engine->finished_get()){
+        old_time = double(sc_time_stamp().to_double());
 
-        double old_time = double(sc_time_stamp().to_double());
-
-        int64_t next_timestamp = gvsoc->step_until(old_time);
-
-        double time = double(sc_time_stamp().to_double());
-
+        next_timestamp = gvsoc->step_until(old_time);
+        inst_power=gvsoc->get_instant_power(x,y);
+        tot_power+=inst_power;
+        time = double(sc_time_stamp().to_double());
+        power_signal.write(tot_power);
         if (next_timestamp == -1){
             break;
         } else {
             if (old_time != time){
-                next_timestamp = gvsoc->step_until(time);
-                printf("%d, %lx, %lx \n", *(req_global->data), req_global->addr, req_global->size);
-                this->axi->reply(req_global);
-            } else {
-                //Update CPU Consumption
-                wait(next_timestamp - time, sc_core::SC_PS);
-                //Restore CPU State
+                while(next_timestamp<time){
+                    next_timestamp = gvsoc->step_until(next_timestamp);
+                    inst_power=gvsoc->get_instant_power(x,y);
+                    tot_power+=inst_power;
+                }
+                power_signal.write(tot_power);
             }
+            // did we arrive at a new sim resolution window?
+            if(((unsigned int)old_time/sim_resolution_val)!=((unsigned int)next_timestamp/sim_resolution_val)){
+                tot_power=0;
+            }
+            //Update CPU Consumption
+            wait(next_timestamp - time, sc_core::SC_PS);
+            //Restore CPU State
         }
     }
+    wait(sim_resolution_val-(next_timestamp%sim_resolution_val),sc_core::SC_PS);
 
     // Wait for simulation termination and exit code returned by simulated test
     int retval = gvsoc->join();
