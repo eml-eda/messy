@@ -1,8 +1,10 @@
 #include <config.h>
+#include <core.h>
 #include <systemc.h>
 
 SC_MODULE({{sensor['name']}})
 {
+    Core* core;
     //Input Port
     sc_core::sc_in <bool> enable;
     sc_core::sc_in <int>  address;

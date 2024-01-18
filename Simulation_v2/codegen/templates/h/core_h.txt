@@ -1,3 +1,5 @@
+#ifndef __CORE_H__GVSYSC
+#define __CORE_H__GVSYSC
 #include "config.h"
 #include <systemc.h>
 #include <gv/gvsoc.hpp>
@@ -9,6 +11,7 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
 {
     public:
     void run();
+    void go_ahead_for(int time_to_skip,int resolution);
     // notif
     void notify_stop(int64_t time);
     void notify_run(int64_t time);
@@ -45,8 +48,12 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
     Core(){}
 
     private:
+    int64_t next_timestamp;
+    double tot_power;
+    int64_t sim_resolution_val;
     gv::Io_binding *axi;
     Gvsoc_launcher *gvsoc;
     gv::Io_request *req_global;
     bool is_async;
 };
+#endif

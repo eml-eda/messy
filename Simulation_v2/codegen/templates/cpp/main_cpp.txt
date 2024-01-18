@@ -37,13 +37,14 @@ int sc_main(int argc, char* argv[])
 
     {% for sensor in settings['sensors'] -%}
     {{sensor['name']}}_functional {{sensor['name'].upper()}}("{{sensor['name']}}");
+    {{sensor['name'].upper()}}.core=&Master;
     {% if sensor['power'] == true -%}
     {{sensor['name']}}_power {{sensor['name'].upper()}}_P("{{sensor['name']}}_Power");
     load_converter {{sensor['name'].upper()}}_CONV("{{sensor['name']}}_Converter");  
     {% endif -%}
     {% endfor %}
     //Master Functional Signal
-    sc_signal <double> Master_F_to_P;
+    sc_signal <double,SC_MANY_WRITERS> Master_F_to_P;
     //Master Poweer Signal
     sca_tdf::sca_signal <double> V_M_to_B;
     sca_tdf::sca_signal <double> I_M_to_B;
