@@ -39,22 +39,27 @@ void Core::run()
         old_time = double(sc_time_stamp().to_double());
 
         next_timestamp = gvsoc->step_until(old_time);
-        inst_power=gvsoc->get_instant_power(x,y);
-        tot_power+=inst_power;
+
         time = double(sc_time_stamp().to_double());
-        power_signal.write(tot_power);
+
+        if (old_time==time){
+            inst_power=gvsoc->get_instant_power(x,y);
+            if(!read_power) tot_power=0;
+            tot_power+=inst_power;
+            read_power++;
+            power_signal.write(tot_power/read_power);
+        }
+
         if (next_timestamp == -1){
             break;
         } else {
-            // did we arrive at a new sim resolution window?
-            if(((unsigned int)old_time/sim_resolution_val)!=((unsigned int)next_timestamp/sim_resolution_val)){
-                tot_power=0;
-            }
             //Update CPU Consumption
             wait(next_timestamp - time, sc_core::SC_PS);
             //Restore CPU State
         }
     }
+    // wait until next resolutional value(next ms)
+    power_signal.write(0);
     wait(sim_resolution_val-(next_timestamp%sim_resolution_val),sc_core::SC_PS);
 
     // Wait for simulation termination and exit code returned by simulated test
@@ -115,18 +120,22 @@ void Core::access(gv::Io_request *req)
     this->axi->reply(req);
 }
 
-void Core::go_ahead_for(int time_to_skip,int resolution){
-    double time=(time_to_skip*sim_resolution_val)+sc_time_stamp().to_double();
+void Core::go_ahead_for(double start_time,int time_to_skip,int resolution){
     double x=0,y=0,inst_power=0;
+    double time=(time_to_skip*sim_resolution_val)+start_time;
+    inst_power=gvsoc->get_instant_power(x,y);
+    if(!read_power) tot_power=0;
+    tot_power+=inst_power;
+    read_power++;
+    power_signal.write(tot_power/read_power);
     while(next_timestamp<time){
         double sc_time=sc_time_stamp().to_double();
         double new_next_timestamp = gvsoc->step_until(next_timestamp);
         inst_power=gvsoc->get_instant_power(x,y);
+        if(!read_power) tot_power=0;
         tot_power+=inst_power;
-        power_signal.write(tot_power);
-        if(((unsigned int)next_timestamp/sim_resolution_val)!=((unsigned int)new_next_timestamp/sim_resolution_val)){
-            tot_power=0;
-        }
+        read_power++;
+        power_signal.write(tot_power/read_power);
         next_timestamp=new_next_timestamp;
         //Update CPU Consumption
         wait(next_timestamp - sc_time, sc_core::SC_PS);

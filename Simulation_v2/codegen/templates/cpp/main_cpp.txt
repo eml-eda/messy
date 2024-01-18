@@ -43,6 +43,7 @@ int sc_main(int argc, char* argv[])
     load_converter {{sensor['name'].upper()}}_CONV("{{sensor['name']}}_Converter");  
     {% endif -%}
     {% endfor %}
+    Master_Power.core=&Master;
     //Master Functional Signal
     sc_signal <double,SC_MANY_WRITERS> Master_F_to_P;
     //Master Poweer Signal

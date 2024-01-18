@@ -15,7 +15,8 @@ void {{sensor['name']}}_functional::sensor_logic(){
                     //data_out.write(rnd);
                     data_out.write(Register[address.read()]);
                     power_signal.write(1);
-                    core->go_ahead_for({{sensor['name'].upper()}}_T_ON_READ,SIM_RESOLUTION);
+                    double start_time=sc_time_stamp().to_double();
+                    core->go_ahead_for(start_time,{{sensor['name'].upper()}}_T_ON_READ,SIM_RESOLUTION);
                     power_signal.write(3);
                     go.write(true);
                 } else {
@@ -23,7 +24,8 @@ void {{sensor['name']}}_functional::sensor_logic(){
                     Register[address.read()] = data_in.read();
                     data_out.write(data_in.read());
                     power_signal.write(2);
-                    core->go_ahead_for({{sensor['name'].upper()}}_T_ON_WRITE,SIM_RESOLUTION);
+                    double start_time=sc_time_stamp().to_double();
+                    core->go_ahead_for(start_time,{{sensor['name'].upper()}}_T_ON_WRITE,SIM_RESOLUTION);
                     power_signal.write(3);
                     go.write(true);
                 }

@@ -1,9 +1,11 @@
 #include <systemc.h>
 #include <systemc-ams.h>
 #include "config.h"
+#include <core.h>
 
 SCA_TDF_MODULE(Core_power)
 {
+    Core* core;
     //Data from Functional Instance
     sca_tdf::sc_in  <double> func_signal;
     //Data to Power Bus

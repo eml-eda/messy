@@ -11,7 +11,7 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
 {
     public:
     void run();
-    void go_ahead_for(int time_to_skip,int resolution);
+    void go_ahead_for(double start_time,int time_to_skip,int resolution);
     // notif
     void notify_stop(int64_t time);
     void notify_run(int64_t time);
@@ -21,7 +21,7 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
     void grant(gv::Io_request *req);
     // This gets called when one of our access gets its response
     void reply(gv::Io_request *req);
-
+    int read_power=0;
     sc_core::sc_out <int> A_Out;
     sc_core::sc_out <int> D_Out;
     sc_core::sc_out <bool> F_Out;
