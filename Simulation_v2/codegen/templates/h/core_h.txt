@@ -11,6 +11,7 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
 {
     public:
     void run();
+    void close_gvsoc();
     void go_ahead_for(double start_time,int time_to_skip,int resolution);
     // notif
     void notify_stop(int64_t time);
@@ -49,6 +50,7 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
 
     private:
     int64_t next_timestamp;
+    int closed=0;
     double tot_power;
     int64_t sim_resolution_val;
     gv::Io_binding *axi;

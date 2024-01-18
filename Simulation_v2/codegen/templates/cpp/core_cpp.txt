@@ -68,10 +68,19 @@ void Core::run()
     std::cout << gvsoc->stop() << std::endl;
     //gvsoc->stop();
     gvsoc->close();
+    closed=1;
     sc_stop();
     return;
 }
 
+void Core::close_gvsoc(){
+    if(!closed){
+        int retval = gvsoc->join();
+        std::cout << gvsoc->stop() << std::endl;
+        gvsoc->close();
+        closed=1;
+    }
+}
 
 void Core::access(gv::Io_request *req)
 {

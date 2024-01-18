@@ -225,6 +225,7 @@ int sc_main(int argc, char* argv[])
 
     std::cout <<"The simulation ends @ "<<sc_time_stamp()<<endl;
 
+    Master.close_gvsoc();
     //Close Trace Files
     sca_util::sca_close_tabular_trace_file(ptf);
     sca_util::sca_close_tabular_trace_file(ftf);
