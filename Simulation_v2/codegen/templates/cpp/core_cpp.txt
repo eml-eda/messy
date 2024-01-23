@@ -35,6 +35,7 @@ void Core::run()
     next_timestamp=0;
     tot_power=0;
     sim_resolution_val=1000000000;
+    //next_timestamp = gvsoc->step_until(0);
     while(!this->gvsoc->top_get()->time_engine->finished_get()){
         old_time = double(sc_time_stamp().to_double());
 
@@ -42,14 +43,17 @@ void Core::run()
 
         time = double(sc_time_stamp().to_double());
 
-        if (old_time==time){
+        if (req_global==NULL){
             inst_power=gvsoc->get_instant_power(x,y);
             if(!read_power) tot_power=0;
             tot_power+=inst_power;
             read_power++;
-            power_signal.write(tot_power/read_power);
+            if(next_timestamp/sim_resolution_val!=old_time/sim_resolution_val) power_signal.write(tot_power/read_power);
         }
-
+        else{
+            handle_req(req_global);
+            time = double(sc_time_stamp().to_double());
+        }
         if (next_timestamp == -1){
             break;
         } else {
@@ -64,10 +68,11 @@ void Core::run()
 
     // Wait for simulation termination and exit code returned by simulated test
     int retval = gvsoc->join();
-    std::cout << sc_time_stamp().to_double() << std::endl;
-    std::cout << gvsoc->stop() << std::endl;
-    //gvsoc->stop();
+    //std::cout << sc_time_stamp().to_double() << std::endl;
+    //std::cout << gvsoc->stop() << std::endl;
+    gvsoc->stop();
     gvsoc->close();
+    fprintf(stdout, "End simulation at %ld\n",next_timestamp);
     closed=1;
     sc_stop();
     return;
@@ -76,28 +81,30 @@ void Core::run()
 void Core::close_gvsoc(){
     if(!closed){
         int retval = gvsoc->join();
-        std::cout << gvsoc->stop() << std::endl;
+        //std::cout << gvsoc->stop() << std::endl;
+        gvsoc->stop();
         gvsoc->close();
         closed=1;
     }
 }
-
-void Core::access(gv::Io_request *req)
+void Core::access(gv::Io_request* req){
+    req_global = req;
+}
+void Core::handle_req(gv::Io_request *req)
 {
     //Here connect the GvSoc signals with SystemC simulator signals   
-    std::cout << sc_time_stamp().to_double() << std::endl;
+    //std::cout << sc_time_stamp().to_double() << std::endl;
     int tmpaddr;
     if (req->type == gv::Io_request_read)
     {
-        printf("Received request (is_read: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
+        //printf("Received request (is_read: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
         D_Out.write(1);
         F_Out.write(true);
         Ready.write(true);
         tmpaddr = req->addr;
         //std::cout << tmpaddr << std::endl;
-
+        
         A_Out.write(tmpaddr);
-
         wait();
         Ready.write(false);
         wait();
@@ -105,7 +112,7 @@ void Core::access(gv::Io_request *req)
     }
     else
     {
-        printf("Received request (is_write: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
+        //printf("Received request (is_write: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
         D_Out.write(*(req->data));
         F_Out.write(false);
         Ready.write(true);
@@ -120,35 +127,41 @@ void Core::access(gv::Io_request *req)
         
     }
     *((uint32_t*)req->data) = Data_in.read();
-
-    req_global = req;
-
-    printf("%d, %lx, %lx \n", *(req_global->data), req_global->addr, req_global->size);
-    
-    std::cout << sc_time_stamp().to_double() << std::endl;
-    this->axi->reply(req);
+    //this->axi->reply(req);
+    custom_reply_axi(req);
+    req_global=NULL;
 }
+
+void Core::custom_reply_axi(gv::Io_request *req){
+    vp::io_req *vp_req = (vp::io_req *)req->handle;
+    vp_req->get_resp_port()->resp(vp_req);
+    delete req;
+}
+
 
 void Core::go_ahead_for(double start_time,int time_to_skip,int resolution){
     double x=0,y=0,inst_power=0;
     double time=(time_to_skip*sim_resolution_val)+start_time;
+    // lettura fatta che ha provocato systemc
     inst_power=gvsoc->get_instant_power(x,y);
     if(!read_power) tot_power=0;
     tot_power+=inst_power;
     read_power++;
     power_signal.write(tot_power/read_power);
+    int count=0;
     while(next_timestamp<time){
         double sc_time=sc_time_stamp().to_double();
-        double new_next_timestamp = gvsoc->step_until(next_timestamp);
+        next_timestamp = gvsoc->step_until(sc_time);
         inst_power=gvsoc->get_instant_power(x,y);
         if(!read_power) tot_power=0;
         tot_power+=inst_power;
         read_power++;
-        power_signal.write(tot_power/read_power);
-        next_timestamp=new_next_timestamp;
+        if(next_timestamp/sim_resolution_val!=sc_time/sim_resolution_val)   power_signal.write(tot_power/read_power);
         //Update CPU Consumption
         wait(next_timestamp - sc_time, sc_core::SC_PS);
+        count++;
     }
+    //fprintf(stdout,"Req had %d timestamps\n",count);
 }
 
 void Core::grant(gv::Io_request *req)

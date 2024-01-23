@@ -19,6 +19,8 @@
 #include "{{sensor['name']}}_power.h"
 {% endif -%}
 {% endfor %}
+//#define __TRACE_ACTIVE__
+
 
 int sc_main(int argc, char* argv[])
 {
@@ -200,6 +202,7 @@ int sc_main(int argc, char* argv[])
     Pv_conv.v_in(PV_V);
     Pv_conv.i_out(PV_I_C_to_Bus);
 
+    #ifdef __TRACE_ACTIVE__
     //Define Power Simulation File
     sca_util::sca_trace_file* ptf = sca_util::sca_create_tabular_trace_file("power_trace.txt");
     //Power Traces
@@ -217,6 +220,7 @@ int sc_main(int argc, char* argv[])
     sca_util::sca_trace(ftf, A_M_to_B, "Master_Adderess");
     sca_util::sca_trace(ftf, D_M_to_B, "Master_Data");
     sca_util::sca_trace(ftf, D_B_to_M, "Bus_Data");
+    #endif
 
     Enable_Temp.write(true);
     std::cout <<"The simulation starts!"<<endl;
@@ -226,9 +230,12 @@ int sc_main(int argc, char* argv[])
     std::cout <<"The simulation ends @ "<<sc_time_stamp()<<endl;
 
     Master.close_gvsoc();
+
+    #ifdef __TRACE_ACTIVE__
     //Close Trace Files
     sca_util::sca_close_tabular_trace_file(ptf);
     sca_util::sca_close_tabular_trace_file(ftf);
+    #endif
 
     return 0;
 }

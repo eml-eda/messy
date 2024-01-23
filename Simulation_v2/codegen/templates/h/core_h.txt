@@ -6,6 +6,7 @@
 #include <cstring>
 #include <string.h>
 #include <vp/launcher.hpp>
+#include <vp/itf/io.hpp>
 
 class Core : public gv::Io_user, public sc_module, public vp::Notifier
 {
@@ -13,6 +14,8 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
     void run();
     void close_gvsoc();
     void go_ahead_for(double start_time,int time_to_skip,int resolution);
+    void handle_req(gv::Io_request *req);
+    void custom_reply_axi(gv::Io_request *req);
     // notif
     void notify_stop(int64_t time);
     void notify_run(int64_t time);
@@ -55,7 +58,7 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
     int64_t sim_resolution_val;
     gv::Io_binding *axi;
     Gvsoc_launcher *gvsoc;
-    gv::Io_request *req_global;
+    gv::Io_request *req_global=NULL;
     bool is_async;
 };
 #endif
