@@ -6,7 +6,7 @@ import json
 import codegen_func
 
 
-def main(input_file, template_dir, output_dir):
+def main(input_file, template_dir, output_dir, starting_voc = 100, perc_voc = 100, name = "default", gvsoc_name = "gvsoc_config.json",core_conv="core"):
     """
     Main function for code generation
 
@@ -57,8 +57,8 @@ def main(input_file, template_dir, output_dir):
         codegen_func.battery_peukert_h_gen(template_dir, header_dir)
         codegen_func.battery_peukert_cpp_gen(template_dir, src_dir)
     elif settings["battery"] == "circuit":
-        codegen_func.battery_circuit_h_gen(template_dir, header_dir)
-        codegen_func.battery_circuit_cpp_gen(template_dir, src_dir)
+        codegen_func.battery_circuit_h_gen(template_dir, header_dir, starting_voc=starting_voc)
+        codegen_func.battery_circuit_cpp_gen(template_dir, src_dir, starting_voc=starting_voc, perc_voc=perc_voc)
 
     # Battery converter statement
     codegen_func.battery_converter_h_gen(template_dir, header_dir)
@@ -90,12 +90,12 @@ def main(input_file, template_dir, output_dir):
 
     # Core statement
     codegen_func.core_h_gen(template_dir, header_dir)
-    codegen_func.core_cpp_gen(settings, template_dir, src_dir)
-    codegen_func.core_power_h_gen(template_dir, header_dir)
+    codegen_func.core_cpp_gen(settings, template_dir, src_dir, gvsoc_name=gvsoc_name)
+    codegen_func.core_power_h_gen(template_dir, header_dir, core_conv=core_conv)
     codegen_func.core_power_cpp_gen(template_dir, src_dir)
 
     # Main statement
-    codegen_func.main_cpp_gen(settings, template_dir, src_dir)
+    codegen_func.main_cpp_gen(settings, template_dir, src_dir, starting_voc=starting_voc, name=name)
 
     print("OK!")
 
@@ -134,6 +134,45 @@ if __name__ == "__main__":
         help="Path where code will be generated",
     )
 
+    parser.add_argument(
+        "-s",
+        "--starting_voc",
+        type=float,
+        default=100,
+        help="starting_voc",
+    )
+
+    parser.add_argument(
+        "-p",
+        "--perc_voc",
+        type=float,
+        default=100,
+        help="perc voc",
+    )
+
+    parser.add_argument(
+        "-n",
+        "--name",
+        type=str,
+        default="default",
+        help="name",
+    )
+
+    parser.add_argument(
+        "-g",
+        "--gvsoc_config",
+        type=str,
+        default="gvsoc_config.json",
+        help="gvsoc config file name",
+    )
+
+    parser.add_argument(
+        "-c",
+        "--core_conv",
+        type=str,
+        default="gvsoc_config.json",
+        help="gvsoc config file name",
+    )
     # Parse the command line arguments
     args = parser.parse_args()
 
@@ -146,5 +185,14 @@ if __name__ == "__main__":
     # Convert the output directory path to a Path object
     output_dir = Path(args.output_dir)
 
+    starting_voc = args.starting_voc
+
+    perc_voc = args.perc_voc
+
+    name = args.name
+
+    gvsoc_name = args.gvsoc_config
+
+    core_conv = args.core_conv
     # Call the main function with the parsed arguments
-    main(input_file=input_file, template_dir=template_dir, output_dir=output_dir)
+    main(input_file=input_file, template_dir=template_dir, output_dir=output_dir, starting_voc=starting_voc, perc_voc=perc_voc, name=name,gvsoc_name=gvsoc_name,core_conv=core_conv)

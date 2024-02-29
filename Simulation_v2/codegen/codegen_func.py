@@ -39,6 +39,7 @@ def config_gen(settings, template_dir, output_dir):
         f.write(f'#define SELFDISCH_FACTOR {settings["selfdisch_factor"]}\n')
         f.write(f"#define NS {nsensor + 1}\n")
         f.write(f"#define NP {nsensor}\n")
+        f.write(f"#define V_CORE 1.8\n")
         # Temporary Lines #
         f.write(f"// params for CPU\n")
         f.write(f"#define CPU_I_IDLE 0.002\n")
@@ -56,7 +57,7 @@ def config_gen(settings, template_dir, output_dir):
 # Main Methods
 
 
-def main_cpp_gen(settings, template_dir, output_dir):
+def main_cpp_gen(settings, template_dir, output_dir, starting_voc=100, name="default"):
     """
     Generate main.cpp file
 
@@ -72,7 +73,7 @@ def main_cpp_gen(settings, template_dir, output_dir):
     with open(template_dir / "cpp" / "main_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "main.cpp", "w") as f:
-            f.write(template.render(settings=settings))
+            f.write(template.render(settings=settings,starting_voc=starting_voc,name=name))
 
 
 # Core Mehods
@@ -96,7 +97,7 @@ def core_h_gen(template_dir, output_dir):
             f.write(template.render())
 
 
-def core_cpp_gen(settings, template_dir, output_dir):
+def core_cpp_gen(settings, template_dir, output_dir, gvsoc_name="gvsoc_config.json"):
     """
     Generate core.cpp file
 
@@ -114,10 +115,10 @@ def core_cpp_gen(settings, template_dir, output_dir):
         template = Template(temp.read())
         tmp_data = dict(settings)
         with open(output_dir / "core.cpp", "w") as f:
-            f.write(template.render(data=tmp_data))
+            f.write(template.render(data=tmp_data,gvsoc_name=gvsoc_name,len_gvsoc_name=len(gvsoc_name)+1))
 
 
-def core_power_h_gen(template_dir, output_dir):
+def core_power_h_gen(template_dir, output_dir, core_conv="core"):
     """
     Generate core_power.h file
     
@@ -133,7 +134,16 @@ def core_power_h_gen(template_dir, output_dir):
         template = Template(temp.read())
         with open(output_dir / "core_power.h", "w") as f:
             f.write(template.render())
+    
+    with open(template_dir / "h" / "core_power_converter_h.txt") as temp:
+        template = Template(temp.read())
+        with open(output_dir / "core_power_converter.h", "w") as f:
+            f.write(template.render(core_converter=core_conv))
 
+    with open(template_dir / "h" / "config_converter_core_h.txt") as temp:
+        template = Template(temp.read())
+        with open(output_dir / "config_converter_core.h", "w") as f:
+            f.write(template.render())
 
 def core_power_cpp_gen(template_dir, output_dir):
     """
@@ -150,6 +160,11 @@ def core_power_cpp_gen(template_dir, output_dir):
     with open(template_dir / "cpp" / "core_power_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "core_power.cpp", "w") as f:
+            f.write(template.render())
+
+    with open(template_dir / "cpp" / "core_power_converter_cpp.txt") as temp:
+        template = Template(temp.read())
+        with open(output_dir / "core_power_converter.cpp", "w") as f:
             f.write(template.render())
 
 
@@ -404,7 +419,7 @@ def battery_peukert_cpp_gen(template_dir, output_dir):
 # Circuit_Model Battery Methods
 
 
-def battery_circuit_h_gen(template_dir, output_dir):
+def battery_circuit_h_gen(template_dir, output_dir,starting_voc=100):
     """
     Generate battery_circuit.h file
 
@@ -423,7 +438,7 @@ def battery_circuit_h_gen(template_dir, output_dir):
     with open(template_dir / "h" / "battery_voc_h.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "battery_voc.h", "w") as f:
-            f.write(template.render())
+            f.write(template.render(starting_voc=starting_voc))
 
     with open(template_dir / "h" / "battery_h.txt") as temp:
         template = Template(temp.read())
@@ -431,7 +446,7 @@ def battery_circuit_h_gen(template_dir, output_dir):
             f.write(template.render())
 
 
-def battery_circuit_cpp_gen(template_dir, output_dir):
+def battery_circuit_cpp_gen(template_dir, output_dir,starting_voc=100, perc_voc=100):
     """
     Generate battery_circuit.cpp file
 
@@ -451,7 +466,7 @@ def battery_circuit_cpp_gen(template_dir, output_dir):
     with open(template_dir / "cpp" / "battery_voc_cpp.txt") as temp:
         template = Template(temp.read())
         with open(output_dir / "battery_voc.cpp", "w") as f:
-            f.write(template.render())
+            f.write(template.render(starting_voc=starting_voc, perc_voc=perc_voc))
 
     with open(template_dir / "cpp" / "battery_cpp.txt") as temp:
         template = Template(temp.read())

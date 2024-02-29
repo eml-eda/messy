@@ -8,19 +8,19 @@
     "sensors" : [
         {
             "power"  : true,
-            "name"   : "air_quality_sensor",
+            "name"   : "microphone",
             "voltage": 3.3,
             "reg" : 250,
             "states" : [
                 {
                     "name"    : "ON_READ",
-                    "current" : "48.2",
-                    "time_on" : "1"
+                    "current" : "0.12",
+                    "time_on" : "30"
                 },
                 {
                     "name"    : "ON_WRITE",
-                    "current" : "49.2",
-                    "time_on" : "1"
+                    "current" : "0.16",
+                    "time_on" : "30"
                 },
                 {
                     "name"    : "IDLE",

@@ -8,24 +8,28 @@
 #include "battery_converter.h"
 #include "core.h"
 #include "core_power.h"
+#include "core_power_converter.h"
 #include "sys_functional_bus.h"
 #include "sys_power_bus.h"
 #include "load_converter.h"
+#ifdef PANEL_ACTIVE
 #include "pv_panel.h"
 #include "converter_pv.h"
+#endif
 {% for sensor in settings['sensors'] -%}
 #include "{{sensor['name']}}_functional.h"
 {% if sensor['power'] == true -%}
 #include "{{sensor['name']}}_power.h"
 {% endif -%}
 {% endfor %}
-//#define __TRACE_ACTIVE__
+#define __TRACE_ACTIVE__
 
 
 int sc_main(int argc, char* argv[])
 {
     Core                          Master("Master");
     Core_power                    Master_Power("Master_Power");
+    Core_power_converter          Master_Power_Conv("Master Power Conv");
     functional_bus                Func("Func");
     power_bus                     Pwr("Power");
     {% if settings['battery'] == 'peukert' -%}
@@ -34,9 +38,12 @@ int sc_main(int argc, char* argv[])
     battery                       Bat("Battery");
     {% endif -%}
     battery_converter             Batt_conv("Battery_Converter");
+    #ifdef PANEL_ACTIVE
     pv_panel                      Pv("Solar_Panel");
     converter_pv                  Pv_conv("Solar_Converter");
-
+    #endif
+    sca_tdf::sca_signal <double> eff_core;
+    sca_tdf::sca_signal <double> curr_out_avg_batt;
     {% for sensor in settings['sensors'] -%}
     {{sensor['name']}}_functional {{sensor['name'].upper()}}("{{sensor['name']}}");
     {{sensor['name'].upper()}}.core=&Master;
@@ -47,9 +54,10 @@ int sc_main(int argc, char* argv[])
     {% endfor %}
     Master_Power.core=&Master;
     //Master Functional Signal
-    sc_signal <double,SC_MANY_WRITERS> Master_F_to_P;
-    //Master Poweer Signal
-    sca_tdf::sca_signal <double> V_M_to_B;
+    sc_signal <int> Master_F_to_P;
+    //Master Power Signal
+    sca_tdf::sca_signal <double> V_M;
+    sca_tdf::sca_signal <double> I_M;
     sca_tdf::sca_signal <double> I_M_to_B;
     //Functional Bus
     sc_signal <bool> Enable_Temp;
@@ -90,11 +98,13 @@ int sc_main(int argc, char* argv[])
     //Battery Converter Signals
     sca_tdf::sca_signal <double> I_Bus_to_C_Batt;
 
+    #ifdef PANEL_ACTIVE
     //Solar Panel Signals
     sca_tdf::sca_signal <double> PV_I;
     sca_tdf::sca_signal <double> PV_V;
     //Solar Converter Signal
     sca_tdf::sca_signal <double> PV_I_C_to_Bus;
+    #endif
 
     {% for sensor in settings['sensors'] -%}
     //{{sensor['name'].upper()}} Data
@@ -119,8 +129,12 @@ int sc_main(int argc, char* argv[])
     Master.power_signal(Master_F_to_P);
     //Binding Power Master's signals
     Master_Power.func_signal(Master_F_to_P);
-    Master_Power.voltage_state(V_M_to_B);
-    Master_Power.current_state(I_M_to_B);
+    Master_Power.voltage_state(V_M);
+    Master_Power.current_state(I_M);
+    Master_Power_Conv.current_in(I_M);
+    Master_Power_Conv.voltage_in(V_M);
+    Master_Power_Conv.current_out(I_M_to_B);
+    Master_Power_Conv.eff_core(eff_core);
     //Binding Functional Bus Master's Input 
     Func.address_in_M(A_M_to_B);
     Func.data_in_M(D_M_to_B);
@@ -144,9 +158,11 @@ int sc_main(int argc, char* argv[])
     }
 
     //Binding Power Bus's Input Signal
-    Pwr.CPU_V(V_M_to_B);
+    Pwr.CPU_V(V_M);
     Pwr.CPU_I(I_M_to_B);
+    #ifdef PANEL_ACTIVE
     Pwr.PV_I(PV_I_C_to_Bus);
+    #endif
 
     for (size_t i = 0; i < NP; i++) {
         Pwr.voltage_in_S[i](V_S_to_B[i]);
@@ -174,6 +190,7 @@ int sc_main(int argc, char* argv[])
     {{sensor['name'].upper()}}_CONV.voltage_in(V_S_to_B[{{loop.index - 1}}]);
     {{sensor['name'].upper()}}_CONV.current_out(I_S_to_B[{{loop.index - 1}}]);
     //Set-Up {{sensor['name'].upper()}} Converter Efficency
+    // sensor doesn't have real converter
     {{sensor['name'].upper()}}_CONV.set_efficency(1.0);
 
     {% endfor -%}
@@ -181,6 +198,7 @@ int sc_main(int argc, char* argv[])
     Batt_conv.current_in(I_Bus_to_C_Batt);
     Batt_conv.voltage_in(V_Batt);
     Batt_conv.current_out(I_Batt);
+    Batt_conv.curr_out_avg_batt(curr_out_avg_batt);
 
     {% if settings['battery'] == 'peukert' -%}
     //Binding Peukert Battery signals
@@ -194,6 +212,7 @@ int sc_main(int argc, char* argv[])
     Bat.soc(SoC_Batt);
     {% endif -%}
 
+    #ifdef PANEL_ACTIVE
     //Binding Solar Panel signals
     Pv.i(PV_I);
     Pv.v(PV_V);
@@ -201,25 +220,32 @@ int sc_main(int argc, char* argv[])
     Pv_conv.i_in(PV_I);
     Pv_conv.v_in(PV_V);
     Pv_conv.i_out(PV_I_C_to_Bus);
+    #endif
 
     #ifdef __TRACE_ACTIVE__
     //Define Power Simulation File
-    sca_util::sca_trace_file* ptf = sca_util::sca_create_tabular_trace_file("power_trace.txt");
+    sca_util::sca_trace_file* ptf = sca_util::sca_create_tabular_trace_file("{{name}}_power_trace.txt");
+    ptf->set_mode(sca_sampling(1,SC_SEC));
     //Power Traces
     sca_util::sca_trace(ptf, SoC_Batt, "SoC_Batt");
     //sca_util::sca_trace(ptf, V_Batt, "Batt_Voltage");
     sca_util::sca_trace(ptf, I_Bus_to_C_Batt, "I_Tot_Bus");
     sca_util::sca_trace(ptf, I_Batt, "I_to_Batt");
     sca_util::sca_trace(ptf, I_M_to_B, "CPU");
+    sca_util::sca_trace(ptf, I_M, "CPU_oneeight");
+    sca_util::sca_trace(ptf, eff_core, "avg_eff_core");
+    sca_util::sca_trace(ptf, curr_out_avg_batt, "curr_out_avg_batt");
     {% for sensor in settings['sensors'] -%}
     sca_util::sca_trace(ptf, I_S_to_B[{{loop.index - 1}}], "{{sensor['name']}}");
     {% endfor %}
+    #ifdef __F_TRACE_ACTIVE__
     //Define Functional Simulation File
     sca_util::sca_trace_file* ftf = sca_util::sca_create_tabular_trace_file("funtional_trace.txt");
     //Simulation Traces
     sca_util::sca_trace(ftf, A_M_to_B, "Master_Adderess");
     sca_util::sca_trace(ftf, D_M_to_B, "Master_Data");
     sca_util::sca_trace(ftf, D_B_to_M, "Bus_Data");
+    #endif
     #endif
 
     Enable_Temp.write(true);
@@ -234,7 +260,9 @@ int sc_main(int argc, char* argv[])
     #ifdef __TRACE_ACTIVE__
     //Close Trace Files
     sca_util::sca_close_tabular_trace_file(ptf);
+    #ifdef __F_TRACE_ACTIVE__
     sca_util::sca_close_tabular_trace_file(ftf);
+    #endif
     #endif
 
     return 0;

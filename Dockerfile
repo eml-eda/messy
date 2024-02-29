@@ -151,7 +151,7 @@ RUN pip3 install -r tools/nntool/requirements.txt
 RUN pip3 install -r utils/gapy_v2/requirements.txt
 
 
-# Install the requirements for the sysc-sim
+# Install the requirements for the messy
 RUN pip3 install -r requirements.txt
 
 # Copy the custom sourceme.sh file to the container
@@ -170,7 +170,7 @@ COPY custom /gap_sdk/examples/gap9
 RUN chmod -R 777 /gap_sdk
 
 # Set working directory to /
-WORKDIR /home/sysc-sim
+WORKDIR /home/messy
 
 # Copy a custom entrypoint script into the container
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh

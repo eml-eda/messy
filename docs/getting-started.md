@@ -7,13 +7,13 @@ This document will guide you through the steps to get started with the project.
 First, clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/eml-eda/sysc-sim
+git clone https://github.com/eml-eda/messy
 ```
 
 Then change into the directory:
 
 ```bash
-cd sysc-sim
+cd messy
 ```
 
 ## Build the docker image
@@ -25,7 +25,7 @@ For details on what the Dockerfile does and how to build the image, please refer
 
 When you have completed the previous steps, you should be inside the container. If not, please refer to the [Run the Docker container](docker.md#run-the-docker-container) section of the Docker getting started file.
 
-The shell inside the container should be in the `/home/sysc-sim` directory. From there, you can change into the `Simulation_v2/codegen` directory:
+The shell inside the container should be in the `/home/messy` directory. From there, you can change into the `Simulation_v2/codegen` directory:
 
 ```bash
 cd Simulation_v2/codegen
@@ -76,9 +76,9 @@ This command will take some time to complete. Once it is done, we should see a n
 We need to copy these files in the `Simulation_v2/bin` folder:
 
 ```bash
-cp gvsoc_config.json /home/sysc-sim/Simulation_v2/
-cp chip.soc.mram.bin /home/sysc-sim/Simulation_v2/
-cp efuse_preload.data /home/sysc-sim/Simulation_v2/
+cp gvsoc_config.json /home/messy/Simulation_v2/
+cp chip.soc.mram.bin /home/messy/Simulation_v2/
+cp efuse_preload.data /home/messy/Simulation_v2/
 ```
 
 ## Simulator

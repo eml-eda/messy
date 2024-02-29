@@ -13,41 +13,16 @@ void Core_power::initialize() {}
 
 void Core_power::processing()
 {
-    double val=func_signal.read();
+    if(!core->read_power){
+        voltage_state.write(0.0);
+        current_state.write(0.0);
+        //power_to_therm.write(0.0);
+        return;
+    }
+    // the results are in W teoretically, but if we want in mW we should put 1000	
+    int unit_mult=1000;
+    double val=((core->tot_power/core->read_power)*unit_mult)/V_CORE;
     core->read_power=0;
-    if(val == 0){
-        //std::cout << "Air quality in OFF state" << std::endl;
-        voltage_state.write(0.0);
-        current_state.write(0.0);
-        //power_to_therm.write(0.0);
-        return;
-    }
-    voltage_state.write(1.2);
-    current_state.write(val/1.2);
-    /*if(func_signal.read() == 1){
-        //std::cout << "Air quality in Computation state" << std::endl;
-        voltage_state.write(VREF_BUS);
-        current_state.write(CPU_ON_I_ON);
-        //power_to_therm.write(0.0);
-        return;
-    }
-
-    if(func_signal.read() == 3){
-        //std::cout << "Core quality in IDLE state" << std::endl;
-        voltage_state.write(VREF_BUS);
-        current_state.write(CPU_I_IDLE);
-        //power_to_therm.write(5.0);
-        return;
-    }
-
-    if(func_signal.read() == 0){
-        //std::cout << "Air quality in OFF state" << std::endl;
-        voltage_state.write(0.0);
-        current_state.write(0.0);
-        //power_to_therm.write(0.0);
-        return;
-    }
-
-    std::cout << "Core in an Unknown state!" << std::endl;
-    //power_to_therm.write(0.0);*/     
+    voltage_state.write(V_CORE);
+    current_state.write(val);
 }

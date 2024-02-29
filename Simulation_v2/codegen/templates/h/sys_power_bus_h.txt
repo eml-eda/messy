@@ -7,7 +7,9 @@ SCA_TDF_MODULE(power_bus){
     //Input Port
     sca_tdf::sca_in <double>  CPU_I;
     sca_tdf::sca_in <double>  CPU_V;
+    #ifdef PANEL_ACTIVE
     sca_tdf::sca_in <double>  PV_I;
+    #endif
     sca_tdf::sca_in <double>  voltage_in_S[NP];
     sca_tdf::sca_in <double>  current_in_S[NP];
 

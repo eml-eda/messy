@@ -26,6 +26,8 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
     // This gets called when one of our access gets its response
     void reply(gv::Io_request *req);
     int read_power=0;
+    double tot_power=0.0;
+    int start=0;
     sc_core::sc_out <int> A_Out;
     sc_core::sc_out <int> D_Out;
     sc_core::sc_out <bool> F_Out;
@@ -54,11 +56,15 @@ class Core : public gv::Io_user, public sc_module, public vp::Notifier
     private:
     int64_t next_timestamp;
     int closed=0;
-    double tot_power;
     int64_t sim_resolution_val;
     gv::Io_binding *axi;
     Gvsoc_launcher *gvsoc;
     gv::Io_request *req_global=NULL;
     bool is_async;
+    #ifdef DEBUG_APP
+    int start=0;
+    int transfer=1;
+    int comp=1;
+    #endif
 };
 #endif

@@ -22,12 +22,14 @@ void battery_converter::processing()
     // Avoid div by zero
     if (v_batt_tmp == 0)
     {
-        v_batt_tmp = 3.6;
+        v_batt_tmp = 3.8;
     }
 
     // Get efficiency
     eta = lut_eta.get_val(fabs(i_bus_tmp)) / 100; 
-
-    current_out.write( (eta * (i_bus_tmp * VREF_BUS)) / v_batt_tmp);
-
+    double curr_out=(eta * (i_bus_tmp * VREF_BUS)) / v_batt_tmp;
+    tot_curr_out+=curr_out;
+    tot_curr_reads+=1;
+    curr_out_avg_batt.write(tot_curr_out/tot_curr_reads);
+    current_out.write( curr_out );
 }
