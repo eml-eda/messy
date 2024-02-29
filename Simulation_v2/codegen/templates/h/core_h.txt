@@ -1,21 +1,33 @@
+#ifndef __CORE_H__GVSYSC
+#define __CORE_H__GVSYSC
 #include "config.h"
 #include <systemc.h>
 #include <gv/gvsoc.hpp>
 #include <cstring>
 #include <string.h>
+#include <vp/launcher.hpp>
+#include <vp/itf/io.hpp>
 
-class Core : public gv::Io_user, public sc_module
+class Core : public gv::Io_user, public sc_module, public vp::Notifier
 {
     public:
     void run();
-
+    void close_gvsoc();
+    void go_ahead_for(double start_time,int time_to_skip,int resolution);
+    void handle_req(gv::Io_request *req);
+    void custom_reply_axi(gv::Io_request *req);
+    // notif
+    void notify_stop(int64_t time);
+    void notify_run(int64_t time);
     // This gets called when an access from gvsoc side is reaching us
     void access(gv::Io_request *req);
     // This gets called when one of our access gets granted
     void grant(gv::Io_request *req);
     // This gets called when one of our access gets its response
     void reply(gv::Io_request *req);
-
+    int read_power=0;
+    double tot_power=0.0;
+    int start=0;
     sc_core::sc_out <int> A_Out;
     sc_core::sc_out <int> D_Out;
     sc_core::sc_out <bool> F_Out;
@@ -42,7 +54,17 @@ class Core : public gv::Io_user, public sc_module
     Core(){}
 
     private:
+    int64_t next_timestamp;
+    int closed=0;
+    int64_t sim_resolution_val;
     gv::Io_binding *axi;
-    gv::Gvsoc *gvsoc;
-    gv::Io_request *req_global;
+    Gvsoc_launcher *gvsoc;
+    gv::Io_request *req_global=NULL;
+    bool is_async;
+    #ifdef DEBUG_APP
+    int start=0;
+    int transfer=1;
+    int comp=1;
+    #endif
 };
+#endif

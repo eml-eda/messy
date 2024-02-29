@@ -36,7 +36,7 @@ The Dockerfile is based on the Ubuntu 20.04 image. It installs the following dep
 The first step is to build the Docker image. To do so, run the following command:
 
 ```bash
-docker build -t sysc-sim:latest --build-arg USER_ID=$(id -u ${USER}) --build-arg GROUP_ID=$(id -g ${USER}) .
+docker build -t messy:latest --build-arg USER_ID=$(id -u ${USER}) --build-arg GROUP_ID=$(id -g ${USER}) .
 ```
 
 The first time you run this command, it will take some time to build the image. Thanks to docker caching, the next time you run this command, it will be much faster.
@@ -46,7 +46,7 @@ The first time you run this command, it will take some time to build the image. 
 Once the image is built, you can run the container with the following command:
 
 ```bash
-docker run -it --rm -v $(pwd):/home/sysc-sim sysc-sim:latest
+docker run -it --rm -v $(pwd):/home/messy messy:latest
 ```
 
-This command will run the container and mount the current directory in the `/home/sysc-sim` directory of the container. This way, you can access the files from the container and the host. Now you should see the shell inside the container.
+This command will run the container and mount the current directory in the `/home/messy` directory of the container. This way, you can access the files from the container and the host. Now you should see the shell inside the container.

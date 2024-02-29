@@ -9,4 +9,4 @@ After that you need to install the Visual Studio Code extension `Remote - Contai
 
 After that, you will find a docker icon in left bar. If you click it, it will show you the list of containers. You should see the container you created before. If you right click on it and select `Attach Visual Studio Code`, it will open a new window with the container attached.
 
-Then you can open the folder `/home/sysc-sim` and click on the debug icon in the left bar. You should see a list of debug configurations. The one we are interested in is called `gdb`. If you click on it, it will start the debugger. You can set breakpoints and step through the code.
+Then you can open the folder `/home/messy` and click on the debug icon in the left bar. You should see a list of debug configurations. The one we are interested in is called `gdb`. If you click on it, it will start the debugger. You can set breakpoints and step through the code.

@@ -5,7 +5,9 @@ void power_bus::set_attributes(){}
 void power_bus::initialize(){}
 
 void power_bus::processing(){
+    #ifdef PANEL_ACTIVE
     double tmp_pv;
+    #endif
     double tmp_i;
     total_current = 0;
 
@@ -16,9 +18,15 @@ void power_bus::processing(){
     }
     
     tmp_i = CPU_I.read();
+    #ifdef PANEL_ACTIVE
     tmp_pv = PV_I.read();
+    #endif
 
+    #ifdef PANEL_ACTIVE
     total_current = total_current + tmp_i - tmp_pv;
+    #else
+    total_current = total_current + tmp_i;
+    #endif
 
     //std::cout << total_current << " A " << sc_time_stamp() << endl;
     battery_out_current.write(total_current);
