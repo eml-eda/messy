@@ -1,0 +1,269 @@
+#include <systemc.h>
+#include <systemc-ams.h>
+{% if settings['battery'] == 'peukert' -%}
+#include "battery_peukert.h"
+{% else -%}
+#include "battery.h"
+{% endif -%}
+#include "battery_converter.h"
+#include "core.h"
+#include "core_power.h"
+#include "core_power_converter.h"
+#include "sys_functional_bus.h"
+#include "sys_power_bus.h"
+#include "load_converter.h"
+#ifdef PANEL_ACTIVE
+#include "pv_panel.h"
+#include "converter_pv.h"
+#endif
+{% for sensor in settings['sensors'] -%}
+#include "{{sensor['name']}}_functional.h"
+{% if sensor['power'] == true -%}
+#include "{{sensor['name']}}_power.h"
+{% endif -%}
+{% endfor %}
+#define __TRACE_ACTIVE__
+
+
+int sc_main(int argc, char* argv[])
+{
+    Core                          Master("Master");
+    Core_power                    Master_Power("Master_Power");
+    Core_power_converter          Master_Power_Conv("Master Power Conv");
+    functional_bus                Func("Func");
+    power_bus                     Pwr("Power");
+    {% if settings['battery'] == 'peukert' -%}
+    battery_peukert               P_Batt("Peukert_Battery");
+    {% else -%}
+    battery                       Bat("Battery");
+    {% endif -%}
+    battery_converter             Batt_conv("Battery_Converter");
+    #ifdef PANEL_ACTIVE
+    pv_panel                      Pv("Solar_Panel");
+    converter_pv                  Pv_conv("Solar_Converter");
+    #endif
+    sca_tdf::sca_signal <double> eff_core;
+    sca_tdf::sca_signal <double> curr_out_avg_batt;
+    {% for sensor in settings['sensors'] -%}
+    {{sensor['name']}}_functional {{sensor['name'].upper()}}("{{sensor['name']}}");
+    {{sensor['name'].upper()}}.core=&Master;
+    {% if sensor['power'] == true -%}
+    {{sensor['name']}}_power {{sensor['name'].upper()}}_P("{{sensor['name']}}_Power");
+    load_converter {{sensor['name'].upper()}}_CONV("{{sensor['name']}}_Converter");  
+    {% endif -%}
+    {% endfor %}
+    Master_Power.core=&Master;
+    //Master Functional Signal
+    sc_signal <int> Master_F_to_P;
+    //Master Power Signal
+    sca_tdf::sca_signal <double> V_M;
+    sca_tdf::sca_signal <double> I_M;
+    sca_tdf::sca_signal <double> I_M_to_B;
+    //Functional Bus
+    sc_signal <bool> Enable_Temp;
+    //Data from Master to Functional Bus
+    sc_signal <int>  A_M_to_B;
+    sc_signal <int>  D_M_to_B;
+    sc_signal <bool> F_M_to_B;
+    sc_signal <bool> Ready_M_to_B;
+    //Data from Functional Bus to Master
+    sc_signal <int>  D_B_to_M;
+    sc_signal <bool> Go_B_to_M;
+    //Data from Functional Bus to Slave
+    sc_signal <int>  A_B_to_S[NS];
+    sc_signal <int>  D_B_to_S[NS];
+    sc_signal <bool> F_B_to_S[NS];
+    sc_signal <bool> Ready_B_to_S[NS];
+    //Data from Slave to Functional Bus
+    sc_signal <int> Fake_D;
+    sc_signal <bool> Fake_GO;
+    Func.data_in_S[0](Fake_D);
+    Func.Go_S[0](Fake_GO);
+
+    //Power Bus
+    //Signals from Slave to Bus
+    sca_tdf::sca_signal <double> V_S_to_B[NP];
+    sca_tdf::sca_signal <double> I_S_to_B[NP];
+    //Output Traces from Power Bus
+    sca_tdf::sca_signal <double> Tot_Voltage;
+
+    //Battery Signals
+    sca_tdf::sca_signal <double> SoC_Batt;
+    sca_tdf::sca_signal <double> V_Batt;
+    sca_tdf::sca_signal <double> I_Batt;
+    {% if settings['battery'] == 'peukert' -%}
+    //Peukert Battery Signals
+    sca_tdf::sca_signal <double> Lifetime;
+    {% endif -%}
+    //Battery Converter Signals
+    sca_tdf::sca_signal <double> I_Bus_to_C_Batt;
+
+    #ifdef PANEL_ACTIVE
+    //Solar Panel Signals
+    sca_tdf::sca_signal <double> PV_I;
+    sca_tdf::sca_signal <double> PV_V;
+    //Solar Converter Signal
+    sca_tdf::sca_signal <double> PV_I_C_to_Bus;
+    #endif
+
+    {% for sensor in settings['sensors'] -%}
+    //{{sensor['name'].upper()}} Data
+    sc_signal <int> {{sensor['name'].upper()}}_Data;
+    sc_signal <bool> {{sensor['name'].upper()}}_Go;  
+    {% if sensor['power'] == true -%}
+    //{{sensor['name'].upper()}} Power
+    sc_signal <int> {{sensor['name'].upper()}}_F_to_P;
+    sca_tdf::sca_signal <double> {{sensor['name'].upper()}}_V_State;
+    sca_tdf::sca_signal <double> {{sensor['name'].upper()}}_I_State;
+    //{{sensor['name'].upper()}} Converter
+    sca_tdf::sca_signal <double> {{sensor['name'].upper()}}_I_S_to_C;  
+    {% endif -%}
+    {% endfor %}
+    //Binding Functional Master's signals
+    Master.A_Out(A_M_to_B);
+    Master.D_Out(D_M_to_B);
+    Master.F_Out(F_M_to_B);
+    Master.Ready(Ready_M_to_B);
+    Master.Go(Go_B_to_M);
+    Master.Data_in(D_B_to_M);
+    Master.power_signal(Master_F_to_P);
+    //Binding Power Master's signals
+    Master_Power.func_signal(Master_F_to_P);
+    Master_Power.voltage_state(V_M);
+    Master_Power.current_state(I_M);
+    Master_Power_Conv.current_in(I_M);
+    Master_Power_Conv.voltage_in(V_M);
+    Master_Power_Conv.current_out(I_M_to_B);
+    Master_Power_Conv.eff_core(eff_core);
+    //Binding Functional Bus Master's Input 
+    Func.address_in_M(A_M_to_B);
+    Func.data_in_M(D_M_to_B);
+    Func.flag_in_M(F_M_to_B);
+    Func.Ready_M(Ready_M_to_B);
+    //Binding Slave Input to Functional Bus
+    {% for sensor in settings['sensors'] -%}
+    //{{sensor['name'].upper()}}
+    Func.data_in_S[{{loop.index}}]({{sensor['name'].upper()}}_Data);
+    Func.Go_S[{{loop.index}}]({{sensor['name'].upper()}}_Go);
+    {% endfor %}
+
+    //Binding Functional Bus's Output Address
+    Func.data_out_M(D_B_to_M);
+    Func.Go_M(Go_B_to_M);
+    for (size_t i = 0; i < NS; i++) {
+        Func.address_out_S[i](A_B_to_S[i]);
+        Func.data_out_S[i](D_B_to_S[i]);
+        Func.flag_out_S[i](F_B_to_S[i]);
+        Func.Ready_S[i](Ready_B_to_S[i]);
+    }
+
+    //Binding Power Bus's Input Signal
+    Pwr.CPU_V(V_M);
+    Pwr.CPU_I(I_M_to_B);
+    #ifdef PANEL_ACTIVE
+    Pwr.PV_I(PV_I_C_to_Bus);
+    #endif
+
+    for (size_t i = 0; i < NP; i++) {
+        Pwr.voltage_in_S[i](V_S_to_B[i]);
+        Pwr.current_in_S[i](I_S_to_B[i]);
+    }
+    //Binding Power Bus's Output Signal
+    Pwr.battery_out_current(I_Bus_to_C_Batt);
+
+    {% for sensor in settings['sensors'] -%}
+    //Binding {{sensor['name'].upper()}}'s signals
+    {{sensor['name'].upper()}}.enable(Enable_Temp);
+    {{sensor['name'].upper()}}.address(A_B_to_S[{{loop.index}}]);
+    {{sensor['name'].upper()}}.data_in(D_B_to_S[{{loop.index}}]);
+    {{sensor['name'].upper()}}.flag_wr(F_B_to_S[{{loop.index}}]);
+    {{sensor['name'].upper()}}.ready(Ready_B_to_S[{{loop.index}}]);
+    {{sensor['name'].upper()}}.data_out({{sensor['name'].upper()}}_Data);
+    {{sensor['name'].upper()}}.go({{sensor['name'].upper()}}_Go);
+    {{sensor['name'].upper()}}.power_signal({{sensor['name'].upper()}}_F_to_P);
+    //Binding {{sensor['name'].upper()}} Power signals
+    {{sensor['name'].upper()}}_P.func_signal({{sensor['name'].upper()}}_F_to_P);
+    {{sensor['name'].upper()}}_P.voltage_state(V_S_to_B[{{loop.index - 1}}]);
+    {{sensor['name'].upper()}}_P.current_state({{sensor['name'].upper()}}_I_S_to_C);
+    //Binding {{sensor['name'].upper()}} Converter signals
+    {{sensor['name'].upper()}}_CONV.current_in({{sensor['name'].upper()}}_I_S_to_C);
+    {{sensor['name'].upper()}}_CONV.voltage_in(V_S_to_B[{{loop.index - 1}}]);
+    {{sensor['name'].upper()}}_CONV.current_out(I_S_to_B[{{loop.index - 1}}]);
+    //Set-Up {{sensor['name'].upper()}} Converter Efficency
+    // sensor doesn't have real converter
+    {{sensor['name'].upper()}}_CONV.set_efficency(1.0);
+
+    {% endfor -%}
+    //Binding Battery Converter signals
+    Batt_conv.current_in(I_Bus_to_C_Batt);
+    Batt_conv.voltage_in(V_Batt);
+    Batt_conv.current_out(I_Batt);
+    Batt_conv.curr_out_avg_batt(curr_out_avg_batt);
+
+    {% if settings['battery'] == 'peukert' -%}
+    //Binding Peukert Battery signals
+    P_Batt.i_batt(I_Batt);
+    P_Batt.v_batt(V_Batt);
+    P_Batt.soc(SoC_Batt);
+    {% else -%}
+    //Binding Battery signals
+    Bat.i_batt(I_Batt);
+    Bat.v_batt(V_Batt);
+    Bat.soc(SoC_Batt);
+    {% endif -%}
+
+    #ifdef PANEL_ACTIVE
+    //Binding Solar Panel signals
+    Pv.i(PV_I);
+    Pv.v(PV_V);
+    //Binding Solar Converter signals
+    Pv_conv.i_in(PV_I);
+    Pv_conv.v_in(PV_V);
+    Pv_conv.i_out(PV_I_C_to_Bus);
+    #endif
+
+    #ifdef __TRACE_ACTIVE__
+    //Define Power Simulation File
+    sca_util::sca_trace_file* ptf = sca_util::sca_create_tabular_trace_file("{{name}}_power_trace.txt");
+    ptf->set_mode(sca_sampling(1,SC_SEC));
+    //Power Traces
+    sca_util::sca_trace(ptf, SoC_Batt, "SoC_Batt");
+    //sca_util::sca_trace(ptf, V_Batt, "Batt_Voltage");
+    sca_util::sca_trace(ptf, I_Bus_to_C_Batt, "I_Tot_Bus");
+    sca_util::sca_trace(ptf, I_Batt, "I_to_Batt");
+    sca_util::sca_trace(ptf, I_M_to_B, "CPU");
+    sca_util::sca_trace(ptf, I_M, "CPU_oneeight");
+    sca_util::sca_trace(ptf, eff_core, "avg_eff_core");
+    sca_util::sca_trace(ptf, curr_out_avg_batt, "curr_out_avg_batt");
+    {% for sensor in settings['sensors'] -%}
+    sca_util::sca_trace(ptf, I_S_to_B[{{loop.index - 1}}], "{{sensor['name']}}");
+    {% endfor %}
+    #ifdef __F_TRACE_ACTIVE__
+    //Define Functional Simulation File
+    sca_util::sca_trace_file* ftf = sca_util::sca_create_tabular_trace_file("funtional_trace.txt");
+    //Simulation Traces
+    sca_util::sca_trace(ftf, A_M_to_B, "Master_Adderess");
+    sca_util::sca_trace(ftf, D_M_to_B, "Master_Data");
+    sca_util::sca_trace(ftf, D_B_to_M, "Bus_Data");
+    #endif
+    #endif
+
+    Enable_Temp.write(true);
+    std::cout <<"The simulation starts!"<<endl;
+
+    sc_start(SIM_LEN , SIM_RESOLUTION); // Set the simulation length
+
+    std::cout <<"The simulation ends @ "<<sc_time_stamp()<<endl;
+
+    Master.close_gvsoc();
+
+    #ifdef __TRACE_ACTIVE__
+    //Close Trace Files
+    sca_util::sca_close_tabular_trace_file(ptf);
+    #ifdef __F_TRACE_ACTIVE__
+    sca_util::sca_close_tabular_trace_file(ftf);
+    #endif
+    #endif
+
+    return 0;
+}

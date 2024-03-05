@@ -1,0 +1,222 @@
+#include "core.h"
+
+void Core::run()
+{
+    char config_path[{{len_gvsoc_name}}] = "{{gvsoc_name}}";
+
+    gv::GvsocConf conf = { .config_path=config_path, .api_mode=gv::Api_mode::Api_mode_sync };
+    gvsoc = (Gvsoc_launcher*) gv::gvsoc_new(&conf);
+    gvsoc->open();
+    // register this core as an executor notifier
+    gvsoc->register_exec_notifier(this);
+    // set is async
+    is_async=conf.api_mode == gv::Api_mode::Api_mode_async;
+
+    // Get a connection to the main soc AXI. This will allow us to inject accesses
+    // and could also be used to received accesses from simulated test
+    // to a certain mapping corresponding to the external devices.
+    this->axi = gvsoc->io_bind(this, "/chip/soc/axi_proxy", "");
+    if (this->axi == NULL)
+    {
+        fprintf(stderr, "Couldn't find AXI proxy\n");
+        return;
+    }
+
+    gvsoc->start();
+    
+    // Run for 5ms to let the chip boot as it is not accessible before it is powered-up
+    //gvsoc->step(5000000000);
+    // Wait for simulation termination and exit code returned by simulated test
+
+    // Run for 10ms to let the chip boot as it is not accessible before it is powered-up
+    //    gvsoc->step(10000000000);
+
+    double x=0,y=0,inst_power=0,time=0,old_time=0;
+    next_timestamp=0;
+    tot_power=0;
+    sim_resolution_val=1000000000;
+    //sim_resolution_val=1000000;
+    //next_timestamp = gvsoc->step_until(0);
+    while(!this->gvsoc->top_get()->time_engine->finished_get()){
+        old_time = double(sc_time_stamp().to_double());
+
+        next_timestamp = gvsoc->step_until(old_time);
+
+        time = double(sc_time_stamp().to_double());
+
+        if (req_global==NULL){
+            inst_power=gvsoc->get_instant_power(x,y);
+            if(!read_power) tot_power=0;
+            tot_power+=inst_power;
+            read_power++;
+            //if(next_timestamp/sim_resolution_val!=old_time/sim_resolution_val)
+            #ifdef DEBUG_APP
+                //power_signal.write((tot_power/read_power)*start*transfer*comp);
+            #else
+                //power_signal.write(tot_power/read_power);
+            #endif
+        }
+        else{
+            //start=1-start;
+            //power_signal.write(start);
+            #ifdef DEBUG_APP
+            printf("Req at addr %d\n",req_global->addr);
+            bool is_transfer=req_global->addr==20;
+            bool is_overall=req_global->addr==16;
+            bool is_comp=req_global->addr>24;
+            bool is_end=req_global->addr==32 || req_global->addr==36;
+            #endif
+            handle_req(req_global);
+            #ifdef DEBUG_APP
+            if(is_overall)
+                start=(1-start);
+            if(is_transfer){
+                //printf("Transfer %d\n",data);
+                if(!is_end) transfer=(-1);
+                else    transfer=1;
+            }
+            if(is_comp){
+                if(!is_end) comp=1000;
+                else    comp=1;
+            }
+            #endif
+            time = double(sc_time_stamp().to_double());
+        }
+        if (next_timestamp == -1){
+            break;
+        } else {
+            //Update CPU Consumption
+            wait(next_timestamp - time, sc_core::SC_PS);
+            //Restore CPU State
+        }
+    }
+    // wait until next resolutional value(next ms)
+    //power_signal.write(0);
+    wait(sim_resolution_val-(next_timestamp%sim_resolution_val),sc_core::SC_PS);
+
+    // Wait for simulation termination and exit code returned by simulated test
+    int retval = gvsoc->join();
+    //std::cout << sc_time_stamp().to_double() << std::endl;
+    //std::cout << gvsoc->stop() << std::endl;
+    gvsoc->stop();
+    gvsoc->close();
+    fprintf(stdout, "End simulation at %ld\n",next_timestamp);
+    closed=1;
+    sc_stop();
+    return;
+}
+
+void Core::close_gvsoc(){
+    if(!closed){
+        int retval = gvsoc->join();
+        //std::cout << gvsoc->stop() << std::endl;
+        gvsoc->stop();
+        gvsoc->close();
+        closed=1;
+    }
+}
+void Core::access(gv::Io_request* req){
+    req_global = req;
+}
+void Core::handle_req(gv::Io_request *req)
+{
+    //Here connect the GvSoc signals with SystemC simulator signals   
+    //std::cout << sc_time_stamp().to_double() << std::endl;
+    int tmpaddr;
+    if (req->type == gv::Io_request_read)
+    {
+        //printf("Received request (is_read: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
+        D_Out.write(1);
+        F_Out.write(true);
+        Ready.write(true);
+        tmpaddr = req->addr;
+        //std::cout << tmpaddr << std::endl;
+        
+        A_Out.write(tmpaddr);
+        wait();
+        Ready.write(false);
+        wait();
+
+    }
+    else
+    {
+        //printf("Received request (is_write: %d, addr: 0x%lx, size: 0x%lx, data: %d)\n", req->type == gv::Io_request_write, req->addr, req->size , *(req->data));
+        D_Out.write(*(req->data));
+        F_Out.write(false);
+        Ready.write(true);
+        tmpaddr = req->addr;
+        //std::cout << tmpaddr << std::endl;
+
+        A_Out.write(tmpaddr);
+
+        wait();
+        Ready.write(false);
+        wait();
+        
+    }
+    *((uint32_t*)req->data) = Data_in.read();
+    //this->axi->reply(req);
+    custom_reply_axi(req);
+    req_global=NULL;
+}
+
+void Core::custom_reply_axi(gv::Io_request *req){
+    vp::io_req *vp_req = (vp::io_req *)req->handle;
+    vp_req->get_resp_port()->resp(vp_req);
+    delete req;
+}
+
+
+void Core::go_ahead_for(double start_time,int time_to_skip,int resolution){
+    double x=0,y=0,inst_power=0;
+    double time=(time_to_skip*sim_resolution_val)+start_time;
+    // lettura fatta che ha provocato systemc
+    inst_power=gvsoc->get_instant_power(x,y);
+    if(!read_power) tot_power=0;
+    tot_power+=inst_power;
+    read_power++;
+    #ifdef DEBUG_APP
+    //power_signal.write((tot_power/read_power)*start*transfer*comp);
+    #else
+    //power_signal.write(tot_power/read_power);
+    #endif
+    int count=0;
+    while(next_timestamp<time){
+        double sc_time=sc_time_stamp().to_double();
+        next_timestamp = gvsoc->step_until(sc_time);
+        inst_power=gvsoc->get_instant_power(x,y);
+        if(!read_power) tot_power=0;
+        tot_power+=inst_power;
+        read_power++;
+        //if(next_timestamp/sim_resolution_val!=sc_time/sim_resolution_val)
+        #ifdef DEBUG_APP
+            //power_signal.write((tot_power/read_power)*start*transfer*comp);
+        #else
+            //power_signal.write(tot_power/read_power);
+        #endif
+        //Update CPU Consumption
+        wait(next_timestamp - sc_time, sc_core::SC_PS);
+        count++;
+    }
+    //fprintf(stdout,"Req had %d timestamps\n",count);
+}
+
+void Core::grant(gv::Io_request *req)
+{
+}
+
+void Core::reply(gv::Io_request *req)
+{
+}
+
+void Core::notify_stop(int64_t time)
+{
+    if(!this->is_async && !this->gvsoc->retain_count())
+        this->gvsoc->release();
+}
+
+void Core::notify_run(int64_t time)
+{
+    if(!this->is_async && !this->gvsoc->retain_count())
+        this->gvsoc->retain();
+}

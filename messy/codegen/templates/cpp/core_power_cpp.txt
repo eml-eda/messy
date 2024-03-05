@@ -1,0 +1,28 @@
+#include "core_power.h"
+
+void Core_power::set_attributes()
+{
+    func_signal.set_rate(1);
+    func_signal.set_timestep(1, SIM_RESOLUTION);
+    //power_to_therm.set_timestep(0.5, SIM_RESOLUTION);
+    //power_to_therm.set_rate(1);
+    //power_to_therm.set_delay(1);
+}
+
+void Core_power::initialize() {}
+
+void Core_power::processing()
+{
+    if(!core->read_power){
+        voltage_state.write(0.0);
+        current_state.write(0.0);
+        //power_to_therm.write(0.0);
+        return;
+    }
+    // the results are in W teoretically, but if we want in mW we should put 1000	
+    int unit_mult=1000;
+    double val=((core->tot_power/core->read_power)*unit_mult)/V_CORE;
+    core->read_power=0;
+    voltage_state.write(V_CORE);
+    current_state.write(val);
+}

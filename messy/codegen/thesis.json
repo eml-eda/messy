@@ -1,0 +1,120 @@
+{
+    "sim_step" : 1,
+    "sim_len": 7736400,
+    "vref_bus" : 3.3,
+    "soc_init" : 1.0,
+    "selfdisch_factor" : 0.0,
+    "battery" : "circuit",
+    "sensors" : [
+        {
+            "power"  : true,
+            "name"   : "air_quality_sensor",
+            "voltage": 3.3,
+            "reg" : 50,
+            "states" : [
+                {
+                    "name"    : "ON_READ",
+                    "current" : "48.2",
+                    "time_on" : "30"
+                },
+                {
+                    "name"    : "ON_WRITE",
+                    "current" : "49.2",
+                    "time_on" : "30"
+                },
+                {
+                    "name"    : "IDLE",
+                    "current" : "0.002"
+                }
+            ]
+        },
+        {
+            "power"  : true,
+            "name"   : "temperature_sensor",
+            "voltage": 3.3,
+            "reg" : 75,
+            "states" : [
+                {
+                    "name"    : "ON_WRITE",
+                    "current" : "0.35",
+                    "time_on" : "6"
+                },
+                {
+                    "name"    : "ON_READ",
+                    "current" : "0.3",
+                    "time_on" : "6"
+                },
+                {
+                    "name"    : "IDLE",
+                    "current" : "0.002"
+                }
+            ]
+        },
+        {
+            "power"  : true,
+            "name"   : "methane_sensor",
+            "voltage": 3.3,
+            "reg" : 25,
+            "states" : [
+                {
+                    "name"    : "ON_WRITE",
+                    "current" : "19",
+                    "time_on" : "30"
+                },
+                {
+                    "name"    : "ON_READ",
+                    "current" : "18",
+                    "time_on" : "30"
+                },
+                {
+                    "name"    : "IDLE",
+                    "current" : "0.002"
+                }
+            ]
+        },
+        {
+            "power"  : true,
+            "name"   : "mic_click_sensor",
+            "voltage": 3.3,
+            "reg" : 15,
+            "states" : [
+                {
+                    "name"    : "ON_WRITE",
+                    "current" : "0.25",
+                    "time_on" : "12"
+                },
+                {
+                    "name"    : "ON_READ",
+                    "current" : "0.15",
+                    "time_on" : "12"
+                },
+                {
+                    "name"    : "IDLE",
+                    "current" : "0.002"
+                }
+            ] 
+        },
+        {
+            "power"  : true,
+            "name"   : "rf_sensor",
+            "voltage": 3.3,
+            "reg" : 10,
+            "states" : [
+                {
+                    "name"    : "ON_WRITE",
+                    "current" : "0.15",
+                    "time_on" : "24"
+                },
+                {
+                    "name"    : "ON_READ",
+                    "current" : "0.1",
+                    "time_on" : "24"
+                },
+                {
+                    "name"    : "IDLE",
+                    "current" : "0.001"
+                }
+            ] 
+        }
+    ]
+}
