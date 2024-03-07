@@ -1,13 +1,19 @@
 #include <systemc-ams.h>
+#include <config.hpp>
+% if (iref and type(iref)==dict) or (vref and type(vref)==dict):
+#include <lut.hpp>
+#include <fstream>
+#include <iostream>
+% endif
 
 % if iref and type(iref)==dict:
-#define SIZE_IREF_${harvester_name}
+#define SIZE_IREF_${harvester_name} ${len(iref["lut"]["input_values"])}
 static const double INPUT_VALUES_IREF_${harvester_name}[SIZE_IREF_${harvester_name}] = {${str(iref["lut"]["input_values"])[1:len(str(iref["lut"]["input_values"]))-1]}};
 static const double IREF_${harvester_name}_VALUES[SIZE_IREF_${harvester_name}] = {${str(iref["lut"]["current_values"])[1:len(str(iref["lut"]["current_values"]))-1]}};
 % endif
 
 % if vref and type(vref)==dict:
-#define SIZE_VREF_${harvester_name}
+#define SIZE_VREF_${harvester_name} ${len(vref["lut"]["input_values"])}
 static const double INPUT_VALUES_VREF_${harvester_name}[SIZE_VREF_${harvester_name}] = {${str(vref["lut"]["input_values"])[1:len(str(vref["lut"]["input_values"]))-1]}};
 static const double VREF_${harvester_name}_VALUES[SIZE_VREF_${harvester_name}] = {${str(vref["lut"]["voltage_values"])[1:len(str(vref["lut"]["voltage_values"]))-1]}};
 % endif
@@ -37,40 +43,6 @@ SCA_TDF_MODULE(Harvester_${harvester_name})
         % endif
 };
 % else:
-SC_MODULE(Harvester_${harvester_name})
-{
-    // Interface and internal components declaration
-    sca_tdf::sca_in<double> i; // Battery current
-    sca_tdf::sca_out<double> v; // Battery voltage
-    sca_tdf::sca_out<double> soc; // Battery SOC
-
-    // Connecting signals
-    sca_tdf::sca_signal<double> v_oc, r_s;
-
-    // Instantiation of battery componenets
-    Harvester_${harvester_name}_battery_voc* voc_module;
-    Harvester_${harvester_name}_battery_char* char_module;
-
-    SC_CTOR(Harvester_${harvester_name}): i("i"),
-                      v("v"),
-                      soc("soc")
-    {
-        voc_module = new Harvester_${harvester_name}_battery_voc("voc");
-        char_module = new Harvester_${harvester_name}_battery_char("batt");
-
-        voc_module->i(i);
-        voc_module->v_oc(v_oc);
-        voc_module->r_s(r_s);
-        voc_module->soc(soc);
-
-        char_module->r_s(r_s);
-        char_module->i(i);
-        char_module->v_oc(v_oc);
-        char_module->v(v);
-    }
-};
-
-
 SCA_TDF_MODULE(Harvester_${harvester_name}_battery_voc)
 {
     sca_tdf::sca_in<double> i; // Battery current
@@ -81,7 +53,7 @@ SCA_TDF_MODULE(Harvester_${harvester_name}_battery_voc)
     SCA_CTOR(Harvester_${harvester_name}_battery_voc): v_oc("v_oc"),
                            r_s("r_s"),
                            soc("soc"),
-                           tmpsoc(({{starting_voc}}/100)),
+                           tmpsoc((${soc_init/100})),
                            prev_i_batt(0) {}
 
     void set_attributes();
@@ -91,7 +63,7 @@ SCA_TDF_MODULE(Harvester_${harvester_name}_battery_voc)
     private:
         // battery is 32mAh
 	    int c_nom = 32;
-        double tmpsoc={{starting_voc/100}}f;
+        double tmpsoc=${soc_init/100}f;
         double prev_i_batt;
 };
 
@@ -136,6 +108,39 @@ SC_MODULE(Harvester_${harvester_name}_battery_char)
         V_batt->p(n2);
         V_batt->n(gnd);
         V_batt->outp(v);
+    }
+};
+
+SC_MODULE(Harvester_${harvester_name})
+{
+    // Interface and internal components declaration
+    sca_tdf::sca_in<double> i; // Battery current
+    sca_tdf::sca_out<double> v; // Battery voltage
+    sca_tdf::sca_out<double> soc; // Battery SOC
+
+    // Connecting signals
+    sca_tdf::sca_signal<double> v_oc, r_s;
+
+    // Instantiation of battery componenets
+    Harvester_${harvester_name}_battery_voc* voc_module;
+    Harvester_${harvester_name}_battery_char* char_module;
+
+    SC_CTOR(Harvester_${harvester_name}): i("i"),
+                      v("v"),
+                      soc("soc")
+    {
+        voc_module = new Harvester_${harvester_name}_battery_voc("voc");
+        char_module = new Harvester_${harvester_name}_battery_char("batt");
+
+        voc_module->i(i);
+        voc_module->v_oc(v_oc);
+        voc_module->r_s(r_s);
+        voc_module->soc(soc);
+
+        char_module->r_s(r_s);
+        char_module->i(i);
+        char_module->v_oc(v_oc);
+        char_module->v(v);
     }
 };
 % endif

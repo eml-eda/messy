@@ -1,4 +1,4 @@
-#include "${sensor_name}_functional.h"
+#include <sensor_${sensor_name}_functional.hpp>
 
 void Sensor_${sensor_name}_functional::sensor_logic(){
     % if memory_init:
@@ -16,7 +16,7 @@ void Sensor_${sensor_name}_functional::sensor_logic(){
                     // reading
                     power_signal.write(${sensor_name}_read);
                     double start_time=sc_time_stamp().to_double();
-                    core->go_ahead_for(start_time,${states["read"]["delay"]},SIM_RESOLUTION);
+                    core->request_delay(start_time,${states["read"]["delay"]},SIM_RESOLUTION);
                     // idling
                     power_signal.write(${sensor_name}_idle);
                     go.write(true);
@@ -27,7 +27,7 @@ void Sensor_${sensor_name}_functional::sensor_logic(){
                     // writing
                     power_signal.write(${sensor_name}_write);
                     double start_time=sc_time_stamp().to_double();
-                    core->go_ahead_for(start_time,${states["write"]["delay"]},SIM_RESOLUTION);
+                    core->request_delay(start_time,${states["write"]["delay"]},SIM_RESOLUTION);
                     // idling
                     power_signal.write(${sensor_name}_idle);
                     go.write(true);

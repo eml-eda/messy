@@ -1,4 +1,4 @@
-#include "core_power.h"
+#include <core_power.hpp>
 
 void Core_power::set_attributes()
 {
@@ -10,7 +10,7 @@ void Core_power::initialize() {}
 
 void Core_power::processing()
 {
-    if(!core->read_power){
+    if(!core->simulation_iters){
         voltage_state.write(0.0);
         current_state.write(0.0);
         return;

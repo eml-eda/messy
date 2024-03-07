@@ -1,4 +1,4 @@
-#include "config.h"
+#include <config.hpp>
 #include <systemc-ams.h>
 
 SCA_TDF_MODULE(Load_converter)

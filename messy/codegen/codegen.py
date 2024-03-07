@@ -80,26 +80,26 @@ def main(input_file, template_dir, output_dir):
         baseaddress += 1 + sensor["register_memory"]
 
         template_generators.append(Template_generator(template_dir/"include"/"sensor_functional.hpp",
-                                   base_header_dir/f"Sensor_{sensor_name}_functional.hpp",
+                                   base_header_dir/f"sensor_{sensor_name}_functional.hpp",
                                    {"sensor_name":sensor_name,**sensor}))
         template_generators.append(Template_generator(template_dir/"src"/"sensor_functional.cpp",
-                                   base_src_dir/f"Sensor_{sensor_name}_functional.cpp",
+                                   base_src_dir/f"sensor_{sensor_name}_functional.cpp",
                                    {"sensor_name":sensor_name,**sensor}))
         
         template_generators.append(Template_generator(template_dir/"include"/"sensor_power.hpp",
-                                   base_header_dir/f"Sensor_{sensor_name}_power.hpp",
+                                   base_header_dir/f"sensor_{sensor_name}_power.hpp",
                                    {"sensor_name":sensor_name,**sensor}))
         template_generators.append(Template_generator(template_dir/"src"/"sensor_power.cpp",
-                                   base_src_dir/f"Sensor_{sensor_name}_power.cpp",
+                                   base_src_dir/f"sensor_{sensor_name}_power.cpp",
                                    {"sensor_name":sensor_name,**sensor}))
         
 
     for idx,(harvester_name,harvester) in enumerate(settings["peripherals"]["harvesters"].items()):
         template_generators.append(Template_generator(template_dir/"src"/"harvester.cpp",
-                                   base_src_dir/f"Harvester_{harvester_name}.cpp",
+                                   base_src_dir/f"harvester_{harvester_name}.cpp",
                                    {"harvester_name":harvester_name,**harvester}))
         template_generators.append(Template_generator(template_dir/"include"/"harvester.hpp",
-                                   base_header_dir/f"Harvester_{harvester_name}.hpp",
+                                   base_header_dir/f"harvester_{harvester_name}.hpp",
                                    {"harvester_name":harvester_name,**harvester}))
         if "converter" in harvester and "lut" in harvester["converter"]:
             template_generators.append(Template_generator(template_dir/"src"/"converter"/"lut_converter.cpp",
@@ -114,6 +114,18 @@ def main(input_file, template_dir, output_dir):
                                base_header_dir/"config.hpp",
                                {**settings}))
     
+    template_generators.append(Template_generator(template_dir/"include"/"messy_request.hpp",
+                               base_header_dir/"messy_request.hpp",
+                               {**settings}))
+    
+    template_generators.append(Template_generator(template_dir/"include"/"lut.hpp",
+                               base_header_dir/"lut.hpp",
+                               {**settings}))
+    
+    template_generators.append(Template_generator(template_dir/"src"/"lut.cpp",
+                               base_src_dir/"lut.cpp",
+                               {**settings}))
+
     template_generators.append(Template_generator(template_dir/"include"/"functional_bus.hpp",
                                base_header_dir/"functional_bus.hpp",
                                {**settings}))
@@ -146,9 +158,9 @@ def main(input_file, template_dir, output_dir):
                                 base_header_dir/"converter"/"core_converter.hpp",
                                 {"name":"core","unit":"core",**settings["core"],**settings["core"]["converter"]}))
     
-    template_generators.append(Template_generator(template_dir/"include"/"adapters"/"iss_adapter.hpp",
-                               adapters_header_dir/"iss_adapter.hpp",
-                               {**settings}))
+    #template_generators.append(Template_generator(template_dir/"include"/"adapters"/"iss_adapter.hpp",
+    #                           adapters_header_dir/"iss_adapter.hpp",
+    #                           {**settings}))
     
     adapter_used={
         "adapter_class":"ISS_Adapter",

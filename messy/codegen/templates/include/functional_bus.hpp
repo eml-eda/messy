@@ -1,24 +1,24 @@
 #include <systemc.h>
-#include "config.h"
+#include <config.hpp>
 
-SC_MODULE(functional_bus){
+SC_MODULE(Functional_bus){
 
     //Input Port
     sc_core::sc_in <int>  request_address;
     sc_core::sc_in <int>  request_data;
     sc_core::sc_in <bool> flag_in_M;
     sc_core::sc_in <bool> request_ready;
-    sc_core::sc_in <int>  data_in_sensor[NS];
-    sc_core::sc_in <bool> go_sensor[NS];
+    sc_core::sc_in <int>  data_input_sensor[NUM_SENSORS];
+    sc_core::sc_in <bool> go_sensors[NUM_SENSORS];
     //Output Port
     sc_core::sc_out <int>  request_value;
     sc_core::sc_out <bool> request_go;
-    sc_core::sc_out <int>  address_out_sensor[NS];
-    sc_core::sc_out <int>  data_out_sensor[NS];
-    sc_core::sc_out <bool> flag_out_sensor[NS];
-    sc_core::sc_out <bool> ready_sensor[NS];
+    sc_core::sc_out <int>  address_out_sensor[NUM_SENSORS];
+    sc_core::sc_out <int>  data_out_sensor[NUM_SENSORS];
+    sc_core::sc_out <bool> flag_out_sensor[NUM_SENSORS];
+    sc_core::sc_out <bool> ready_sensor[NUM_SENSORS];
 
-    SC_CTOR(functional_bus):
+    SC_CTOR(Functional_bus):
     request_address("Address_from_Master_to_Bus"),
     request_data("Data_from_Master_to_Bus"),
     flag_in_M("Flag_from_Master_to_Bus"),
@@ -29,7 +29,7 @@ SC_MODULE(functional_bus){
         SC_THREAD(processing_data);
         sensitive << request_ready;
         for (int i = 0; i < NUM_SENSORS; i++){
-            sensitive << go_sensor[i];
+            sensitive << go_sensors[i];
         }      
         
     }
@@ -42,5 +42,5 @@ SC_MODULE(functional_bus){
     private:
         int selected_slave = 0;
 
-functional_bus(){}
+Functional_bus(){}
 };

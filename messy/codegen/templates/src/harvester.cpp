@@ -1,5 +1,5 @@
-#include "harvester_${harvester_name}.h"
-
+#include <harvester_${harvester_name}.hpp>
+% if harvester_type!="battery":
 void Harvester_${harvester_name}::set_attributes()
 {
     i.set_timestep(1, SIM_RESOLUTION);
@@ -45,8 +45,7 @@ void Harvester_${harvester_name}::processing()
     % endif
 
 }
-
-% if harvester_type=="battery":
+% else:
 void Harvester_${harvester_name}_battery_voc::set_attributes()
 {
     v_oc.set_timestep(1, SIM_RESOLUTION);

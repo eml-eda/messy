@@ -1,13 +1,11 @@
-#ifndef __CORE_H__GVSYSC
-#define __CORE_H__GVSYSC
-#include "config.h"
+#ifndef __MESSY_CORE_H__
+#define __MESSY_CORE_H__
+#include <config.hpp>
 #include <systemc.h>
-#include <gv/gvsoc.hpp>
 #include <cstring>
 #include <string.h>
-#include <vp/launcher.hpp>
-#include <vp/itf/io.hpp>
 #include <adapters/${adapter_filenames}.hpp>
+#include <messy_request.hpp>
 
 class Core : public sc_module
 {
@@ -16,15 +14,16 @@ class Core : public sc_module
     void close();
     void run_next_sc();
     void continue_messy();
+    void handle_req_queue();
     void request_delay(double start_time,int time_to_skip,int resolution);
-    void handle_req(messy::Request *req);
+    void handle_req(MessyRequest *req);
     // This gets called when an access from gvsoc side is reaching us
-    void access_request(messy::Request *req);
+    void access_request(MessyRequest *req);
     // This gets called when one of our access gets granted
-    void grant_req(messy::Request *req);
+    void grant_req(MessyRequest *req);
     // This gets called when one of our access gets its response
-    void reply_to_req(messy::Request *req);
-    int read_power=0;
+    void reply_to_req(MessyRequest *req);
+    int simulation_iters=0;
     double tot_power=0.0;
     sc_core::sc_out <int> request_address;
     sc_core::sc_out <int> request_data;
@@ -45,14 +44,17 @@ class Core : public sc_module
     power_signal("Func_to_Power_signal")
     {
         SC_THREAD(run);
-        sensitive << Go;
+        sensitive << request_go;
 
     }
 
-    Core(){}
+    Core(){
+        iss_adapter=(${adapter_class}*) new ${adapter_class}();
+    }
 
     private:
     int64_t next_timestamp=0;
+    int64_t sc_timestamp=0;
     int64_t sim_resolution_val=100000;
     ${adapter_class} *iss_adapter;
 };

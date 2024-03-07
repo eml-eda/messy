@@ -1,10 +1,10 @@
-#include "power_bus.h"
+#include <power_bus.hpp>
 
-void power_bus::set_attributes(){}
+void Power_bus::set_attributes(){}
 
-void power_bus::initialize(){}
+void Power_bus::initialize(){}
 
-void power_bus::processing(){
+void Power_bus::processing(){
     double tmp_i;
     total_current = 0;
 

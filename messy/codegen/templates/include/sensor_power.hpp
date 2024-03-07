@@ -1,6 +1,8 @@
 #include <systemc.h>
 #include <systemc-ams.h>
-#include "config.h"
+#include <config.hpp>
+#define ${sensor_name}_VREF ${vref}
+
 
 SCA_TDF_MODULE(Sensor_${sensor_name}_power)
 {
@@ -9,7 +11,6 @@ SCA_TDF_MODULE(Sensor_${sensor_name}_power)
     //Data to Power Bus
     sca_tdf::sca_out <double> voltage_state;
     sca_tdf::sca_out <double> current_state;
-    //sca_tdf::sc_out <int> power_to_therm;
 
     SCA_CTOR(Sensor_${sensor_name}_power):
         func_signal("State_of_Power_From_Functional"),

@@ -13,7 +13,7 @@ CFLAGS := -c -g -Wno-deprecated
 
 #The Directories, Source, Includes, Objects, Binary and Resources
 SRCDIR := src
-INCDIR := inc
+INCDIR := include
 BUILDDIR := obj
 TARGETDIR := bin
 SRCEXT := cpp
@@ -27,7 +27,7 @@ SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(SOURCES:$(SRCDIR)/%.$(SRCEXT)=$(BUILDDIR)/%.$(OBJEXT))
 
 # include Makefile.defs
-INCDIR = -I./inc -I./src \
+INCDIR = -I./include -I./src \
 		 -I$(AMS_HOME)/include \
 		 -I$(SYSTEMC_HOME)/include \
 		 -I$(SYSTEMC_HOME)/src/sysc/libs \
@@ -54,15 +54,15 @@ clean:
 	rm -rf $(TARGETDIR)
 	rm -rf src
 	rm -rf codegen/src
-	rm -rf inc
-	rm -rf codegen/inc
+	rm -rf include
+	rm -rf codegen/include
 	rm -rf codegen/__pycache__
 
 codegen: clean
 	echo "Generating code"
 	cd codegen && python3 codegen.py -f $(file)
 	mv codegen/src src
-	mv codegen/inc inc
+	mv codegen/include include
 
 run: $(TARGETDIR)/$(EXE)
 	@echo "Running $(EXE)"

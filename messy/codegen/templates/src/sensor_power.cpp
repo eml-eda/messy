@@ -1,4 +1,4 @@
-#include "${sensor_name}_power.h"
+#include <sensor_${sensor_name}_power.hpp>
 
 void Sensor_${sensor_name}_power::set_attributes()
 {
@@ -12,7 +12,7 @@ void Sensor_${sensor_name}_power::processing()
 {
     % for state_name,state in states.items():
     if(func_signal.read() == ${sensor_name}_${state_name} ){
-        voltage_state.write(vref);
+        voltage_state.write(${sensor_name}_VREF);
         current_state.write(${state["current"]});
         return;
     }

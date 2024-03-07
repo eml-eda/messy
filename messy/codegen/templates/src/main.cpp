@@ -1,21 +1,23 @@
 #include <systemc.h>
 #include <systemc-ams.h>
-#include "core.h"
-#include "core_power.h"
-#include "core_converter.h"
-#include "functional_bus.h"
-#include "power_bus.h"
-#include "load_converter.h"
+#include <core.hpp>
+#include <core_power.hpp>
+% if "converter" in core:
+#include <converter/core_converter.hpp>
+% endif
+#include <functional_bus.hpp>
+#include <power_bus.hpp>
+#include <converter/load_converter.hpp>
 
 % for sensor_name in peripherals["sensors"].keys():
-#include "${sensor_name}_functional.h"
-#include "${sensor_name}_power.h"
+#include <sensor_${sensor_name}_functional.hpp>
+#include <sensor_${sensor_name}_power.hpp>
 % endfor
 
 % for harvester_name,harvester in peripherals["harvesters"].items():
-#include "${harvester_name}.h"
+#include <harvester_${harvester_name}.hpp>
 % if "converter" in harvester:
-#include "${harvester_name}_conv.h"
+#include <converter/${harvester_name}_converter.hpp>
 % endif
 % endfor
 
@@ -29,7 +31,7 @@ int sc_main(int argc, char* argv[])
     core_power.core=&core;
     ${"core_converter" if "converter" in core else "Load_converter"} core_conv("Master Power Conv");
 
-    sc_signal <int> core_state;
+    sc_signal <double> core_state;
     //Master Power Signal
     sca_tdf::sca_signal <double> voltage_core;
     sca_tdf::sca_signal <double> current_core;
@@ -52,7 +54,7 @@ int sc_main(int argc, char* argv[])
     sc_signal <int> fake_data;
     sc_signal <bool> fake_go;
     functional_bus.data_input_sensor[0](fake_data);
-    functional_bus.go_sensor[0](fake_go);
+    functional_bus.go_sensors[0](fake_go);
 
     //Power Bus
     //Signals from Slave to Bus
@@ -66,12 +68,12 @@ int sc_main(int argc, char* argv[])
     ${f"{harvester_name}_converter" if "converter" in harvester else "Load_converter"} ${harvester_name}_conv("${harvester_name}_conv");
     % if harvester["harvester_type"]=="battery":
     sca_tdf::sca_signal <double> SoC_${harvester_name};
-    ${harvester_name}.SoC(SoC_${harvester_name});
+    ${harvester_name}.soc(SoC_${harvester_name});
     % endif
     sca_tdf::sca_signal <double> voltage_${harvester_name};
-    ${harvester_name}.voltage(voltage_${harvester_name});
+    ${harvester_name}.v(voltage_${harvester_name});
     sca_tdf::sca_signal <double> current_${harvester_name};
-    ${harvester_name}.current(current_${harvester_name});
+    ${harvester_name}.i(current_${harvester_name});
     sca_tdf::sca_signal <double> current_${harvester_name}_bus;
     ${harvester_name}_conv.current_in(${f"current_{harvester_name}" if harvester["harvester_type"]=="battery" else f"current_{harvester_name}_bus"});
     ${harvester_name}_conv.voltage_in(voltage_${harvester_name});
@@ -107,7 +109,7 @@ int sc_main(int argc, char* argv[])
     ${sensor_name}_conv.current_in(${sensor_name}_I_S_to_C);
     ${sensor_name}_conv.voltage_in(voltage_sensors[${idx}]);
     ${sensor_name}_conv.current_out(current_sensors[${idx}]);
-    functional_bus.data_input_sensors[${idx}](${sensor_name}_Data);
+    functional_bus.data_input_sensor[${idx}](${sensor_name}_Data);
     functional_bus.go_sensors[${idx}](${sensor_name}_Go);
     % endfor
 

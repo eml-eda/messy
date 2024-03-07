@@ -1,4 +1,4 @@
-#include "core.h"
+#include <core.hpp>
 
 void Core::run()
 {
@@ -12,6 +12,7 @@ void Core::run()
 
 void Core::run_next_sc(){
     wait(next_timestamp-sc_time_stamp().to_double(),sc_core::SC_PS);
+    simulation_iters++;
 }
 
 void Core::close(){
@@ -19,6 +20,8 @@ void Core::close(){
     fprintf(stdout, "End simulation at %ld\n",next_timestamp);
     sc_stop();
 }
+
+void Core::handle_req_queue(){}
 
 void Core::continue_messy(){
 
@@ -31,16 +34,16 @@ void Core::continue_messy(){
 }
 
 
-void Core::access_request(messy::Request *req){
+void Core::access_request(MessyRequest *req){
 
 }
 
-void Core::handle_req(messy::Request *req)
+void Core::handle_req(MessyRequest *req)
 {
     //Here connect the signals with SystemC simulator signals   
     //std::cout << sc_time_stamp().to_double() << std::endl;
     int tmpaddr;
-    if (req->type == messy::Request::read_Req)
+    if (req->read_req)
     {
 
         request_data.write(1);
@@ -79,12 +82,12 @@ void Core::request_delay(double start_time,int time_to_skip,int resolution){
         this->continue_messy();
 }
 
-void Core::grant_req(messy::Request *req)
+void Core::grant_req(MessyRequest *req)
 {
 
 }
 
-void Core::reply_to_req(messy::Request *req)
+void Core::reply_to_req(MessyRequest *req)
 {
 
 }

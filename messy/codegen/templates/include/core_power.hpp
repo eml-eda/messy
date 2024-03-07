@@ -1,7 +1,9 @@
 #include <systemc.h>
 #include <systemc-ams.h>
-#include "config.h"
-#include <core.h>
+#include <config.hpp>
+#include <core.hpp>
+
+#define V_CORE ${vref}
 
 SCA_TDF_MODULE(Core_power)
 {

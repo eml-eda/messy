@@ -1,4 +1,4 @@
-#include "lut.h"
+#include <lut.hpp>
 
 LUT::LUT(const double* k, const double* v, int sz)
 {

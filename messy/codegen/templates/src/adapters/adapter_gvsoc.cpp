@@ -1,7 +1,9 @@
-#include "adapters/adapter_gvsoc.h"
+#include <adapters/adapter_gvsoc.hpp>
 
-virtual void AdapterGvsoc::AdapterGvsoc()
+AdapterGvsoc::AdapterGvsoc()
 {
+}
+void AdapterGvsoc::startup(){
     char config_path[${len(config["path"])+1}] = "${config['path']}";
 
     gv::GvsocConf conf = { .config_path=config_path, .api_mode=gv::Api_mode::Api_mode_sync };
@@ -9,8 +11,6 @@ virtual void AdapterGvsoc::AdapterGvsoc()
     gvsoc->open();
     // register this core as an executor notifier
     gvsoc->register_exec_notifier(this);
-    // set is async
-    is_async=conf.api_mode == gv::Api_mode::Api_mode_async;
 
     // Get a connection to the main soc AXI. This will allow us to inject accesses
     // and could also be used to received accesses from simulated test
@@ -23,7 +23,10 @@ virtual void AdapterGvsoc::AdapterGvsoc()
     }
 
     gvsoc->start();
+}
 
+MessyRequest* AdapterGvsoc::get_messy_request_from_gvsoc(gv::Io_request* req){
+    return (MessyRequest*)new MessyRequest(0,0,true,0x0);
 }
 
 int64_t AdapterGvsoc::exec_event_at(int64_t timestamp){
@@ -41,11 +44,11 @@ void AdapterGvsoc::close(){
 }
 
 void AdapterGvsoc::access(gv::Io_request* req){
-    this->core->access_request(this->get_messy_request_from_gvsoc(req));
+    core_requests.push_back(this->get_messy_request_from_gvsoc(req));
 }
 
-void AdapterGvsoc::custom_reply_axi(gv::Io_request *req){
-    vp::io_req *vp_req = (vp::io_req *)req->handle;
+void AdapterGvsoc::custom_reply(MessyRequest* req){
+    vp::io_req *vp_req = (vp::io_req *)req->handle_c;
     vp_req->get_resp_port()->resp(vp_req);
     delete req;
 }
@@ -62,12 +65,12 @@ void AdapterGvsoc::reply(gv::Io_request *req)
 
 void AdapterGvsoc::notify_stop(int64_t time)
 {
-    if(!this->is_async && !this->gvsoc->retain_count())
+    if(!this->gvsoc->retain_count())
         this->gvsoc->release();
 }
 
 void AdapterGvsoc::notify_run(int64_t time)
 {
-    if(!this->is_async && !this->gvsoc->retain_count())
+    if(!this->gvsoc->retain_count())
         this->gvsoc->retain();
 }

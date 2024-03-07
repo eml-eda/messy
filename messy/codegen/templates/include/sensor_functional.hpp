@@ -1,5 +1,5 @@
-#include <config.h>
-#include <core.h>
+#include <config.hpp>
+#include <core.hpp>
 #include <systemc.h>
 
 SC_MODULE(Sensor_${sensor_name}_functional)
@@ -38,5 +38,5 @@ SC_MODULE(Sensor_${sensor_name}_functional)
     Sensor_${sensor_name}_functional(){}
     //Register Map
     private: 
-    int Register[${register_memory}];
+    int register_memory[${register_memory}];
 };
