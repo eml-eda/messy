@@ -8,4 +8,4 @@ Messy is an open-source framework that integrates functional RISC-V simulation (
 
 # Documentation
 
-To get started, please refer to the [Documentation](https://eml-eda.github.io/messy/how-to-build-docs/)
+To get started, please refer to the [Documentation](https://eml-eda.github.io/messy/)
