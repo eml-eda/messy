@@ -11,17 +11,16 @@
 #include <vp/itf/io.hpp>
 #include <messy_request.hpp>
 
-class AdapterGvsoc : public gv::Io_user, public vp::Notifier{
+class AdapterGvsoc : public gv::Io_user{
     public:
-    int64_t exec_event_at(int64_t timestamp);
+    int64_t exec_events_at(int64_t timestamp);
+    double get_power_at(int64_t timestamp);
     void close();
     void startup();
     void custom_reply(MessyRequest* req);
     void access(gv::Io_request* req);
     void grant(gv::Io_request *req);
     void reply(gv::Io_request *req);
-    void notify_stop(int64_t time);
-    void notify_run(int64_t time);
     MessyRequest* get_messy_request_from_gvsoc(gv::Io_request* req);
     AdapterGvsoc();
     //~AdapterGvsoc() {};
@@ -29,7 +28,7 @@ class AdapterGvsoc : public gv::Io_user, public vp::Notifier{
     private:
     int closed=0;
     gv::Io_binding *axi;
-    Gvsoc_launcher *gvsoc;
+    gv::GvsocLauncher *gvsoc;
 };
 
 #endif

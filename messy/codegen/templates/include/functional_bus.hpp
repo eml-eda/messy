@@ -6,7 +6,7 @@ SC_MODULE(Functional_bus){
     //Input Port
     sc_core::sc_in <int>  request_address;
     sc_core::sc_in <int>  request_data;
-    sc_core::sc_in <bool> flag_in_M;
+    sc_core::sc_in <bool> flag_from_core;
     sc_core::sc_in <bool> request_ready;
     sc_core::sc_in <int>  data_input_sensor[NUM_SENSORS];
     sc_core::sc_in <bool> go_sensors[NUM_SENSORS];
@@ -21,7 +21,7 @@ SC_MODULE(Functional_bus){
     SC_CTOR(Functional_bus):
     request_address("Address_from_Master_to_Bus"),
     request_data("Data_from_Master_to_Bus"),
-    flag_in_M("Flag_from_Master_to_Bus"),
+    flag_from_core("Flag_from_Master_to_Bus"),
     request_ready("Ready_from_Master_to_Bus"),
     request_value("Data_from_Bus_to_Master"),
     request_go("Go_from_Bus_to_Master")

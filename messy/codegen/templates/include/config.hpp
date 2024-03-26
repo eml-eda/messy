@@ -5,6 +5,8 @@
 
 
 #define NUM_SENSORS ${len(peripherals["sensors"])}
+#define NUM_SOURCES ${len([harv_name for harv_name,harv in peripherals["harvesters"].items() if harv["harvester_type"]=="source"])}
+#define NUM_BATTERIES ${len([harv_name for harv_name,harv in peripherals["harvesters"].items() if harv["harvester_type"]=="battery"])}
 #define NUM_HARVESTERS ${len(peripherals["harvesters"])}
 
 #define SIM_RESOLUTION ${resolution}

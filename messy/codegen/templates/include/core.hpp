@@ -27,7 +27,7 @@ class Core : public sc_module
     double tot_power=0.0;
     sc_core::sc_out <int> request_address;
     sc_core::sc_out <int> request_data;
-    sc_core::sc_out <bool> F_Out;
+    sc_core::sc_out <bool> functional_bus_flag;
     sc_core::sc_out <bool> request_ready;
     sc_core::sc_in  <bool> request_go;
     sc_core::sc_in  <int> request_value;
@@ -37,7 +37,7 @@ class Core : public sc_module
     SC_CTOR(Core):
     request_address("Address_From_Core_to_Func_Bus"),
     request_data("Data_From_Core_to_Func_Bus"),
-    F_Out("Flag_From_Core_to_Func_Bus"),
+    functional_bus_flag("Flag_From_Core_to_Func_Bus"),
     request_ready("Master_Ready_to_Func_Bus"),
     request_go("Master_GO_to_Func_Bus"),
     request_value("Data_form_Bus_to_Master"),
@@ -47,15 +47,14 @@ class Core : public sc_module
         sensitive << request_go;
 
     }
-
-    Core(){
+    
+    void init_iss_adapter(){
         iss_adapter=(${adapter_class}*) new ${adapter_class}();
     }
 
     private:
     int64_t next_timestamp=0;
     int64_t sc_timestamp=0;
-    int64_t sim_resolution_val=100000;
     ${adapter_class} *iss_adapter;
 };
 #endif

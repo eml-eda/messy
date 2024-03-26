@@ -172,7 +172,11 @@ def main(input_file, template_dir, output_dir):
             "adapter_class":"AdapterGvsoc",
             "adapter_filenames":"adapter_gvsoc"
         }
-    
+    if "iss" in settings["core"] and settings["core"]["iss"]=="gvsoc_gap9":
+        adapter_used={
+            "adapter_class":"AdapterGvsocGap9",
+            "adapter_filenames":"adapter_gvsoc_gap9"
+        }
     if adapter_used["adapter_filenames"]!="iss_adapter":
         template_generators.append(Template_generator(template_dir/"include"/"adapters"/f"{adapter_used['adapter_filenames']}.hpp",
                                 adapters_header_dir/f"{adapter_used['adapter_filenames']}.hpp",

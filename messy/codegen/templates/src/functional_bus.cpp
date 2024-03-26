@@ -10,7 +10,7 @@ void Functional_bus::processing_data(){
     while (true){
         if (request_ready.read() == true) {
             add_s = request_address.read();
-            flag_s = flag_in_M.read();
+            flag_s = flag_from_core.read();
             
             % for idx,(sensor_name,sensor) in enumerate(peripherals["sensors"].items()):
             if (${sensor_name}_BASE_ADDRESS <= add_s && add_s <= (${sensor_name}_BASE_ADDRESS + ${sensor["register_memory"]})) 

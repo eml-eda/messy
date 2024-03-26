@@ -1,18 +1,37 @@
 #include <core.hpp>
 
+int64_t get_resolution_val(sc_core::sc_time_unit time_unit){
+    switch (time_unit)
+    {
+    case sc_core::SC_PS:
+        return 1;
+    case sc_core::SC_NS:
+        return 1000;
+    case sc_core::SC_US:
+        return 1000000;
+    case sc_core::SC_MS:
+        return 1000000000;
+    case sc_core::SC_SEC:
+        return 1000000000000;
+    default:
+        return 1;
+    }
+}
+
 void Core::run()
 {
+    this->init_iss_adapter();
     iss_adapter->startup();
     
     while(!this->iss_adapter->finished)
         continue_messy();
     // wait until next resolutional value(next ms)
-    wait(sim_resolution_val-(next_timestamp%sim_resolution_val),sc_core::SC_PS);
+    wait(get_resolution_val(${resolution})-(next_timestamp%get_resolution_val(${resolution})),sc_core::SC_PS);
 }
 
 void Core::run_next_sc(){
     wait(next_timestamp-sc_time_stamp().to_double(),sc_core::SC_PS);
-    simulation_iters++;
+    sc_timestamp=double(sc_time_stamp().to_double());
 }
 
 void Core::close(){
@@ -21,20 +40,23 @@ void Core::close(){
     sc_stop();
 }
 
-void Core::handle_req_queue(){}
+void Core::handle_req_queue(){
+    int core_requests_size=core_requests.size();
+    for(int i=0;i<core_requests_size;i++)   handle_req(core_requests[i]);
+    core_requests.erase(core_requests.begin(),core_requests.begin()+core_requests_size);
+}
 
 void Core::continue_messy(){
 
-    next_timestamp = this->iss_adapter->exec_event_at(sc_timestamp);
+    next_timestamp = this->iss_adapter->exec_events_at(sc_timestamp);
+
+    this->tot_power += this->iss_adapter->get_power_at(sc_timestamp);
+
+    simulation_iters++;
 
     this->handle_req_queue();
         
     this->run_next_sc();
-
-}
-
-
-void Core::access_request(MessyRequest *req){
 
 }
 
@@ -47,7 +69,7 @@ void Core::handle_req(MessyRequest *req)
     {
 
         request_data.write(1);
-        F_Out.write(true);
+        functional_bus_flag.write(true);
         request_ready.write(true);
         tmpaddr = req->addr;
         
@@ -60,7 +82,7 @@ void Core::handle_req(MessyRequest *req)
     else
     {
         request_data.write(*(req->data));
-        F_Out.write(false);
+        functional_bus_flag.write(false);
         request_ready.write(true);
         tmpaddr = req->addr;
 
@@ -72,12 +94,12 @@ void Core::handle_req(MessyRequest *req)
         
     }
     *((uint32_t*)req->data) = request_value.read();
-    iss_adapter->custom_reply(req);
+    iss_adapter->custom_reply(req);   
 }
 
 
 void Core::request_delay(double start_time,int time_to_skip,int resolution){
-    double time=(time_to_skip*sim_resolution_val)+start_time;
+    double time=(time_to_skip*get_resolution_val(${resolution}))+start_time;
     while(next_timestamp<time)
         this->continue_messy();
 }

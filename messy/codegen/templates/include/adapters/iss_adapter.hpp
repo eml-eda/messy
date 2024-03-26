@@ -5,11 +5,12 @@
 #include <stdint.h>
 class ISS_Adapter {
     public:
-    virtual int64_t exec_event_at(int64_t timestamp);
+    virtual int64_t exec_events_at(int64_t timestamp);
     virtual void close();
     virtual ~ISS_Adapter() {};
     virtual void startup();
     virtual void custom_reply(MessyRequest* req);
+    virtual double get_power_at(int64_t timestamp);
     bool finished=false;
 };
 

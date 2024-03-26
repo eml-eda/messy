@@ -9,14 +9,23 @@ void Power_bus::processing(){
     total_current = 0;
 
     for (int i = 0; i < NUM_SENSORS; i++){
-
         tmp_i = current_sensors[i].read();
-        total_current = total_current + tmp_i;
+        total_current += tmp_i;
     }
-    
+
     tmp_i = core_current.read();
 
-    total_current = total_current + tmp_i;
+    total_current += tmp_i;
+
+    #if NUM_SOURCES>0
+    for (int i = 0; i < NUM_SOURCES; i++){
+        tmp_i = current_sources[i].read();
+        total_current -= tmp_i;
+    }
+    #endif
     
-    battery_out_current.write(total_current);
+    #if NUM_BATTERIES>0
+    for (int i = 0; i < NUM_BATTERIES; i++)
+        current_batteries[i].write(total_current/NUM_BATTERIES);
+    #endif
 }

@@ -45,11 +45,87 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
     libgl1-mesa-dev \
     unzip \
     sudo \
-    gdb
+    gdb \
+    autoconf \
+    automake \
+    autotools-dev \
+    curl \
+    libmpc-dev \
+    libmpfr-dev \
+    libgmp-dev \
+    gawk \
+    build-essential \
+    bison \
+    flex \
+    texinfo \
+    gperf \
+    libtool \
+    patchutils \
+    bc \
+    zlib1g-dev \
+    build-essential \
+    git \
+    libftdi-dev \
+    libftdi1 \
+    doxygen \
+    python3-pip \
+    libsdl2-dev \
+    curl \
+    cmake \
+    libusb-1.0-0-dev \
+    scons \
+    gtkwave \
+    libsndfile1-dev \
+    rsync \
+    autoconf \
+    automake \
+    texinfo \
+    libtool \
+    pkg-config \
+    libsdl2-ttf-dev \
+    vim
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
+# Change directory to /
+WORKDIR /
+
+RUN wget https://github.com/pulp-platform/pulp-riscv-gnu-toolchain/releases/download/v1.0.16/v1.0.16-pulp-riscv-gcc-ubuntu-18.tar.bz2
+
+RUN tar -xf v1.0.16-pulp-riscv-gcc-ubuntu-18.tar.bz2
+
+RUN rm v1.0.16-pulp-riscv-gcc-ubuntu-18.tar.bz2
+
+RUN mv /v1.0.16-pulp-riscv-gcc-ubuntu-18 /pulp_toolchain
+
+WORKDIR /pulp_toolchain
+
+# Make the sourceme.sh file executable
+RUN chmod +x sourceme.sh
+
+# Source the sourceme.sh file
+RUN /bin/bash -c "source sourceme.sh"
+
+WORKDIR /
+
+RUN git clone --recursive https://github.com/pulp-platform/pulp-sdk.git
+
+WORKDIR /pulp-sdk
+
+RUN pip3 install argcomplete pyelftools prettytable six mako rich
+
+ENV PULP_RISCV_GCC_TOOLCHAIN=/pulp_toolchain
+
+RUN /bin/bash -c "source configs/pulp-open.sh"
+
+RUN chmod +x configs/pulp-open.sh
+
+COPY docker/build_open.sh .
+
+RUN /bin/bash -c "source build_open.sh"
 # Pass the current directory to the container
+WORKDIR /
+
 COPY deps/systemc-2.3.3.tar /systemc.tar 
 
 # Create a directory for systemc
@@ -109,83 +185,23 @@ RUN make install
 # Change the permissions of the systemc-ams folder
 RUN chmod -R 777 /usr/local/systemc-ams
 
-# Change directory to /
-WORKDIR /
-
-# Clone the gap_riscv_toolchain_ubuntu repository
-RUN git clone https://github.com/GreenWaves-Technologies/gap_riscv_toolchain_ubuntu.git
-
-# Change directory to gap_riscv_toolchain_ubuntu
-WORKDIR gap_riscv_toolchain_ubuntu
-
-# Install the gap_riscv_toolchain_ubuntu
-RUN ./install.sh /usr/lib/gap_riscv_toolchain
-
-# Change the permissions of the gap_riscv_toolchain_ubuntu folder
-RUN chmod -R 777 /usr/lib/gap_riscv_toolchain
-
-# Change directory to /
-WORKDIR /
-
-# Copy the gap_sdk_private_correct.zip file to the container
-COPY deps/gap_sdk_private_tesi_calice.zip /gap_sdk.zip
-# COPY deps/gap_sdk_private-5.14_dev.zip /gap_sdk.zip
-
-# # Extract the gap_sdk.zip file
-RUN unzip gap_sdk.zip 
-
-# # Remove the gap_sdk.zip file
-RUN rm gap_sdk.zip
-
-# Rename gap_sdk_private_correct to gap_sdk
-RUN mv gap_sdk_private_correct gap_sdk 
-# RUN mv gap_sdk_private-5.14_dev gap_sdk 
-
-# Change directory to gap_sdk
-WORKDIR gap_sdk
-
-# Install the python3 requirements for the gap_sdk
-RUN pip3 install -r requirements.txt
-RUN pip3 install -r doc/requirements.txt
-RUN pip3 install -r tools/nntool/requirements.txt
-RUN pip3 install -r utils/gapy_v2/requirements.txt
-
-
-# Install the requirements for the messy
-RUN pip3 install -r requirements.txt
-
-# Copy the custom sourceme.sh file to the container
-COPY utils/gap_sdk/custom_sourceme.sh sourceme.sh
-
-# Make the sourceme.sh file executable
-RUN chmod +x sourceme.sh
-
-# Source the sourceme.sh file
-RUN /bin/bash -c "source sourceme.sh && make all"
-
-# Copy the custom folder containing the custom .c examples files to /gap_sdk/examples/gap9
-COPY custom /gap_sdk/examples/gap9
-
-# Change the permissions of the gap_sdk folder
-RUN chmod -R 777 /gap_sdk
-
-# Set working directory to /
-WORKDIR /home/messy
-
-# Copy a custom entrypoint script into the container
-COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-
 # # Set the custom entrypoint script as the entry point for the container
 # ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # # Give the user the permission to run the custom entrypoint script
 # RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Set the default command to launch the desired shell (bash in this case)
-CMD ["/bin/bash"]
-
 # Copy the custom .bashrc file to the container
 COPY docker/.bashrc /home/docker_user/.bashrc
 
+WORKDIR /
+
+COPY . /messy
+
+WORKDIR /messy
+
 # Create a user with the same user id and group id as the host user
 RUN groupadd -g 1000 docker_group && useradd -u 1000 -g docker_group docker_user
+
+# Set the default command to launch the desired shell (bash in this case)
+CMD ["/bin/bash"]

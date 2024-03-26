@@ -4,6 +4,7 @@
 void ${name}_converter::set_attributes()
 {
     current_out.set_timestep(1, SIM_RESOLUTION);
+    current_out.set_delay(1);
 }
 
 void ${name}_converter::initialize() {}

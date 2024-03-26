@@ -78,14 +78,14 @@
             "photovoltaic" : {
                 "harvester_type" :"source",
                 "vref" :{
-                    "input_file":"gmoths.txt",
+                    "input_file":"input_files/gmonths.txt",
                     "lut":{
                         "input_values":[250,500,750,1000],
                         "voltage_values":[2.9367,3.0710,3.1334,3.1689]
                     }
                 },
                 "iref":{
-                    "input_file":"gmoths.txt",
+                    "input_file":"input_files/gmonths.txt",
                     "lut":{
                         "input_values":[250,500,750,1000],
                         "current_values":[13.4031,27.2251,41.8848,56.7245]

@@ -9,7 +9,7 @@ OTHER := -Wall -O3
 
 # Use this CFLAGS definition if you need to see debug output
 # CFLAGS = -c -g -Wno-deprecated -Wall -D_DEBUG
-CFLAGS := -c -g -Wno-deprecated 
+CFLAGS := -c -g -Wno-deprecated $(OTHER)
 
 #The Directories, Source, Includes, Objects, Binary and Resources
 SRCDIR := src
@@ -33,6 +33,7 @@ INCDIR = -I./include -I./src \
 		 -I$(SYSTEMC_HOME)/src/sysc/libs \
 		 -I$(SYSTEMC_HOME)/src/sysc/kernel \
 		 -I$(GAP_HOME)/gvsoc/gvsoc/engine/include
+
 
 EXE := $(MODULE).x
 
@@ -60,9 +61,7 @@ clean:
 
 codegen: clean
 	echo "Generating code"
-	cd codegen && python3 codegen.py -f $(file)
-	mv codegen/src src
-	mv codegen/include include
+	python3 codegen/codegen.py -f $(file)
 
 run: $(TARGETDIR)/$(EXE)
 	@echo "Running $(EXE)"
