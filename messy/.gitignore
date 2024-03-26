@@ -1,7 +1,5 @@
 Makefile.exp
 power_trace*
-src
-include
 *vcd*
 *bin
 power_report*
