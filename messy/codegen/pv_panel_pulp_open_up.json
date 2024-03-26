@@ -16,7 +16,8 @@
         "vref":1.8,
         "iss":"gvsoc",
         "config":{
-            "path":"./gvsoc_config.json"
+            "path":"./gvsoc_config.json",
+            "axi_path":"/chip/axi_proxy"
         },
         "converter":{
             "input_variable":"current",

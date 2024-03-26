@@ -15,7 +15,7 @@ void AdapterGvsoc::startup(){
     // Get a connection to the main soc AXI. This will allow us to inject accesses
     // and could also be used to received accesses from simulated test
     // to a certain mapping corresponding to the external devices.
-    this->axi = gvsoc->io_bind(this, "/chip/soc/axi_proxy", "");
+    this->axi = gvsoc->io_bind(this, ${config["axi_path"]}, "");
     if (this->axi == NULL)
     {
         fprintf(stderr, "Couldn't find AXI proxy\n");
@@ -31,7 +31,7 @@ MessyRequest* AdapterGvsoc::get_messy_request_from_gvsoc(gv::Io_request* req){
 
 int64_t AdapterGvsoc::exec_events_at(int64_t timestamp){
     int64_t next_event_time=gvsoc->step_until(timestamp);
-    finished=this->gvsoc->top_get()->time_engine->finished_get();
+    finished=next_event_time==-1;
     return next_event_time;
 }
 
