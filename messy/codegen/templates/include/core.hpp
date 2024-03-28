@@ -13,7 +13,7 @@ class Core : public sc_module
     void run();
     void close();
     void run_next_sc();
-    void continue_messy();
+    void continue_messy(bool handle_req_queue);
     void handle_req_queue();
     void request_delay(double start_time,int time_to_skip,int resolution);
     void handle_req(MessyRequest *req);

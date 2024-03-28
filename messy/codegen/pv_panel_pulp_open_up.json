@@ -1,8 +1,8 @@
 {
     "resolution":"SC_MS",
     "tracing":{
-        "power":{
-            "filename":"power_trace.txt",
+        "messy_trace":{
+            "filename":"messy_trace.log",
             "resolution":{
                 "unit":"SC_SEC",
                 "mult":10
@@ -18,6 +18,11 @@
         "config":{
             "path":"./gvsoc_config.json",
             "axi_path":"/chip/axi_proxy"
+        },
+        "tracing":{
+            "messy_trace":{
+                "core_I":"current"
+            }
         },
         "converter":{
             "input_variable":"current",
@@ -36,6 +41,11 @@
         "sensors" : {
             "mic_click": {
                 "power": true,
+                "tracing":{
+                    "messy_trace":{
+                        "mic_click_I":"current"
+                    }
+                },
                 "vref": 3.3,
                 "register_memory" : 256,
                 "states":{
@@ -56,6 +66,11 @@
         "harvesters":{
             "battery" : {
                 "harvester_type":"battery",
+                "tracing":{
+                    "messy_trace":{
+                        "battery":"SoC"
+                    }
+                },
                 "vref":3.8,
                 "soc_init" : 100,
                 "soc_end" : 0,

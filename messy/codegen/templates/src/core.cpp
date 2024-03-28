@@ -24,7 +24,7 @@ void Core::run()
     iss_adapter->startup();
     
     while(!this->iss_adapter->finished)
-        continue_messy();
+        continue_messy(true);
     // wait until next resolutional value(next ms)
     wait(get_resolution_val(${resolution})-(next_timestamp%get_resolution_val(${resolution})),sc_core::SC_PS);
 }
@@ -41,12 +41,12 @@ void Core::close(){
 }
 
 void Core::handle_req_queue(){
-    int core_requests_size=core_requests.size();
-    for(int i=0;i<core_requests_size;i++)   handle_req(core_requests[i]);
-    core_requests.erase(core_requests.begin(),core_requests.begin()+core_requests_size);
+    int core_requests_size=request_queue_size();
+    for(int i=0;i<core_requests_size;i++)   handle_req(get_request_at(i));
+    delete_n_requests(core_requests_size);
 }
 
-void Core::continue_messy(){
+void Core::continue_messy(bool handle_req_queue){
 
     next_timestamp = this->iss_adapter->exec_events_at(sc_timestamp);
 
@@ -54,7 +54,7 @@ void Core::continue_messy(){
 
     simulation_iters++;
 
-    this->handle_req_queue();
+    if(handle_req_queue)    this->handle_req_queue();
         
     this->run_next_sc();
 
@@ -101,7 +101,7 @@ void Core::handle_req(MessyRequest *req)
 void Core::request_delay(double start_time,int time_to_skip,int resolution){
     double time=(time_to_skip*get_resolution_val(${resolution}))+start_time;
     while(next_timestamp<time)
-        this->continue_messy();
+        this->continue_messy(false);
 }
 
 void Core::grant_req(MessyRequest *req)

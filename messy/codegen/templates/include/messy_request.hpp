@@ -17,6 +17,14 @@ class MessyRequest{
     };
 };
 
-static std::vector<MessyRequest*> core_requests={};
+static std::vector<MessyRequest*> core_requests;
+
+void add_request(MessyRequest* req);
+
+MessyRequest* get_request_at(int i);
+
+void delete_n_requests(int size);
+
+int request_queue_size();
 
 #endif

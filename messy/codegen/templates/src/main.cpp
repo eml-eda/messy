@@ -158,13 +158,18 @@ int sc_main(int argc, char* argv[])
     power_bus.core_voltage(voltage_core);
     power_bus.core_current(core_conv_current);
 
-    % for trace_type,trace_data in tracing.items():
+    % for trace_name,trace_data in tracing.items():
     // define trace file
-    sca_util::sca_trace_file* ${trace_type}_trace = sca_util::sca_create_tabular_trace_file("${trace_data['filename']}");
+    sca_util::sca_trace_file* ${trace_name} = sca_util::sca_create_tabular_trace_file("${trace_data['filename']}");
     % if "resolution" in trace_data:
-    ${trace_type}_trace->set_mode(sca_sampling(${1 if "mult" not in trace_data["resolution"] else trace_data["resolution"]["mult"]},
+    ${trace_name}->set_mode(sca_sampling(${1 if "mult" not in trace_data["resolution"] else trace_data["resolution"]["mult"]},
     ${trace_data["resolution"]["unit"]}));
     % endif
+    % for traces_obj in trace_data["traces"]:
+    % for log_name,log_signal in utils["get_signals"](traces_obj).items():
+    sca_util::sca_trace(${trace_name}, ${log_signal}, "${log_name}");
+    % endfor
+    % endfor
     % endfor
 
     enable_temp.write(true);
@@ -177,8 +182,8 @@ int sc_main(int argc, char* argv[])
     core.close();
 
     //Close Trace Files
-    % for trace_type,trace_data in tracing.items():
-    sca_util::sca_close_tabular_trace_file(${trace_type}_trace);
+    % for trace_name,trace_data in tracing.items():
+    sca_util::sca_close_tabular_trace_file(${trace_name});
     % endfor
 
     return 0;

@@ -31,6 +31,24 @@ def generate_at_from_with(template_generators: List[Template_generator]):
             print("ERROR WHILE GENERATING CODE!")
             break
 
+def get_signals(settings):
+    signals=dict()
+    if settings["type"]=="core":
+        for param_name,param_type in settings["params"].items():
+            signals[param_name]=param_type+"_core"
+    if settings["type"]=="converter_core":
+        for params_name,param_type in settings["params"].items():
+            signals[param_name]="core_conv_"+param_type
+    if settings["type"]=="sensor":
+        for param_name,param_type in settings["params"].items():
+            signals[param_name]=settings["name"]+"_I_S_to_C"
+    if settings["type"]=="harvester":
+        for param_name,param_type in settings["params"].items():
+            signals[param_name]=param_type+"_"+settings["name"]
+    if settings["type"]=="converter_harvester":
+        for param_name,param_type in settings["params"].items():
+            signals[param_name]=param_type+"_"+settings["name"]
+    return signals
 
 def main(input_file, template_dir, output_dir):
     """
@@ -50,6 +68,9 @@ def main(input_file, template_dir, output_dir):
     with open(input_file, "r") as f:
         settings = json.load(f)
 
+    settings["utils"]={
+        "get_signals":get_signals,
+    }
     base_header_dir = output_dir / "include"
     base_header_dir.mkdir(parents=True, exist_ok=True)
     base_src_dir = output_dir / "src"
@@ -68,6 +89,17 @@ def main(input_file, template_dir, output_dir):
     template_generators = []
     # Adding internal variable
     baseaddress = 0
+    if "tracing" not in settings:
+        settings["tracing"]={}
+    for trace_val in settings["tracing"].values():
+        trace_val["traces"]=[]
+    if "tracing" in settings["core"]:
+        for t_name,t_params in settings["core"]["tracing"].items():
+            settings["tracing"][t_name]["traces"].append({
+                "type":"core",
+                "name":"core",
+                "params":t_params
+            })
     if "peripherals" not in settings:
         settings["peripherals"]={"sensors":{},"harvesters":{}}
     if "sensors" not in settings["peripherals"]:
@@ -78,7 +110,14 @@ def main(input_file, template_dir, output_dir):
         sensor["base"] = baseaddress
         sensor["ID"] = idx
         baseaddress += 1 + sensor["register_memory"]
-
+        if "tracing" in sensor:
+            for t_name,t_params in sensor["tracing"].items():
+                if t_name in settings["tracing"]:
+                    settings["tracing"][t_name]["traces"].append({
+                        "type":"sensor",
+                        "name":sensor_name,
+                        "params":t_params
+                    })
         template_generators.append(Template_generator(template_dir/"include"/"sensor_functional.hpp",
                                    base_header_dir/f"sensor_{sensor_name}_functional.hpp",
                                    {"sensor_name":sensor_name,**sensor}))
@@ -95,6 +134,14 @@ def main(input_file, template_dir, output_dir):
         
 
     for idx,(harvester_name,harvester) in enumerate(settings["peripherals"]["harvesters"].items()):
+        if "tracing" in harvester:
+            for t_name,t_params in harvester["tracing"].items():
+                if t_name in settings["tracing"]:
+                    settings["tracing"][t_name]["traces"].append({
+                        "type":"harvester",
+                        "name":harvester_name,
+                        "params":t_params
+                    })
         template_generators.append(Template_generator(template_dir/"src"/"harvester.cpp",
                                    base_src_dir/f"harvester_{harvester_name}.cpp",
                                    {"harvester_name":harvester_name,**harvester}))
@@ -102,6 +149,14 @@ def main(input_file, template_dir, output_dir):
                                    base_header_dir/f"harvester_{harvester_name}.hpp",
                                    {"harvester_name":harvester_name,**harvester}))
         if "converter" in harvester and "lut" in harvester["converter"]:
+            if "tracing" in harvester["converter"]:
+                for t_name,t_params in harvester["converter"]["tracing"].items():
+                    if t_name in settings["tracing"]:
+                        settings["tracing"][t_name]["traces"].append({
+                            "type":"harvester_converter",
+                            "name":harvester_name,
+                            "params":t_params
+                        })
             template_generators.append(Template_generator(template_dir/"src"/"converter"/"lut_converter.cpp",
                                    base_src_dir/"converter"/f"{harvester_name}_converter.cpp",
                                    {"name":harvester_name,"unit":"harvester",**harvester,**harvester["converter"]}))
@@ -118,6 +173,10 @@ def main(input_file, template_dir, output_dir):
                                base_header_dir/"messy_request.hpp",
                                {**settings}))
     
+    template_generators.append(Template_generator(template_dir/"src"/"messy_request.cpp",
+                               base_src_dir/"messy_request.cpp",
+                               {**settings}))
+
     template_generators.append(Template_generator(template_dir/"include"/"lut.hpp",
                                base_header_dir/"lut.hpp",
                                {**settings}))
@@ -151,6 +210,13 @@ def main(input_file, template_dir, output_dir):
                                {**settings}))
     
     if "converter" in settings["core"] and "lut" in settings["core"]["converter"]:
+        if "tracing" in settings["core"]["converter"]:
+            for t_name,t_params in settings["core"]["converter"]["tracing"].items():
+                settings["tracing"][t_name]["traces"].append({
+                    "type":"converter_core",
+                    "name":"core",
+                    "params":t_params
+                })
         template_generators.append(Template_generator(template_dir/"src"/"converter"/"lut_converter.cpp",
                                 base_src_dir/"converter"/"core_converter.cpp",
                                 {"name":"core","unit":"core",**settings["core"],**settings["core"]["converter"]}))

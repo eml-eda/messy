@@ -17,7 +17,7 @@ void AdapterGvsocGap9::startup(){
     // Get a connection to the main soc AXI. This will allow us to inject accesses
     // and could also be used to received accesses from simulated test
     // to a certain mapping corresponding to the external devices.
-    this->axi = gvsoc->io_bind(this, ${config["axi_path"]}, "");
+    this->axi = gvsoc->io_bind(this, "${config['axi_path']}", "");
     if (this->axi == NULL)
     {
         fprintf(stderr, "Couldn't find AXI proxy\n");
@@ -28,7 +28,7 @@ void AdapterGvsocGap9::startup(){
 }
 
 MessyRequest* AdapterGvsocGap9::get_messy_request_from_gvsoc(gv::Io_request* req){
-    return (MessyRequest*)new MessyRequest(0,0,true,0x0);
+    return (MessyRequest*)new MessyRequest((long long)req->addr,(unsigned int*)req->data,(bool)req->type==gv::Io_request_read,(unsigned int*)req->handle);
 }
 
 int64_t AdapterGvsocGap9::exec_events_at(int64_t timestamp){
@@ -45,7 +45,6 @@ double AdapterGvsocGap9::get_power_at(int64_t timestamp){
 void AdapterGvsocGap9::close(){
     if(!closed){
         int retval = gvsoc->join();
-        //std::cout << gvsoc->stop() << std::endl;
         gvsoc->stop();
         gvsoc->close();
         closed=1;
@@ -53,7 +52,7 @@ void AdapterGvsocGap9::close(){
 }
 
 void AdapterGvsocGap9::access(gv::Io_request* req){
-    core_requests.emplace_back(this->get_messy_request_from_gvsoc(req));
+    add_request(this->get_messy_request_from_gvsoc(req));
 }
 
 void AdapterGvsocGap9::custom_reply(MessyRequest* req){
