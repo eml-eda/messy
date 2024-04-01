@@ -4,8 +4,8 @@
         "messy_trace":{
             "filename":"messy_trace.log",
             "resolution":{
-                "unit":"SC_SEC",
-                "mult":10
+                "unit":"SC_MS",
+                "mult":1
             }
         }
     },
@@ -14,10 +14,10 @@
     },
     "core":{
         "vref":1.8,
-        "iss":"gvsoc",
+        "iss":"gvsoc_gap9",
         "config":{
-            "path":"./gvsoc_config.json",
-            "axi_path":"/chip/axi_proxy"
+            "path":"./gvsoc_deps/gvsoc_config.json",
+            "axi_path":"/chip/soc/axi_proxy"
         },
         "tracing":{
             "messy_trace":{

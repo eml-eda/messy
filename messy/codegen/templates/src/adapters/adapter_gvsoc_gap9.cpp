@@ -39,7 +39,8 @@ int64_t AdapterGvsocGap9::exec_events_at(int64_t timestamp){
 
 double AdapterGvsocGap9::get_power_at(int64_t timestamp){
     double x=0,y=0;
-    return this->gvsoc->get_instant_power(x,y);
+    double inst_power=this->gvsoc->get_instant_power(x,y);
+    return inst_power;
 }
 
 void AdapterGvsocGap9::close(){

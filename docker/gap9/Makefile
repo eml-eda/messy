@@ -1,5 +1,6 @@
+SHELL := /bin/bash
 .SUFFIXES:
-.SUFFIXES: .cc .cpp .o .x
+.SUFFIXES: .cc .cpp .o
 .PHONY: clean ultraclean help
 
 CC := g++
@@ -20,7 +21,7 @@ SRCEXT := cpp
 OBJEXT := o
 SYSTEMC_HOME := /usr/local/systemc
 AMS_HOME := /usr/local/systemc-ams
-GAP_HOME := /gap_sdk
+GAP_SDK := /gap_sdk
 MODULE := run
 
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
@@ -32,10 +33,10 @@ INCDIR = -I./include -I./src \
 		 -I$(SYSTEMC_HOME)/include \
 		 -I$(SYSTEMC_HOME)/src/sysc/libs \
 		 -I$(SYSTEMC_HOME)/src/sysc/kernel \
-		 -I$(GAP_HOME)/gvsoc/gvsoc/engine/include
+		 -I$(GAP_SDK)/gvsoc/gvsoc/engine/include
 
 
-EXE := $(MODULE).x
+EXE := $(MODULE)
 
 $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@echo "Compiling source $< into object $@"
@@ -45,7 +46,7 @@ $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 $(TARGETDIR)/$(EXE): $(OBJECTS)
 	@echo "Building $@ from $<"
 	@mkdir -p '$(@D)'
-	$(GCC_PATH)$(CC) -g $(INCDIR) -std=c++14 -o $@ $(OBJECTS) -L$(GAP_HOME)/install/workstation/lib -lpulpvp \
+	$(GCC_PATH)$(CC) -g $(INCDIR) -std=c++14 -o $@ $(OBJECTS) -L$(GAP_SDK)/install/workstation/lib -lpulpvp \
 	$(AMS_HOME)/lib-linux64/libsystemc-ams.a \
 	$(SYSTEMC_HOME)/lib-linux64/libsystemc.a -lpthread 2>&1 | c++filt \
 
@@ -65,6 +66,8 @@ codegen: clean
 
 run: $(TARGETDIR)/$(EXE)
 	@echo "Running $(EXE)"
+	cd $(GAP_SDK);\
+	source sourceme.sh 1;\
 	$(TARGETDIR)/$(EXE)
 
 ultraclean: clean
@@ -81,6 +84,16 @@ ultraclean: clean
 
 Makefile.deps:
 	$(GCC_PATH)$(CC) $(CFLAGS) $(INCDIR) -M $(SOURCES) $(SRCS_BUS) >> Makefile.deps
+
+application:
+	cd $(GAP_SDK);\
+	source sourceme.sh 1;\
+	cd $(application);\
+	make all gvsoc.prepare platform=gvsoc runner_args="--vcd --event=.*";\
+	cp BUILD/GAP9_V2/GCC_RISCV_FREERTOS/gvsoc_config.json /messy/messy/gvsoc_deps/;\
+	cp BUILD/GAP9_V2/GCC_RISCV_FREERTOS/efuse_preload.data /messy/messy/gvsoc_deps/;\
+	cp BUILD/GAP9_V2/GCC_RISCV_FREERTOS/flash.bin /messy/messy/gvsoc_deps/;\
+	cp BUILD/GAP9_V2/GCC_RISCV_FREERTOS/chip.soc.mram.bin /messy/messy/gvsoc_deps/
 
 # include Makefile.deps
 

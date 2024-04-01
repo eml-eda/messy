@@ -2,7 +2,22 @@
 
 AdapterGvsoc::AdapterGvsoc()
 {
+
 }
+
+void AdapterGvsoc::has_ended(){
+    this->finished=true;
+    return;
+}
+
+void AdapterGvsoc::has_stopped(){
+    return;
+}
+
+void AdapterGvsoc::was_updated(){
+    return;
+}
+
 void AdapterGvsoc::startup(){
     string gvsoc_config_path="${config['path']}";
     gv::GvsocConf conf;
@@ -21,18 +36,17 @@ void AdapterGvsoc::startup(){
         fprintf(stderr, "Couldn't find AXI proxy\n");
         return;
     }
-
+    gvsoc->vcd_disable();
     gvsoc->start();
+    gvsoc->bind((gv::Gvsoc_user*)this);
 }
 
 MessyRequest* AdapterGvsoc::get_messy_request_from_gvsoc(gv::Io_request* req){
-    return (MessyRequest*)new MessyRequest((long long)req->addr,(unsigned int*)req->data,(bool)req->type==gv::Io_request_read,(unsigned int*)req->handle);
+    return (MessyRequest*)new MessyRequest((long long)((req->addr-0x20000000)/req->size),(unsigned int*)req->data,(bool)req->type==gv::Io_request_read,(unsigned int*)req->handle);
 }
 
 int64_t AdapterGvsoc::exec_events_at(int64_t timestamp){
-    int64_t next_event_time=gvsoc->step_until(timestamp);
-    finished=next_event_time==-1;
-    return next_event_time;
+    return gvsoc->step_until(timestamp);
 }
 
 double AdapterGvsoc::get_power_at(int64_t timestamp){

@@ -11,7 +11,7 @@
 #include <vp/itf/io.hpp>
 #include <messy_request.hpp>
 
-class AdapterGvsoc : public gv::Io_user{
+class AdapterGvsoc : public gv::Io_user, public gv::Gvsoc_user{
     public:
     int64_t exec_events_at(int64_t timestamp);
     double get_power_at(int64_t timestamp);
@@ -21,6 +21,29 @@ class AdapterGvsoc : public gv::Io_user{
     void access(gv::Io_request* req);
     void grant(gv::Io_request *req);
     void reply(gv::Io_request *req);
+    /**
+     * Called by GVSOC to notify the simulation has ended.
+     *
+     * This means the simulated software is over and probably exited and GVSOC cannnot further
+     * simulate it.
+     */
+    void has_ended() override;
+
+    /**
+     * Called by GVSOC to notify the simulation has stopped.
+     *
+     * This means the an event occurs which stopped the simulation. Simulation can be still be
+     * resumed.
+     */
+    void has_stopped() override;
+
+    /**
+     * Called by GVSOC to notify the simulation engine was updated.
+     *
+     * This means a new event was posted to the engine and modified the timestamp of the next
+     * event to be executed.
+     */
+    void was_updated() override;
     MessyRequest* get_messy_request_from_gvsoc(gv::Io_request* req);
     AdapterGvsoc();
     //~AdapterGvsoc() {};
@@ -29,6 +52,7 @@ class AdapterGvsoc : public gv::Io_user{
     int closed=0;
     gv::Io_binding *axi;
     gv::GvsocLauncher *gvsoc;
+    gv::PowerReport* power_report;
 };
 
 #endif

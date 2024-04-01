@@ -1,12 +1,13 @@
+SHELL := /bin/bash
 .SUFFIXES:
-.SUFFIXES: .cc .cpp .o .x
+.SUFFIXES: .cc .cpp .o
 .PHONY: clean ultraclean help
 
 CC := g++
 OPT =
 DEBUG = 
 OTHER := -Wall -O3
-
+PULP_SDK := /pulp-sdk
 # Use this CFLAGS definition if you need to see debug output
 # CFLAGS = -c -g -Wno-deprecated -Wall -D_DEBUG
 CFLAGS := -c -g -Wno-deprecated $(OTHER)
@@ -32,9 +33,9 @@ INCDIR = -I./include -I./src \
 		 -I$(SYSTEMC_HOME)/include \
 		 -I$(SYSTEMC_HOME)/src/sysc/libs \
 		 -I$(SYSTEMC_HOME)/src/sysc/kernel \
-		 -I/pulp-sdk/tools/gvsoc/core/engine/include
+		 -I$(PULP_SDK)/tools/gvsoc/core/engine/include 
 
-EXE := $(MODULE).x
+EXE := $(MODULE)
 
 $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@echo "Compiling source $< into object $@"
@@ -44,7 +45,7 @@ $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 $(TARGETDIR)/$(EXE): $(OBJECTS)
 	@echo "Building $@ from $<"
 	@mkdir -p '$(@D)'
-	$(GCC_PATH)$(CC) -g $(INCDIR) -std=c++14 -o $@ $(OBJECTS) -L/pulp-sdk/install/workstation/lib -lpulpvp \
+	$(GCC_PATH)$(CC) -g $(INCDIR) -std=c++14 -o $@ $(OBJECTS) -L$(PULP_SDK)/install/workstation/lib -lpulpvp \
 	$(AMS_HOME)/lib-linux64/libsystemc-ams.a \
 	$(SYSTEMC_HOME)/lib-linux64/libsystemc.a -lpthread 2>&1 | c++filt \
 
@@ -64,6 +65,9 @@ codegen: clean
 
 run: $(TARGETDIR)/$(EXE)
 	@echo "Running $(EXE)"
+	cd $(PULP_SDK);\
+	source configs/pulp-open.sh;\
+	cd /messy/messy;\
 	$(TARGETDIR)/$(EXE)
 
 ultraclean: clean
@@ -82,6 +86,21 @@ Makefile.deps:
 	$(GCC_PATH)$(CC) $(CFLAGS) $(INCDIR) -M $(SOURCES) $(SRCS_BUS) >> Makefile.deps
 
 # include Makefile.deps
+
+application:
+	cd /messy/messy;\
+	rm -r gvsoc_deps;\
+	mkdir gvsoc_deps;\
+	echo "Building application";\
+	cd $(app);\
+	make all gvsoc.prepare platform=gvsoc runner_args="--vcd --event=.*";\
+	pwd;\
+	cp BUILD/PULP/GCC_RISCV/gvsoc_config.json /messy/messy/gvsoc_deps/;\
+	cp BUILD/PULP/GCC_RISCV/efuse_preload.data /messy/messy/gvsoc_deps/;\
+	cp BUILD/PULP/GCC_RISCV/flash.bin /messy/messy/gvsoc_deps/;\
+	cp BUILD/PULP/GCC_RISCV/chip.soc.mram.bin /messy/messy/gvsoc_deps/;\
+	cp BUILD/PULP/GCC_RISCV/spiflash.bin /messy/messy/gvsoc_deps/;\
+	cp BUILD/PULP/GCC_RISCV/hyperflash.bin /messy/messy/gvsoc_deps/
 
 help:
 	@echo "Available targets:"

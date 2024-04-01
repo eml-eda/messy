@@ -1,40 +1,23 @@
-## Build the simulation
+## Usage
 
-Now we can build the simulation. To do so, we need to change into the `Simulation_v2` directory:
-
-```bash
-cd /home/messy/Simulation_v2
-```
-
-Then we can run the `make` command:
+To run a simulation you must go into the `messy` directory:
 
 ```bash
-make
+cd /messy/messy/
 ```
 
-This command will take some time to complete. Once it is done, it creates a `run.x` file in the `Simulation_v2/bin` folder. This is the executable file of the simulation.
-
-## Run the simulation
-
-Now we can run the simulation. To do so, we need to change into the `Simulation_v2/bin` directory:
+Then we can run python:
 
 ```bash
-cd /home/messy/Simulation_v2/bin
+python3 messy.py -f codegen/pulp-open.json -a /application 
 ```
 
-First we have to make the `run.x` file executable:
+The python scripts expects 2 arguments, where the first one is the file name of the configuration chosen, as below, where the basic pulp-open configuration is used.
 
-```bash
-chmod +x run.x
-```
-Then we have to up one level:
+The second one instead regards the application to simulate folder.
 
-```bash
-cd ..
-```
+Many RISC-V Instruction Set Simulators require to have a configuration file, and others that may refer to memory flashing etc., for example GvSoC requires a configuration file called gvsoc_config.json and other dependencies.
 
-Then we can run the `run.x` file:
+Therefore, to build a complete workflow MESSY builds these dependencies and completes an end-to-end simulation process.
 
-```bash
-./bin/run.x
-```
+To recap, MESSY generates the C++ SystemC-AMS sources of our configuration(sensors, batteries etc.) and build, finally it brings the configurations of the ISS and runs the simulation.

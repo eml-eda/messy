@@ -7,3 +7,4 @@ power_report*
 trace*
 *.data
 *config.json
+gvsoc_deps

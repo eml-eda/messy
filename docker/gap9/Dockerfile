@@ -132,7 +132,7 @@ RUN pip3 install -r utils/gapy_v2/requirements.txt
 RUN pip3 install -r requirements.txt
 
 # Copy the custom sourceme.sh file to the container
-COPY docker/build_gap9.sh sourceme.sh
+COPY docker/gap9/build_gap9.sh sourceme.sh
 
 # Make the sourceme.sh file executable
 RUN chmod +x sourceme.sh
@@ -204,21 +204,17 @@ RUN make install
 # Change the permissions of the systemc-ams folder
 RUN chmod -R 777 /usr/local/systemc-ams
 
-# # Set the custom entrypoint script as the entry point for the container
-# ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
-# # Give the user the permission to run the custom entrypoint script
-# RUN chmod +x /usr/local/bin/entrypoint.sh
-
-# Copy the custom .bashrc file to the container
-COPY docker/.bashrc /home/docker_user/.bashrc
-
 WORKDIR /
 
 COPY . /messy
 
 WORKDIR /messy
 
+RUN cp /messy/docker/pulp-open/Makefile /messy/messy/Makefile
+
+RUN chmod 777 /messy/messy/Makefile
+
+RUN chmod 777 messy/Makefile
 # Create a user with the same user id and group id as the host user
 RUN groupadd -g 1000 docker_group && useradd -u 1000 -g docker_group docker_user
 

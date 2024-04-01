@@ -179,8 +179,6 @@ int sc_main(int argc, char* argv[])
 
     std::cout <<"The simulation ends @ "<<sc_time_stamp()<<endl;
 
-    core.close();
-
     //Close Trace Files
     % for trace_name,trace_data in tracing.items():
     sca_util::sca_close_tabular_trace_file(${trace_name});

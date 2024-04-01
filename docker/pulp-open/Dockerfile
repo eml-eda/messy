@@ -112,6 +112,16 @@ RUN git clone --recursive https://github.com/pulp-platform/pulp-sdk.git
 
 WORKDIR /pulp-sdk
 
+RUN git submodule update --remote --recursive
+
+RUN rm -r tools/gvsoc
+
+WORKDIR /pulp-sdk/tools
+
+RUN git clone --recursive https://github.com/eml-eda/gvsoc.git
+
+WORKDIR /pulp-sdk
+
 RUN pip3 install argcomplete pyelftools prettytable six mako rich
 
 ENV PULP_RISCV_GCC_TOOLCHAIN=/pulp_toolchain
@@ -120,7 +130,7 @@ RUN /bin/bash -c "source configs/pulp-open.sh"
 
 RUN chmod +x configs/pulp-open.sh
 
-COPY docker/build_open.sh .
+COPY docker/pulp-open/build_open.sh .
 
 RUN /bin/bash -c "source build_open.sh"
 # Pass the current directory to the container
@@ -185,21 +195,15 @@ RUN make install
 # Change the permissions of the systemc-ams folder
 RUN chmod -R 777 /usr/local/systemc-ams
 
-# # Set the custom entrypoint script as the entry point for the container
-# ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
-# # Give the user the permission to run the custom entrypoint script
-# RUN chmod +x /usr/local/bin/entrypoint.sh
-
-# Copy the custom .bashrc file to the container
-COPY docker/.bashrc /home/docker_user/.bashrc
-
 WORKDIR /
 
 COPY . /messy
 
 WORKDIR /messy
 
+RUN cp /messy/docker/pulp-open/Makefile /messy/messy/Makefile
+
+RUN chmod 777 /messy/messy/Makefile
 # Create a user with the same user id and group id as the host user
 RUN groupadd -g 1000 docker_group && useradd -u 1000 -g docker_group docker_user
 
