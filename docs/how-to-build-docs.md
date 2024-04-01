@@ -17,19 +17,19 @@ Open this folder in Visual Studio Code
 Create a python virtual environment
 
 ```bash
-python3 -m venv venv
+python3 -m venv doc_env
 ```
 
 Activate the virtual environment
 
 ```bash
-source venv/bin/activate
+source doc_env/bin/activate
 ```
 
 Install the dependencies
 
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 Serve the documentation

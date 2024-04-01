@@ -46,11 +46,15 @@ nav:
   - Home: index.md
   - "Getting started": getting-started.md
   - "Docker": docker.md
-  - "Build GAP SDK": build-gap-sdk.md
+  - "Debugging": debugging.md
+  - "Converters": converters.md
   - "Codegen": codegen.md
+  - "Harvesters": harvesters.md
   - "Sensors": sensors.md
+  - "LUT": lut.md
+  - "Resolution": resolution.md
+  - "Tracing": tracing.md
   - "Simulator": simulator.md
-  - "Custom Code GAP SDK": custom-code-gap-sdk.md
   - "How to build the documentation": how-to-build-docs.md
 
 

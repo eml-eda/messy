@@ -2,7 +2,7 @@
 
 This module will explain the codegen process with its characteristics.
 
-The codegen is a Python script that generates the code for the simulation. It is located in the `Simulation_v2/codegen` folder. The codegen is composed of two files:
+The codegen is a Python script that generates the code for the simulation. It is located in the `messy/codegen` folder. The codegen is composed of two files:
 
 - `codegen.py`: this is the main file of the codegen. It contains the call to specific functions that will generate the code of the components of the simulator.
 
