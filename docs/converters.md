@@ -1,6 +1,6 @@
 # Converters
 
-Converters are very important objects in electronics system, they are supported in MESSY currently by a LUT approach, here an example of a converter:
+Converters are very important objects in electronics system, they are supported in MESSY currently by a [LUT](lut.md) approach, here an example of a converter:
 
 ```JSON
 "converter" : {
@@ -13,6 +13,6 @@ Converters are very important objects in electronics system, they are supported 
 }
 ```
 
-The converter is described through the direction, set by `out_dir`, that we want to consider, the `input_variable` that we want to consider, that can be either voltage or current and finally the previously mentioned LUT([LUT](lut.md)), the LUT second values for a converter are the `efficiency_values`, which are the efficiency percentages of a converter.
+The converter is described through the direction, set by `out_dir`, that we want to consider, the `input_variable` that we want to consider, that can be either voltage or current and finally the previously mentioned [LUT](lut.md), the [LUT](lut.md) second values for a converter are the `efficiency_values`, which are the efficiency percentages of a converter.
 
 The modeled converter can be described as a simple Buck DC-DC converter, but we want to support a wider variety of converters. 

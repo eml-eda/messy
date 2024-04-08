@@ -46,15 +46,15 @@ nav:
   - Home: index.md
   - "Getting started": getting-started.md
   - "Docker": docker.md
-  - "Debugging": debugging.md
-  - "Converters": converters.md
+  - "Simulator": simulator.md
   - "Codegen": codegen.md
+  - "Converters": converters.md
   - "Harvesters": harvesters.md
   - "Sensors": sensors.md
   - "LUT": lut.md
   - "Resolution": resolution.md
+  - "Debugging": debugging.md
   - "Tracing": tracing.md
-  - "Simulator": simulator.md
   - "How to build the documentation": how-to-build-docs.md
 
 
