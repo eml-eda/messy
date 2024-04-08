@@ -7,5 +7,4 @@ The availability of simulation platforms is a key ingredient for making RISC-V b
 Messy is an open-source framework that integrates functional RISC-V simulation (achieved with GVSoC for the PULP cores) with SystemC-AMS (used to model extra-functional aspects, in detail power storage and distribution). The combination of GVSoC and SystemC-AMS in a single simulation framework allows to perform a DSE that is dependent on the mutual impact between functional and extra-functional aspects. 
 
 # Getting Started
-
 To get started, please refer to the [Getting Started](getting-started.md)
