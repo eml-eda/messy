@@ -86,14 +86,21 @@ Makefile.deps:
 	$(GCC_PATH)$(CC) $(CFLAGS) $(INCDIR) -M $(SOURCES) $(SRCS_BUS) >> Makefile.deps
 
 application:
+	cd /messy/messy;\
+	rm -r gvsoc_deps;\
+	mkdir gvsoc_deps;\
 	cd $(GAP_SDK);\
 	source sourceme.sh 1;\
-	cd $(application);\
+	cd $(app);\
+	echo "Building application";\
 	make all gvsoc.prepare platform=gvsoc runner_args="--vcd --event=.*";\
 	cp BUILD/GAP9_V2/GCC_RISCV_FREERTOS/gvsoc_config.json /messy/messy/gvsoc_deps/;\
 	cp BUILD/GAP9_V2/GCC_RISCV_FREERTOS/efuse_preload.data /messy/messy/gvsoc_deps/;\
 	cp BUILD/GAP9_V2/GCC_RISCV_FREERTOS/flash.bin /messy/messy/gvsoc_deps/;\
-	cp BUILD/GAP9_V2/GCC_RISCV_FREERTOS/chip.soc.mram.bin /messy/messy/gvsoc_deps/
+	cp BUILD/GAP9_V2/GCC_RISCV_FREERTOS/chip.soc.mram.bin /messy/messy/gvsoc_deps/\
+	sed -i 's:"efuse_preload.data":"/messy/messy/gvsoc_deps/efuse_preload.data":g' /messy/messy/gvsoc_deps/gvsoc_config.json;\
+	sed -i 's:"chip.soc.mram.bin":"/messy/messy/gvsoc_deps/chip.soc.mram.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json;\
+	sed -i 's:"flash.bin":"/messy/messy/gvsoc_deps/flash.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json
 
 # include Makefile.deps
 
