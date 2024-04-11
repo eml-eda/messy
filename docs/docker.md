@@ -38,7 +38,7 @@ Each Dockerfile is based on the Ubuntu 22.04 image. It installs the following de
 
 ## Build the Docker image
 
-The first step is to build a Docker image. For example to build the pulp-open container the following command should be issued:
+The first step is to build a Docker image. For example to build the `pulp-open` container the following command should be issued:
 
 ```bash
 docker build . -f docker/pulp-open/Dockerfile -t messy

@@ -36,7 +36,8 @@ The sensors are defined together with the rest of the system in a JSON configura
 }
 ```
 
-Each sensor needs a certain amount of memory to interact with the system, this is simulated and setted thanks to the `register_memory` paramter.
+Each sensor needs a certain amount of memory to interact with the system and this is simulated and setted thanks to the `register_memory` paramter. 
+
 
 Ideally each sensor could define a set of states and model it in those states, however currently the system supports only the reading state, the writing state and an idle state, which are fundamental.
 
