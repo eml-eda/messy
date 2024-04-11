@@ -9,7 +9,7 @@ cd /messy/messy/
 Then we can run python:
 
 ```bash
-python3 messy.py -f codegen/pulp-open.json -a /application 
+python3 messy.py -f codegen/pulp_open.json -a /application 
 ```
 
 The python scripts expects 2 arguments, where the first one is the file name of the configuration chosen, as below, where the basic pulp-open configuration is used.

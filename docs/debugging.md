@@ -5,7 +5,7 @@ The whole configuration is provided in the `.vscode` folder. Everything should w
 
 You have to create a docker container first. See [Getting Started](getting-started.md) for more information.
 
-After that you need to install the Visual Studio Code extension `Remote - Containers`. You can find it [here](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
+After that you need to install the Visual Studio Code `Remote - Containers` and `C/C++` extensions. You can find them [here](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) and [here](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) respectively. 
 
 After that, you will find a docker icon in left bar. If you click it, it will show you the list of containers. You should see the container you created before. If you right click on it and select `Attach Visual Studio Code`, it will open a new window with the container attached.
 
