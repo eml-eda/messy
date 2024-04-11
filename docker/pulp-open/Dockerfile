@@ -204,8 +204,11 @@ WORKDIR /messy
 RUN cp /messy/docker/pulp-open/Makefile /messy/messy/Makefile
 
 RUN chmod 777 /messy/messy/Makefile
+
 # Create a user with the same user id and group id as the host user
 RUN groupadd -g 1000 docker_group && useradd -u 1000 -g docker_group docker_user
+
+RUN echo "source /pulp-sdk/configs/pulp-open.sh" >> /root/.bashrc
 
 # Set the default command to launch the desired shell (bash in this case)
 CMD ["/bin/bash"]

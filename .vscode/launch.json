@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/messy/bin/run.x",
+            "program": "${workspaceFolder}/messy/bin/run",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}/messy",
