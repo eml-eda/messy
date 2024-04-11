@@ -5,6 +5,8 @@
 
 deps
 venv
+src
+include
 
 *BUILD/
 doc_env/
