@@ -13,12 +13,17 @@ void Functional_bus::processing_data(){
             flag_s = flag_from_core.read();
             
             % for idx,(sensor_name,sensor) in enumerate(peripherals["sensors"].items()):
-            if (${sensor_name}_BASE_ADDRESS <= add_s && add_s <= (${sensor_name}_BASE_ADDRESS + ${sensor["register_memory"]})) 
+            % if idx == 0:
+            if
+            % else:
+            else if
+            % endif
+            (${sensor_name}_BASE_ADDRESS <= add_s && add_s < (${sensor_name}_BASE_ADDRESS + ${sensor["register_memory"]})) 
             {
                 reg_s = add_s - ${sensor_name}_BASE_ADDRESS;
                 data_s = request_data.read();
                 //cout << data_s << endl;
-
+                // printf("Entrato in ${sensor_name}\n");
                 address_out_sensor[${idx}].write(reg_s);
                 data_out_sensor[${idx}].write(data_s);
                 flag_out_sensor[${idx}].write(flag_s);
@@ -26,6 +31,9 @@ void Functional_bus::processing_data(){
                 Set_Slave(selected_slave, true);
             }
             % endfor
+            else {
+                printf("Address %d of sensor/actuator not found\n", add_s);
+            }
         }
         wait();
 

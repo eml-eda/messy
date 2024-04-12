@@ -109,7 +109,7 @@ def main(input_file, template_dir, output_dir):
     for idx,(sensor_name,sensor) in enumerate(settings["peripherals"]["sensors"].items()):
         sensor["base"] = baseaddress
         sensor["ID"] = idx
-        baseaddress += 1 + sensor["register_memory"]
+        baseaddress += sensor["register_memory"]
         if "tracing" in sensor:
             for t_name,t_params in sensor["tracing"].items():
                 if t_name in settings["tracing"]:

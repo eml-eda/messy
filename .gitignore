@@ -5,8 +5,8 @@
 
 deps
 venv
-src
-include
+messy/src
+messy/include
 
 *BUILD/
 doc_env/
