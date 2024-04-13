@@ -2,7 +2,7 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
-site_name: Messy
+site_name: MESSY
 repo_url: https://github.com/eml-eda/messy
 repo_name: eml-eda/messy
 theme:
