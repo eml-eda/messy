@@ -1,4 +1,4 @@
-## Usage
+## Usage (Hello World Example)
 
 To run a simulation you must go into the `messy` directory:
 
@@ -43,4 +43,5 @@ This python script, will then launch as a subprocesses some `Makefile` targets. 
 1. `gvsoc_config.json`
 2. `hyperflash.bin`
 3. `spiflash.bin`
+
 

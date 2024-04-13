@@ -1,10 +1,6 @@
 # Start with a base image of ubuntu
 FROM ubuntu:22.04
 
-# Add a user that is the same as the host user
-ARG USER_ID
-ARG GROUP_ID
-
 # Update and upgrade the system
 RUN apt update && apt upgrade -y
 
@@ -86,6 +82,10 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
     vim
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+
+# Add a user that is the same as the host user
+ARG USER_ID
+ARG GROUP_ID
 
 # Change directory to /
 WORKDIR /
@@ -206,9 +206,18 @@ RUN cp /messy/docker/pulp-open/Makefile /messy/messy/Makefile
 RUN chmod 777 /messy/messy/Makefile
 
 # Create a user with the same user id and group id as the host user
-RUN groupadd -g 1000 docker_group && useradd -u 1000 -g docker_group docker_user
+RUN groupadd -g ${GROUP_ID} docker_group && useradd -u ${USER_ID} -g docker_group docker_user
 
 RUN echo "source /pulp-sdk/configs/pulp-open.sh" >> /root/.bashrc
+
+RUN mkdir /home/docker_user
+RUN mkdir /home/docker_user/.vscode-server
+RUN chmod 777 -R /home/docker_user/.vscode-server
+
+RUN cp /root/.bashrc /home/docker_user/.bashrc
+
+# Switch user
+USER docker_user
 
 # Set the default command to launch the desired shell (bash in this case)
 CMD ["/bin/bash"]
