@@ -91,10 +91,6 @@ application:
 	cd /messy/messy;\
 	rm -r gvsoc_deps;\
 	mkdir gvsoc_deps;\
-	rm -r src;\
-	mkdir src;\
-	rm -r include;\
-	mkdir include;\
 	cd $(PULP_SDK);\
 	source configs/pulp-open.sh;\
 	cd $(app);\
