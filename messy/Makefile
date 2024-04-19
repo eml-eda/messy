@@ -110,9 +110,10 @@ application:
 
 help:
 	@echo "Available targets:"
-	@echo "  all       : Build the executable"
-	@echo "  clean     : Remove build and generated files"
-	@echo "  codegen   : Generate code"
-	@echo "  ultraclean: Perform a clean and remove additional files"
-	@echo "  run       : Build the executable and run it"
-	@echo "  help      : Display this help message"
+	@echo "  all       		: Build the executable"
+	@echo "  clean     		: Remove build and generated files"
+	@echo "  codegen   		: Generate code"
+	@echo "  ultraclean		: Perform a clean and remove additional files"
+	@echo "  run       		: Build the executable and run it without regenerating the code"
+	@echo "  application 		: Build and run the specified application. Usage example: make application app=/messy/examples/helloworld"
+	@echo "  help      		: Display this help message"
