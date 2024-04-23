@@ -28,15 +28,24 @@ SC_MODULE(Sensor_${sensor_name}_functional)
     data_out("Data_out"),
     go("Go"),
     power_signal("Func_to_Power_signal")
-    {    
+    {
+        //printf("SENSOR :: systemc constructor");
+        register_memory = new uint8_t[${register_memory}];
         SC_THREAD(sensor_logic);
         sensitive << ready;
     }
 
     void sensor_logic();
 
-    Sensor_${sensor_name}_functional(){}
+    Sensor_${sensor_name}_functional(){
+        //printf("SENSOR :: constructor");
+    }
+
+    ~Sensor_${sensor_name}_functional(){
+        delete[]register_memory;
+    }
     //Register Map
     private: 
-    int register_memory[${register_memory}];
+    uint8_t* register_memory;
+    int register_memory_size=${register_memory};
 };

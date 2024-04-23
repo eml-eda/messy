@@ -5,7 +5,8 @@
 #else
 #define AXI_BASE 0x20000000
 #endif
-#define NUM_ITERS 10
+#define MEMORY_SENSOR_SIZE 256
+#define STRIDE_ADDRESSES 1
 /* Program Entry. */
 int main(void)
 {
@@ -17,8 +18,12 @@ int main(void)
     printf("[%d %d] Hello World!\n", cluster_id, core_id);
 
     int* mic_click_sensor = (volatile int *)AXI_BASE+0x0;
-    for(int i=0;i<NUM_ITERS;i++)
-        printf("Microphone sensor %d\n", *mic_click_sensor);
+    printf("Messy sensor test, there should be %d iters\n\n",(MEMORY_SENSOR_SIZE)/STRIDE_ADDRESSES);
+    for(int i=0;i<MEMORY_SENSOR_SIZE;i+=STRIDE_ADDRESSES){
+        printf("iter n.%d\n",i/STRIDE_ADDRESSES);
+        *((uint8_t*)(mic_click_sensor+i))=i%256;
+        printf("Sensor read #%d : %d\n",i, *((uint8_t*)(mic_click_sensor+i)));
+    }
 
     return errors;
 }
