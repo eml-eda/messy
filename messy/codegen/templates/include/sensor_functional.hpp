@@ -7,12 +7,13 @@ SC_MODULE(Sensor_${sensor_name}_functional)
     Core* core;
     //Input Port
     sc_core::sc_in <bool> enable;
-    sc_core::sc_in <int>  address;
-    sc_core::sc_in <int>  data_in;
+    sc_core::sc_in <unsigned int>   address;
+    sc_core::sc_in <uint8_t*>   data_in;
+    sc_core::sc_in <unsigned int>   req_size;
     sc_core::sc_in <bool> flag_wr;
     sc_core::sc_in <bool> ready;
     //Output Port
-    sc_core::sc_out <int> data_out;
+    sc_core::sc_out <uint8_t*>  data_out;
     sc_core::sc_out <bool> go;
     //Power Port
     sc_core::sc_out <int> power_signal;

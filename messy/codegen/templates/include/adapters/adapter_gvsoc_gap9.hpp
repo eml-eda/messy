@@ -10,6 +10,10 @@
 #include <vp/launcher.hpp>
 #include <vp/itf/io.hpp>
 #include <messy_request.hpp>
+#define LOG_REQUESTS 1
+#ifdef LOG_REQUESTS
+#include <fstream>
+#endif
 
 class AdapterGvsocGap9 : public gv::Io_user, public vp::Notifier{
     public:
@@ -31,6 +35,10 @@ class AdapterGvsocGap9 : public gv::Io_user, public vp::Notifier{
     int closed=0;
     gv::Io_binding *axi;
     Gvsoc_launcher *gvsoc;
+    #ifdef LOG_REQUESTS
+    std::ofstream request_addresses;
+    std::ofstream request_sizes;
+    #endif
 };
 
 #endif

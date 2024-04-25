@@ -20,13 +20,11 @@ int64_t get_resolution_val(sc_core::sc_time_unit time_unit){
 
 void Core::run()
 {
-    this->init_iss_adapter();
     iss_adapter->startup();
     
     while(!this->iss_adapter->finished)
         continue_messy(true);
-    // wait until next resolutional value(next ms)
-    wait(get_resolution_val(${resolution})-(next_timestamp%get_resolution_val(${resolution})),sc_core::SC_PS);
+
     this->close();
 }
 
@@ -36,6 +34,9 @@ void Core::run_next_sc(){
 }
 
 void Core::close(){
+    // wait until next resolutional value(next ms)
+    wait(get_resolution_val(${resolution})-(next_timestamp%get_resolution_val(${resolution})),sc_core::SC_PS);
+    delete_n_requests(request_queue_size());
     this->iss_adapter->close();
     sc_stop();
 }
@@ -64,36 +65,37 @@ void Core::handle_req(MessyRequest *req)
 {
     //Here connect the signals with SystemC simulator signals   
     //std::cout << sc_time_stamp().to_double() << std::endl;
-    int tmpaddr;
     if (req->read_req)
     {
-
-        request_data.write(1);
         functional_bus_flag.write(true);
         request_ready.write(true);
-        tmpaddr = req->addr;
         
-        request_address.write(tmpaddr);
+        request_address.write(req->addr);
+        request_size.write(req->size);
         wait();
+        // segmentation fault
+        if(idx_sensor.read()<0) this->close();
         request_ready.write(false);
         wait();
 
+        // read onto iss data
+        uint8_t* sensor_memory=(uint8_t*)request_value.read();
+        for(unsigned int i=0;i<req->size;i++)    ((uint8_t*)req->data)[i] = sensor_memory[i];
     }
     else
     {
-        request_data.write(*(req->data));
+        request_data.write(((uint8_t*)req->data));
         functional_bus_flag.write(false);
         request_ready.write(true);
-        tmpaddr = req->addr;
 
-        request_address.write(tmpaddr);
-
+        request_address.write(req->addr);
+        request_size.write(req->size);
         wait();
+        if(idx_sensor.read()<0) this->close();
         request_ready.write(false);
         wait();
         
     }
-    *((uint32_t*)req->data) = request_value.read();
     iss_adapter->custom_reply(req);   
 }
 

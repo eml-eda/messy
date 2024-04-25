@@ -10,7 +10,7 @@
 #include <vp/launcher.hpp>
 #include <vp/itf/io.hpp>
 #include <messy_request.hpp>
-//#define LOG_REQUESTS 1
+#define LOG_REQUESTS 1
 #ifdef LOG_REQUESTS
 #include <fstream>
 #endif

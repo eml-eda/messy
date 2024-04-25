@@ -39,16 +39,19 @@ int sc_main(int argc, char* argv[])
     //Functional Bus
     sc_signal <bool> enable_temp;
     //Data from Master to Functional Bus
-    sc_signal <int>  core_request_address;
-    sc_signal <int>  core_request_data;
+    sc_signal <unsigned int>  core_request_address;
+    sc_signal <uint8_t*>  core_request_data;
+    sc_signal <unsigned int>  core_request_size;
     sc_signal <bool> core_request_ready;
     sc_signal <bool> core_functional_bus_flag;
     //Data from Functional Bus to Master
-    sc_signal <int>  core_request_value;
+    sc_signal <uint8_t*>  core_request_value;
     sc_signal <bool> core_request_go;
+    sc_signal <int> idx_sensor;
     //Data from Functional Bus to Slave
-    sc_signal <int>  address_to_sensors[NUM_SENSORS];
-    sc_signal <int>  data_to_sensors[NUM_SENSORS];
+    sc_signal <unsigned int>  address_to_sensors[NUM_SENSORS];
+    sc_signal <unsigned int>  size_to_sensors[NUM_SENSORS];
+    sc_signal <uint8_t*>  data_to_sensors[NUM_SENSORS];
     sc_signal <bool> F_B_to_S[NUM_SENSORS];
     sc_signal <bool> ready_to_sensors[NUM_SENSORS];
 
@@ -90,7 +93,7 @@ int sc_main(int argc, char* argv[])
     Load_converter ${sensor_name}_conv("${sensor_name}_converter");
     ${sensor_name}_conv.set_efficency(1.0);
 
-    sc_signal <int> ${sensor_name}_Data;
+    sc_signal <uint8_t*> ${sensor_name}_Data;
     sc_signal <bool> ${sensor_name}_Go;  
     sc_signal <int> ${sensor_name}_F_to_P;
     sca_tdf::sca_signal <double> ${sensor_name}_V_State;
@@ -99,6 +102,7 @@ int sc_main(int argc, char* argv[])
 
     ${sensor_name}.enable(enable_temp);
     ${sensor_name}.address(address_to_sensors[${idx}]);
+    ${sensor_name}.req_size(size_to_sensors[${idx}]);
     ${sensor_name}.data_in(data_to_sensors[${idx}]);
     ${sensor_name}.flag_wr(F_B_to_S[${idx}]);
     ${sensor_name}.ready(ready_to_sensors[${idx}]);
@@ -118,9 +122,11 @@ int sc_main(int argc, char* argv[])
     //Binding Functional Master's signals
     core.request_address(core_request_address);
     core.request_data(core_request_data);
+    core.request_size(core_request_size);
     core.request_ready(core_request_ready);
     core.request_go(core_request_go);
     core.request_value(core_request_value);
+    core.idx_sensor(idx_sensor);
     core.functional_bus_flag(core_functional_bus_flag);
     core.power_signal(core_state);
     //Binding Power Master's signals
@@ -134,6 +140,8 @@ int sc_main(int argc, char* argv[])
     functional_bus.request_address(core_request_address);
     functional_bus.request_data(core_request_data);
     functional_bus.request_ready(core_request_ready);
+    functional_bus.request_size(core_request_size);
+    functional_bus.idx_sensor(idx_sensor);
     functional_bus.flag_from_core(core_functional_bus_flag);
     //Binding Slave Input to Functional Bus
 
@@ -144,6 +152,7 @@ int sc_main(int argc, char* argv[])
         functional_bus.address_out_sensor[i](address_to_sensors[i]);
         functional_bus.data_out_sensor[i](data_to_sensors[i]);
         functional_bus.flag_out_sensor[i](F_B_to_S[i]);
+        functional_bus.size_out_sensor[i](size_to_sensors[i]);
         functional_bus.ready_sensor[i](ready_to_sensors[i]);
         power_bus.voltage_sensors[i](voltage_sensors[i]);
         power_bus.current_sensors[i](current_sensors[i]);

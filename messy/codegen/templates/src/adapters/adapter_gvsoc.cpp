@@ -49,7 +49,7 @@ MessyRequest* AdapterGvsoc::get_messy_request_from_gvsoc(gv::Io_request* req){
     request_addresses << req->addr << std::endl;
     request_sizes << req->size << std::endl;
     #endif
-    return (MessyRequest*)new MessyRequest((long long)((req->addr-0x20000000)/4),(unsigned int*)req->data,(bool)req->type==gv::Io_request_read,(unsigned int*)req->handle);
+    return (MessyRequest*)new MessyRequest((long long)req->addr-0x20000000,(unsigned int*)req->data,(bool)req->type==gv::Io_request_read,(unsigned int*)req->handle,req->size);
 }
 
 int64_t AdapterGvsoc::exec_events_at(int64_t timestamp){
