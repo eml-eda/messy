@@ -66,7 +66,19 @@ void Harvester_${harvester_name}_battery_voc::processing(){
     Compute actual state-of-charge solving the integral:
     SOC_t = SOC_{t-1} - \int^{t}_{-inf} i(\tau) / C d\tau
     */
-    tmpsoc -= (((tmpcurrent + prev_i_batt) * 1) / (2 * (3600*1000) * c_nom)); // 3600 * 1000 Cnom, mAh to mAs cause [sim step] = [ms]
+    // TODO: Quickfix for scaling resulution
+    int scaling_factor_resulution;
+    if (SIM_RESOLUTION == 4)
+    {
+        // MS
+        scaling_factor_resulution = 1000;
+    }
+    else
+    {
+        // SEC
+        scaling_factor_resulution = 1;
+    }
+    tmpsoc -= (((tmpcurrent + prev_i_batt) * 1) / (2 * (3600) * c_nom * scaling_factor_resulution));
     prev_i_batt = tmpcurrent; // Update
 
     // Output the battery SOC
