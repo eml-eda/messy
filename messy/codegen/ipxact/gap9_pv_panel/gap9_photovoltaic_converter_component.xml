@@ -4,10 +4,9 @@
 XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
   <ipxact:vendor>POLITO</ipxact:vendor>
   <ipxact:library>GAP9</ipxact:library>
-  <ipxact:name>battery_converter</ipxact:name>
+  <ipxact:name>photovoltaic_converter</ipxact:name>
   <ipxact:version>1.0</ipxact:version>
   <ipxact:model>
-    <!-- Here the question is whether or not we should mention the views at all-->
     <ipxact:views>
       <ipxact:view>
         <ipxact:name>interface</ipxact:name>
@@ -24,11 +23,11 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
         <ipxact:moduleParameters>
           <ipxact:moduleParameter parameterId="input_variable" resolve="user" type="string">
             <ipxact:name>input_variable</ipxact:name>
-            <ipxact:value>current</ipxact:value>
+            <ipxact:value>voltage</ipxact:value>
           </ipxact:moduleParameter>
           <ipxact:moduleParameter parameterId="out_dir" resolve="user" type="string">
             <ipxact:name>out_dir</ipxact:name>
-            <ipxact:value>true</ipxact:value>
+            <ipxact:value>false</ipxact:value>
           </ipxact:moduleParameter>
         </ipxact:moduleParameters>
 
@@ -45,7 +44,6 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:port>
                 <ipxact:name>V_in</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>requires</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -59,7 +57,6 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:port>
                 <ipxact:name>I_in</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>requires</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -69,11 +66,9 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
                     </ipxact:transTypeDefs>
                 </ipxact:transactional>
             </ipxact:port>
-
             <ipxact:port>
                 <ipxact:name>V_out</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>provides</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -87,7 +82,6 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:port>
                 <ipxact:name>I_out</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>provides</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -106,10 +100,10 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
   <ipxact:vendorExtensions>
     <lut>
       <input_values>
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400]
+        [0.6559,0.7397,0.8363,0.9588,1.0941,1.1907,1.4291,1.7642,1.8544,1.9961,2.4278,2.5954,2.6534,2.7307,2.7758,2.7887,2.9691,3.1688,3.3428,3.5876,3.7874,3.9678,4.1353,4.3673,4.5928,4.7668,4.9729]
       </input_values>
       <efficiency_values>
-        [88.0165, 90.9091, 91.1157, 92.1488, 92.7686, 92.7686, 93.595, 93.8017, 92.9752, 93.1818, 93.595, 94.2149, 94.4215, 94.6281, 94.4215, 94.4215, 94.4215, 94.4215, 94.6281, 94.4215, 94.6281, 96.6942]
+        [64.92,69.37,74.44,78.79,81.87,83.69,84.77,85.86,86.04,85.95,89.31,90.66,83.14,75.71,70.73,68.46,68.64,68.19,66.83,63.93,61.75,59.31,57.22,54.77,52.42,50.51,47.70]
       </efficiency_values>
       </lut>
   </ipxact:vendorExtensions>
