@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ipxact:component xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.accellera.org/
+XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
+  <ipxact:vendor>POLITO</ipxact:vendor>
+  <ipxact:library>GAP9</ipxact:library>
+  <ipxact:name>sensors</ipxact:name>
+  <ipxact:version>1.0</ipxact:version>
+  <ipxact:model>
+    <!-- Here the question is whether or not we should mention the views at all-->
+    <ipxact:views>
+      <ipxact:view>
+        <ipxact:name>interface</ipxact:name>
+        <ipxact:componentInstantiationRef>tlm-interface</ipxact:componentInstantiationRef>
+      </ipxact:view>
+    </ipxact:views>
+
+    <ipxact:instantiations>
+      <ipxact:componentInstantiation>
+        <ipxact:name>tlms-interface</ipxact:name>
+        <ipxact:language>system-c</ipxact:language>
+        <ipxact:libraryName>gap9lib</ipxact:libraryName>
+        <ipxact:moduleName>sensors</ipxact:moduleName>
+
+        <ipxact:fileSetRef>
+          <ipxact:localName>fs-harvesters-interface</ipxact:localName>
+        </ipxact:fileSetRef>
+
+      </ipxact:componentInstantiation>
+    </ipxact:instantiations>
+
+    <ipxact:ports>
+        <ipxact:ports>
+
+            <ipxact:port>
+                <ipxact:name>V_out</ipxact:name>
+                <ipxact:transactional>
+                    <ipxact:initiative>provides</ipxact:initiative>
+                    <ipxact:transTypeDefs>
+                        <ipxact:transTypeDef>
+                            <ipxact:typeName>double</ipxact:typeName>
+                            <ipxact:viewRef>interface</ipxact:viewRef>
+                        </ipxact:transTypeDef>
+                    </ipxact:transTypeDefs>
+                </ipxact:transactional>
+            </ipxact:port>
+
+            <ipxact:port>
+                <ipxact:name>I_out</ipxact:name>
+                <ipxact:transactional>
+                    <ipxact:initiative>provides</ipxact:initiative>
+                    <ipxact:transTypeDefs>
+                        <ipxact:transTypeDef>
+                            <ipxact:typeName>double</ipxact:typeName>
+                            <ipxact:viewRef>interface</ipxact:viewRef>
+                        </ipxact:transTypeDef>
+                    </ipxact:transTypeDefs>
+                </ipxact:transactional>
+            </ipxact:port>
+
+            <ipxact:port>
+                <ipxact:name>V_in</ipxact:name>
+                <ipxact:transactional>
+                    <ipxact:initiative>requires</ipxact:initiative>
+                    <ipxact:transTypeDefs>
+                        <ipxact:transTypeDef>
+                            <ipxact:typeName>double</ipxact:typeName>
+                            <ipxact:viewRef>interface</ipxact:viewRef>
+                        </ipxact:transTypeDef>
+                    </ipxact:transTypeDefs>
+                </ipxact:transactional>
+            </ipxact:port>
+
+            <ipxact:port>
+                <ipxact:name>I_in</ipxact:name>
+                <ipxact:transactional>
+                    <ipxact:initiative>requires</ipxact:initiative>
+                    <ipxact:transTypeDefs>
+                        <ipxact:transTypeDef>
+                            <ipxact:typeName>double</ipxact:typeName>
+                            <ipxact:viewRef>interface</ipxact:viewRef>
+                        </ipxact:transTypeDef>
+                    </ipxact:transTypeDefs>
+                </ipxact:transactional>
+            </ipxact:port>
+
+        </ipxact:ports>
+    </ipxact:ports>
+
+  </ipxact:model>
+
+</ipxact:component>
+

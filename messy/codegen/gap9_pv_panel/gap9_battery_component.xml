@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ipxact:component xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.accellera.org/
+XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
+    <!-- Vendor and Library Information -->
+    <ipxact:vendor>POLITO</ipxact:vendor>
+    <ipxact:library>GAP9</ipxact:library>
+    <ipxact:name>battery</ipxact:name>
+    <ipxact:version>1.0</ipxact:version>
+    
+    <ipxact:instantiations>
+      <ipxact:componentInstantiation>
+        <ipxact:name>tlms-interface</ipxact:name>
+        <ipxact:language>system-c</ipxact:language>
+        <ipxact:libraryName>gap9lib</ipxact:libraryName>
+        <ipxact:moduleName>battery</ipxact:moduleName>
+        <ipxact:moduleParameters>
+        <ipxact:moduleParameter parameterId="harvester_type" resolve="user" type="string">
+            <ipxact:name>harvester_type</ipxact:name>
+            <ipxact:value>battery</ipxact:value>
+        </ipxact:moduleParameter>
+        <ipxact:moduleParameter parameterId="vref" resolve="user" type="float">
+            <ipxact:name>vref</ipxact:name>
+            <ipxact:value>3.8</ipxact:value>
+        </ipxact:moduleParameter>
+        <ipxact:moduleParameter parameterId="soc_init" resolve="user" type="int">
+            <ipxact:name>soc_init</ipxact:name>
+            <ipxact:value>100</ipxact:value>
+        </ipxact:moduleParameter>
+        <ipxact:moduleParameter parameterId="soc_end" resolve="user" type="int">
+            <ipxact:name>soc_end</ipxact:name>
+            <ipxact:value>0</ipxact:value>
+        </ipxact:moduleParameter>
+        <ipxact:moduleParameter parameterId="capacity" resolve="user" type="int">
+            <ipxact:name>capacity</ipxact:name>
+            <ipxact:value>32</ipxact:value>
+        </ipxact:moduleParameter>
+    </ipxact:moduleParameters>
+
+        <ipxact:fileSetRef>
+          <ipxact:localName>fs-core-interface</ipxact:localName>
+        </ipxact:fileSetRef>
+
+      </ipxact:componentInstantiation>
+    </ipxact:instantiations>
+
+    <ipxact:vendorExtensions>
+        <self_discharge>
+            <resolution>
+                <unit>SC_S</unit>
+                <mult>1</mult>
+            </resolution>
+            <value>0.001</value>
+        </self_discharge>
+        <class>harvester</class>
+        <harvester_type>battery</harvester_type>
+    </ipxact:vendorExtensions>
+
+    <ipxact:ports>
+        <ipxact:port>
+            <ipxact:name>En</ipxact:name>
+            <ipxact:wire>
+                <ipxact:direction>In</ipxact:direction>
+            </ipxact:wire>
+        </ipxact:port>
+        <ipxact:port>
+            <ipxact:name>V</ipxact:name>
+            <ipxact:transactional>
+                <ipxact:initiative>provides</ipxact:initiative>
+                <ipxact:transTypeDefs>
+                    <ipxact:transTypeDef>
+                        <ipxact:typeName>double</ipxact:typeName>
+                        <ipxact:viewRef>interface</ipxact:viewRef>
+                    </ipxact:transTypeDef>
+                </ipxact:transTypeDefs>
+            </ipxact:transactional>
+        </ipxact:port>
+        <ipxact:port>
+            <ipxact:name>I</ipxact:name>
+            <ipxact:transactional>
+                <ipxact:initiative>requires</ipxact:initiative>
+                <ipxact:transTypeDefs>
+                    <ipxact:transTypeDef>
+                        <ipxact:typeName>double</ipxact:typeName>
+                        <ipxact:viewRef>interface</ipxact:viewRef>
+                    </ipxact:transTypeDef>
+                </ipxact:transTypeDefs>
+            </ipxact:transactional>
+        </ipxact:port>
+        <ipxact:port>
+            <ipxact:name>SOC</ipxact:name>
+            <ipxact:transactional>
+                <ipxact:initiative>provides</ipxact:initiative>
+                <ipxact:transTypeDefs>
+                    <ipxact:transTypeDef>
+                        <ipxact:typeName>double</ipxact:typeName>
+                        <ipxact:viewRef>interface</ipxact:viewRef>
+                    </ipxact:transTypeDef>
+                </ipxact:transTypeDefs>
+            </ipxact:transactional>
+        </ipxact:port>
+    </ipxact:ports>
+</ipxact:component>
