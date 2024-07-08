@@ -8,4 +8,5 @@ trace*
 *.data
 *config.json
 gvsoc_deps
+obj
 request*.log

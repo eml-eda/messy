@@ -1,6 +1,4 @@
 # Documentation
-Until the project is not public, you can read the documentation in the following way, supposing you are using Visual Studio Code:
-
 Clone the repository
 
 ```bash
@@ -12,7 +10,7 @@ Change into the directory
 ```bash
 cd messy
 ```
-Open this folder in Visual Studio Code
+Open this folder in Visual Studio Code (or in the terminal)
 
 Create a python virtual environment
 

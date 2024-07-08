@@ -11,4 +11,4 @@ A LUT is defined through a JSON object containing as following:
 }
 ```
 
-In this object the user shall set in `input_values` an array of values representing the input variable(tension, current, nits, torque etc.) and finally should call the second field(`efficiency_values`, `voltage_values` and `current_values`) with an array of the other values.
+In this object the user shall set in `input_values` an array of values representing the input variable(tension, current, nits, torque etc.) and finally should call the second field (`efficiency_values`, `voltage_values` and `current_values`) with an array of the other values.
