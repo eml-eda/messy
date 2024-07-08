@@ -2,3 +2,4 @@ chip.cluster.*
 chip.soc.*
 *view.gtkw
 debug_binary*
+nets

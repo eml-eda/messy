@@ -2,6 +2,10 @@
 
 AdapterGvsocGap9::AdapterGvsocGap9()
 {
+    #ifdef LOG_REQUESTS
+    request_addresses.open("./request_adresses.log");
+    request_sizes.open("./request_sizes.log");
+    #endif
 }
 void AdapterGvsocGap9::startup(){
     string gvsoc_config_path="${config['path']}";
@@ -28,7 +32,11 @@ void AdapterGvsocGap9::startup(){
 }
 
 MessyRequest* AdapterGvsocGap9::get_messy_request_from_gvsoc(gv::Io_request* req){
-    return (MessyRequest*)new MessyRequest((long long)req->addr,(unsigned int*)req->data,(bool)req->type==gv::Io_request_read,(unsigned int*)req->handle);
+    #ifdef LOG_REQUESTS
+    request_addresses << req->addr << std::endl;
+    request_sizes << req->size << std::endl;
+    #endif
+    return (MessyRequest*)new MessyRequest((long long)req->addr,(unsigned int*)req->data,(bool)req->type==gv::Io_request_read,(unsigned int*)req->handle,req->size);
 }
 
 int64_t AdapterGvsocGap9::exec_events_at(int64_t timestamp){

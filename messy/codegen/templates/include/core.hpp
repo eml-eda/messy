@@ -25,12 +25,14 @@ class Core : public sc_module
     void reply_to_req(MessyRequest *req);
     int simulation_iters=0;
     double tot_power=0.0;
-    sc_core::sc_out <int> request_address;
-    sc_core::sc_out <int> request_data;
+    sc_core::sc_out <unsigned int> request_address;
+    sc_core::sc_out <uint8_t*> request_data;
+    sc_core::sc_out <unsigned int> request_size;
     sc_core::sc_out <bool> functional_bus_flag;
     sc_core::sc_out <bool> request_ready;
     sc_core::sc_in  <bool> request_go;
-    sc_core::sc_in  <int> request_value;
+    sc_core::sc_in  <uint8_t*> request_value;
+    sc_core::sc_in <int> idx_sensor;
     //Power Port
     sc_core::sc_out <double> power_signal;
 
@@ -41,15 +43,16 @@ class Core : public sc_module
     request_ready("Master_Ready_to_Func_Bus"),
     request_go("Master_GO_to_Func_Bus"),
     request_value("Data_form_Bus_to_Master"),
-    power_signal("Func_to_Power_signal")
+    power_signal("Func_to_Power_signal"),
+    idx_sensor("selected_sensor_of_request")
     {
+        iss_adapter=(${adapter_class}*) new ${adapter_class}();
         SC_THREAD(run);
         sensitive << request_go;
-
     }
     
-    void init_iss_adapter(){
-        iss_adapter=(${adapter_class}*) new ${adapter_class}();
+    ~Core(){
+        delete iss_adapter;
     }
 
     private:

@@ -1,4 +1,4 @@
-# Messy (Multi-layer Extra-functional Systemc Simulator)
+# MESSY (Multi-layer Extra-functional Simulator in Systemc)
 
 <img src="docs/images/logo.webp" alt="drawing" width="300"/>
 

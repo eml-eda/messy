@@ -11,8 +11,9 @@ void Sensor_${sensor_name}_functional::sensor_logic(){
         if( enable.read() == true ){
             if(ready.read() == true){
                 if( flag_wr.read() == true ){
+                    unsigned int add=address.read();
                     // read operation
-                    data_out.write(register_memory[address.read()]);
+                    data_out.write(register_memory+add);
                     // reading
                     power_signal.write(${sensor_name}_read);
                     double start_time=sc_time_stamp().to_double();
@@ -21,9 +22,12 @@ void Sensor_${sensor_name}_functional::sensor_logic(){
                     power_signal.write(${sensor_name}_idle);
                     go.write(true);
                 } else {
+                    unsigned int add=address.read();
                     // write operation
-                    register_memory[address.read()] = data_in.read();
-                    data_out.write(data_in.read());
+                    unsigned int req_size_val=req_size.read();
+                    uint8_t* req_core_val_addr=data_in.read();
+                    for(unsigned int i=0;i<req_size_val;i++) register_memory[i+add] = req_core_val_addr[i];
+                    data_out.write(register_memory+add);
                     // writing
                     power_signal.write(${sensor_name}_write);
                     double start_time=sc_time_stamp().to_double();

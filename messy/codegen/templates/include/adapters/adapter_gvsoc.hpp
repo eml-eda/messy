@@ -10,6 +10,10 @@
 #include <vp/launcher.hpp>
 #include <vp/itf/io.hpp>
 #include <messy_request.hpp>
+#define LOG_REQUESTS 1
+#ifdef LOG_REQUESTS
+#include <fstream>
+#endif
 
 class AdapterGvsoc : public gv::Io_user, public gv::Gvsoc_user{
     public:
@@ -53,6 +57,10 @@ class AdapterGvsoc : public gv::Io_user, public gv::Gvsoc_user{
     gv::Io_binding *axi;
     gv::GvsocLauncher *gvsoc;
     gv::PowerReport* power_report;
+    #ifdef LOG_REQUESTS
+    std::ofstream request_addresses;
+    std::ofstream request_sizes;
+    #endif
 };
 
 #endif

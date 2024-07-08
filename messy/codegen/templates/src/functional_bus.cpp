@@ -2,15 +2,17 @@
 #include <functional_bus.hpp>
 
 void Functional_bus::processing_data(){
-    int add_s;
-    int data_s;
-    int reg_s;
+    unsigned int add_s;
+    uint8_t* data_s;
+    unsigned int reg_s;
+    unsigned int size_s;
     bool flag_s;
     
     while (true){
         if (request_ready.read() == true) {
             add_s = request_address.read();
             flag_s = flag_from_core.read();
+            size_s = request_size.read();
             
             % for idx,(sensor_name,sensor) in enumerate(peripherals["sensors"].items()):
             % if idx == 0:
@@ -20,46 +22,53 @@ void Functional_bus::processing_data(){
             % endif
             (${sensor_name}_BASE_ADDRESS <= add_s && add_s < (${sensor_name}_BASE_ADDRESS + ${sensor["register_memory"]})) 
             {
-                reg_s = add_s - ${sensor_name}_BASE_ADDRESS;
-                data_s = request_data.read();
-                //cout << data_s << endl;
-                // printf("Entrato in ${sensor_name}\n");
-                address_out_sensor[${idx}].write(reg_s);
-                data_out_sensor[${idx}].write(data_s);
-                flag_out_sensor[${idx}].write(flag_s);
-                selected_slave = ${idx};
-                Set_Slave(selected_slave, true);
+                if(add_s+size_s > (${sensor_name}_BASE_ADDRESS + ${sensor["register_memory"]})){
+                    fprintf(stderr,"\n[MESSY]\tRead/Write at %d of %d bytes exceeds ${sensor_name} memory\n",add_s,size_s);
+                    selected_sensor=-1;
+                    request_value.write(0x0);
+                    request_go.write(true);
+                }
+                else{
+                    reg_s = add_s - ${sensor_name}_BASE_ADDRESS;
+                    data_s = request_data.read();
+                    size_out_sensor[${idx}].write(size_s);
+                    address_out_sensor[${idx}].write(reg_s);
+                    data_out_sensor[${idx}].write(data_s);
+                    flag_out_sensor[${idx}].write(flag_s);
+                    selected_sensor = ${idx};
+                    ready_sensor[selected_sensor].write(true);
+                }
             }
             % endfor
-            else {
-                printf("Address %d of sensor/actuator not found\n", add_s);
+            else{
+                fprintf(stderr,"\n[MESSY]\tAddress %d not found by functional bus\n", add_s);
+                selected_sensor=-1;
+                request_value.write(0x0);
+                request_go.write(true);
             }
-        }
-        wait();
-
-        response();
-
-        while (go_sensors[selected_slave].read() != false && request_ready.read() != false) {
-            wait();
+            idx_sensor.write(selected_sensor);
         }
         
-        Set_Go(false);
+        wait();
+
+        if(selected_sensor>=0){
+
+            response();
+
+            while (go_sensors[selected_sensor].read() != false && request_ready.read() != false) {
+                wait();
+            }
+            
+            request_go.write(false);
+        }
  
     }
 }    
 
 void Functional_bus::response(){
-    if (go_sensors[selected_slave].read() == true) {
-        request_value.write(data_input_sensor[selected_slave].read());
-        Set_Go(true);
-        Set_Slave(selected_slave, false);
+    if (go_sensors[selected_sensor].read() == true) {
+        request_value.write(data_input_sensor[selected_sensor].read());
+        request_go.write(true);
+        ready_sensor[selected_sensor].write(false);
     }
-}
-
-void Functional_bus::Set_Go(bool flag){
-    request_go.write(flag);
-}
-
-void Functional_bus::Set_Slave(int address, bool flag){
-    ready_sensor[address].write(flag);
 }
