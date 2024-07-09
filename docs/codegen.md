@@ -131,8 +131,6 @@ Supposing we have two sensors with a `memory_map` of 256 and we want to access t
 | sensor1| 0x20000000|256| 0|
 | sensor2 |0x20000256|256| 256|
 
-Check with Amine if it is correct
-
 ## States
 
 Another important detail is the presence of different states. At the moment each sensor only supports 3 states:
@@ -155,8 +153,29 @@ Inside this states we can define the current drawn to execute that operation and
 
 These states, at the moment, are managed in the following way:
 
-- Idle
-    - Read
-        - Idle
-    - Write
-        - Idle
+- Off
+    - Idle
+        - Read
+            - Idle
+        - Write
+            - Idle
+
+The state machine can be represented as follows:
+
+``` mermaid
+stateDiagram
+  state Off
+  state Write
+  state Read
+  state Idle
+
+  [*] --> Off
+  Off --> Read
+  Off --> Write
+  Read --> Idle
+  Write --> Idle
+  Idle --> Read
+  Idle --> Write
+```
+
+Future works, will go in the direction of supporting the `Off` state after a certain amount of idle time.
