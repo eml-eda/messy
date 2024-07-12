@@ -61,8 +61,7 @@ SCA_TDF_MODULE(Harvester_${harvester_name}_battery_voc)
     void processing();
     
     private:
-        // battery is 32mAh
-	    int c_nom = 32;
+	    int c_nom=${capacity};
         double tmpsoc=${soc_init/100}f;
         double prev_i_batt;
 };
