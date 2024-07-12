@@ -67,11 +67,11 @@ def read_params(params, design):
 def sanity_check(json_data, requirements):
     #Some sanity check to make sure the component is from the same vendor/library and of the same version
     if (json_data["vendor"] != requirements["vendor"]):
-        raise Exception(f"Bus vendor of the component {json_data["vendor"]} is not the same as mentioned in the design {requirements["vendor"]}")
+        raise Exception(f"Bus vendor of the component {json_data['vendor']} is not the same as mentioned in the design {requirements['vendor']}")
     if (json_data["library"] != requirements["library"]):
-        raise Exception(f"Bus library of the component {json_data["library"]} is not the same as mentioned in the design {requirements["library"]}")
+        raise Exception(f"Bus library of the component {json_data['library']} is not the same as mentioned in the design {requirements['library']}")
     if (json_data["version"] != requirements["version"]):
-        raise Exception(f"Bus version of the component {json_data["version"]} is not the same as mentioned in the design {requirements["version"]}")
+        raise Exception(f"Bus version of the component {json_data['version']} is not the same as mentioned in the design {requirements['version']}")
 
 def process_bus(file_path, requirements, design):
     json_data = xml_to_json(file_path)
