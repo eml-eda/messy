@@ -1,0 +1,131 @@
+{
+    "resolution":"SC_SEC",
+    "tracing":{
+        "messy_trace":{
+            "filename":"messy_trace.log",
+            "resolution":{
+                "unit":"SC_SEC",
+                "mult":900
+            }
+        }
+    },
+    "bus":{
+        "vref":3.3,
+        "tracing":{
+            "messy_trace":{
+                "bus_I":"current"
+            }
+        }
+    },
+    "core":{
+        "vref":1.8,
+        "iss":"gvsoc",
+        "config":{
+            "path":"./gvsoc_deps/gvsoc_config.json",
+            "axi_path":"/chip/axi_proxy"
+        },
+        "tracing":{
+            "messy_trace":{
+                "core_I":"current"
+            }
+        },
+        "converter":{
+            "input_variable":"current",
+            "out_dir":false,
+            "lut":{
+                "input_values":[
+                    0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400
+                ],
+                "efficiency_values":[
+                    42.7039, 50.2146, 64.1631, 64.8069, 71.6738, 73.8197, 74.4635, 75.3219, 77.0386, 77.897, 82.4034, 84.1202, 84.7639, 85.4077, 86.0515, 86.2661, 86.2661, 86.4807, 86.9099, 87.7682, 87.7682, 87.9828, 87.9828, 88.1974, 87.9828, 88.1974, 88.1974, 88.1974, 88.412, 88.6266, 87.5536, 87.5536, 87.7682, 88.6266, 88.8412, 88.8412, 89.0558, 90.1288, 90.3433, 90.5579, 90.5579, 90.7725, 90.7725, 91.2017, 90.7725, 90.7725, 90.1288, 88.412, 84.9785
+                ]
+            }
+        }
+    },
+    "peripherals":{
+        "sensors" : {
+            "mic_click": {
+                "power": true,
+                "tracing":{
+                    "messy_trace":{
+                        "mic_click_I":"current"
+                    }
+                },
+                "vref": 3.3,
+                "register_memory" : 256,
+                "states":{
+                    "read" : {
+                        "current" : "0.12",
+                        "delay" : "30"
+                    },
+                    "write": {
+                        "current" : "0.16",
+                        "delay" : "30"
+                    },
+                    "idle":{
+                        "current" : "0.002"
+                    }
+                }
+            }
+        },
+        "harvesters":{
+            "battery" : {
+                "harvester_type":"battery",
+                "tracing":{
+                    "messy_trace":{
+                        "battery":"SoC"
+                    }
+                },
+                "vref":3.8,
+                "soc_init" : 80,
+                "soc_end" : 0,
+                "capacity":32,
+                "self_discharge":{
+                    "resolution":{
+                        "unit":"SC_S",
+                        "mult":1
+                    },
+                    "value":0.001
+                },
+                "converter" : {
+                    "input_variable":"current",
+                    "out_dir":true,
+                    "lut":{
+                        "input_values":[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400],
+                        "efficiency_values":[88.0165, 90.9091, 91.1157, 92.1488, 92.7686, 92.7686, 93.595, 93.8017, 92.9752, 93.1818, 93.595, 94.2149, 94.4215, 94.6281, 94.4215, 94.4215, 94.4215, 94.4215, 94.6281, 94.4215, 94.6281, 96.6942]
+                    }
+                }
+            },
+            "photovoltaic" : {
+                "harvester_type" :"source",
+                "tracing":{
+                    "messy_trace":{
+                        "pv_I":"current"
+                    }
+                },
+                "vref" :{
+                    "input_file":"input_files/gmonths_1sec_1day.txt",
+                    "lut":{
+                        "input_values":[250,1000],
+                        "voltage_values":[2.92,3.20]
+                    }
+                },
+                "iref":{
+                    "input_file":"input_files/gmonths_1sec_1day.txt",
+                    "lut":{
+                        "input_values":[250,1000],
+                        "current_values":[11.76,47.15]
+                    }
+                },
+                "converter" : {
+                    "input_variable":"voltage",
+                    "out_dir":false,
+                    "lut":{
+                        "input_values":[0.6559,0.7397,0.8363,0.9588,1.0941,1.1907,1.4291,1.7642,1.8544,1.9961,2.4278,2.5954,2.6534,2.7307,2.7758,2.7887,2.9691,3.1688,3.3428,3.5876,3.7874,3.9678,4.1353,4.3673,4.5928,4.7668,4.9729],
+                        "efficiency_values":[64.92,69.37,74.44,78.79,81.87,83.69,84.77,85.86,86.04,85.95,89.31,90.66,83.14,75.71,70.73,68.46,68.64,68.19,66.83,63.93,61.75,59.31,57.22,54.77,52.42,50.51,47.70]
+                    }
+                }
+            }
+        }
+    }
+}
