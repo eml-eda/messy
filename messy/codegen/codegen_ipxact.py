@@ -72,7 +72,7 @@ def main(input_file, input_folder, template_dir, output_dir):
 
     lib = read_ipxact_design(input_file)
     design = dict()
-    print(lib["components"])
+
     design["harvesters"] = {}
     design["peripherals"] = {}
     design["peripherals"]["sensors"] = {}
@@ -97,6 +97,7 @@ def main(input_file, input_folder, template_dir, output_dir):
             design["peripherals"]["sensors"] = process_sensor(path_to_component, component["componentRef"], design["peripherals"]["sensors"])
 
     settings = design
+    print(json.dumps(settings, indent=2))
     
     settings["utils"]={
         "get_signals":get_signals,
@@ -320,15 +321,6 @@ if __name__ == "__main__":
         help="Path to the top-level IPXACT design",
     )
 
-    # Add an argument for the input library directory path
-    parser.add_argument(
-        "-d",
-        "--directory",
-        type=str,
-        metavar="PATH",
-        help="Path to the corresponding IPXACT component library",
-    )
-
     # Add an argument for the template directory path
     parser.add_argument(
         "-t",
@@ -356,7 +348,7 @@ if __name__ == "__main__":
     input_file = os.path.join(os.getcwd(), Path(args.input_file))
 
     # Convert the template directory path to a Path object
-    input_folder = os.path.join(os.getcwd(),Path(args.directory))
+    input_folder = Path(args.input_file).parent
 
     # Convert the template directory path to a Path object
     template_dir = os.path.join(os.getcwd(),Path(args.template_dir))
