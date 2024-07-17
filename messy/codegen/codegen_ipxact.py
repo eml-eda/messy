@@ -103,19 +103,19 @@ def main(input_file, input_folder, template_dir, output_dir):
         "get_signals":get_signals,
     }
 
-    base_header_dir = os.path.join(output_dir, "include")
+    base_header_dir = Path(os.path.join(output_dir, "include"))
     base_header_dir.mkdir(parents=True, exist_ok=True)
-    base_src_dir = os.path.join(output_dir, "src")
+    base_src_dir = Path(os.path.join(output_dir, "src"))
     base_src_dir.mkdir(parents=True, exist_ok=True)
 
-    converter_header_dir = os.path.join(output_dir, "include", "converter")
+    converter_header_dir = Path(os.path.join(output_dir, "include", "converter"))
     converter_header_dir.mkdir(parents=True, exist_ok=True)
-    converter_src_dir = os.path.join(output_dir, "src", "converter")
+    converter_src_dir = Path(os.path.join(output_dir, "src", "converter"))
     converter_src_dir.mkdir(parents=True, exist_ok=True)
 
-    adapters_header_dir = os.path.join(output_dir, "include", "adapters")
+    adapters_header_dir = Path(os.path.join(output_dir, "include", "adapters"))
     adapters_header_dir.mkdir(parents=True, exist_ok=True)
-    adapters_src_dir = os.path.join(output_dir, "src", "adapters")
+    adapters_src_dir = Path(os.path.join(output_dir, "src", "adapters"))
     adapters_src_dir.mkdir(parents=True, exist_ok=True)
 
     template_generators = []
