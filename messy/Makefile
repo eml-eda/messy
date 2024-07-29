@@ -3,27 +3,34 @@ SHELL := /bin/bash
 .SUFFIXES: .cc .cpp .o
 .PHONY: clean ultraclean help
 
+# Compiler settings
 CC := g++
 OPT =
 DEBUG = 
 OTHER := -Wall -O3
+
 PULP_SDK := /pulp-sdk
 # Use this CFLAGS definition if you need to see debug output
 # CFLAGS = -c -g -Wno-deprecated -Wall -D_DEBUG
 CFLAGS := -c -g -Wno-deprecated $(OTHER)
 
-#The Directories, Source, Includes, Objects, Binary and Resources
+# The Directories, Source, Includes, Objects, Binary and Resources
 SRCDIR := src
 INCDIR := include
 BUILDDIR := obj
 TARGETDIR := bin
+
+# File extensions
 SRCEXT := cpp
 OBJEXT := o
+
+# External library paths
 SYSTEMC_HOME := /usr/local/systemc
 AMS_HOME := /usr/local/systemc-ams
 GAP_HOME := /gap_sdk
 MODULE := run
 
+# Find all source files
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(SOURCES:$(SRCDIR)/%.$(SRCEXT)=$(BUILDDIR)/%.$(OBJEXT))
 
@@ -37,11 +44,13 @@ INCDIR = -I./include -I./src \
 
 EXE := $(MODULE)
 
+# Rule to compile source files into object files
 $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@echo "Compiling source $< into object $@"
 	@mkdir -p '$(@D)'
 	$(GCC_PATH)$(CC) $(CFLAGS) $(INCDIR) -std=c++14 $< -o $@
 
+# Rule to compile source files into object files
 $(TARGETDIR)/$(EXE): $(OBJECTS)
 	@echo "Building $@ from $<"
 	@mkdir -p '$(@D)'
@@ -49,6 +58,7 @@ $(TARGETDIR)/$(EXE): $(OBJECTS)
 	$(AMS_HOME)/lib-linux64/libsystemc-ams.a \
 	$(SYSTEMC_HOME)/lib-linux64/libsystemc.a -lpthread 2>&1 | c++filt \
 
+# Clean target to remove build artifacts
 clean:
 	echo "Cleaning up"
 	rm -rf $(BUILDDIR)
@@ -59,10 +69,12 @@ clean:
 	rm -rf codegen/include
 	rm -rf codegen/__pycache__
 
+# Code generation target. The target depends on the clean target to ensure that the code is regenerated
 codegen: clean
 	echo "Generating code"
 	python3 codegen/codegen.py -f $(file)
 
+# Run target to build and execute the program
 run: $(TARGETDIR)/$(EXE)
 	@echo "Running $(EXE)"
 	cd $(PULP_SDK);\
@@ -70,6 +82,7 @@ run: $(TARGETDIR)/$(EXE)
 	cd /messy/messy;\
 	$(TARGETDIR)/$(EXE)
 
+# Ultra clean target to remove all generated files
 ultraclean: clean
 	rm -f Makefile.deps
 	rm -f tx_uart.log
@@ -84,8 +97,6 @@ ultraclean: clean
 
 Makefile.deps:
 	$(GCC_PATH)$(CC) $(CFLAGS) $(INCDIR) -M $(SOURCES) $(SRCS_BUS) >> Makefile.deps
-
-# include Makefile.deps
 
 application:
 	cd /messy/messy;\
@@ -112,7 +123,7 @@ help:
 	@echo "Available targets:"
 	@echo "  all       		: Build the executable"
 	@echo "  clean     		: Remove build and generated files"
-	@echo "  codegen   		: Generate code"
+	@echo "  codegen   		: Generate code. Usage example: make codegen file=/messy/messy/codegen/pulp_open.json"
 	@echo "  ultraclean		: Perform a clean and remove additional files"
 	@echo "  run       		: Build the executable and run it without regenerating the code"
 	@echo "  application 		: Build and run the specified application. Usage example: make application app=/messy/examples/helloworld"

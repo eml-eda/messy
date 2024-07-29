@@ -5,7 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "Python Codegen Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/messy/messy/messy.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-f",
+                "codegen/pulp-open.json",
+                "-a",
+                "/messy/examples/helloworld"
+            ],
+        },
+        {
+            "name": "Messy Debug",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/messy/bin/run",
