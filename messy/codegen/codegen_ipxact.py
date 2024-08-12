@@ -73,8 +73,8 @@ def main(input_file, input_folder, template_dir, output_dir):
     lib = read_ipxact_design(input_file)
     design = dict()
 
-    design["harvesters"] = {}
     design["peripherals"] = {}
+    design["peripherals"]["harvesters"] = {}
     design["peripherals"]["sensors"] = {}
 
     for component in lib["components"]:
@@ -86,19 +86,18 @@ def main(input_file, input_folder, template_dir, output_dir):
         elif (component["componentRef"]["name"] == "core_converter"):
             design["core"] = process_converter(path_to_component, component["componentRef"], design["core"])
         elif (component["componentRef"]["name"] == "battery"):
-            design["harvesters"] = process_battery(path_to_component, component["componentRef"], design["harvesters"])
+            design["peripherals"]["harvesters"] = process_battery(path_to_component, component["componentRef"], design["peripherals"]["harvesters"])
         elif (component["componentRef"]["name"] == "battery_converter"):
-            design["harvesters"]["battery"] = process_converter(path_to_component, component["componentRef"], design["harvesters"]["battery"])
+            design["peripherals"]["harvesters"]["battery"] = process_converter(path_to_component, component["componentRef"], design["peripherals"]["harvesters"]["battery"])
         elif (component["componentRef"]["name"] == "photovoltaic"):
-            design["harvesters"] = process_photovoltaic(path_to_component, component["componentRef"], design["harvesters"])
+            design["peripherals"]["harvesters"] = process_photovoltaic(path_to_component, component["componentRef"], design["peripherals"]["harvesters"])
         elif (component["componentRef"]["name"] == "photovoltaic_converter"):
-            design["harvesters"]["photovoltaic"] = process_converter(path_to_component, component["componentRef"], design["harvesters"]["photovoltaic"])
+            design["peripherals"]["harvesters"]["photovoltaic"] = process_converter(path_to_component, component["componentRef"], design["peripherals"]["harvesters"]["photovoltaic"])
         elif ("_sensor" in component["componentRef"]["name"]):
             design["peripherals"]["sensors"] = process_sensor(path_to_component, component["componentRef"], design["peripherals"]["sensors"])
 
     settings = design
-    print(json.dumps(settings, indent=2))
-    
+
     settings["utils"]={
         "get_signals":get_signals,
     }
@@ -150,18 +149,18 @@ def main(input_file, input_folder, template_dir, output_dir):
                         "name":sensor_name,
                         "params":t_params
                     })
-        template_generators.append(Template_generator(template_dir/"include"/"sensor_functional.hpp",
-                                   base_header_dir/f"sensor_{sensor_name}_functional.hpp",
+        template_generators.append(Template_generator(os.path.join(template_dir, "include", "sensor_functional.hpp"),
+                                   os.path.join(base_header_dir, f"sensor_{sensor_name}_functional.hpp"),
                                    {"sensor_name":sensor_name,**sensor}))
-        template_generators.append(Template_generator(template_dir/"src"/"sensor_functional.cpp",
-                                   base_src_dir/f"sensor_{sensor_name}_functional.cpp",
+        template_generators.append(Template_generator(os.path.join(template_dir,"src","sensor_functional.cpp"),
+                                   os.path.join(base_src_dir,f"sensor_{sensor_name}_functional.cpp"),
                                    {"sensor_name":sensor_name,**sensor}))
         
-        template_generators.append(Template_generator(template_dir/"include"/"sensor_power.hpp",
-                                   base_header_dir/f"sensor_{sensor_name}_power.hpp",
+        template_generators.append(Template_generator(os.path.join(template_dir,"include","sensor_power.hpp"),
+                                   os.path.join(base_header_dir,f"sensor_{sensor_name}_power.hpp"),
                                    {"sensor_name":sensor_name,**sensor}))
-        template_generators.append(Template_generator(template_dir/"src"/"sensor_power.cpp",
-                                   base_src_dir/f"sensor_{sensor_name}_power.cpp",
+        template_generators.append(Template_generator(os.path.join(template_dir, "src", "sensor_power.cpp"),
+                                   os.path.join(base_src_dir, f"sensor_{sensor_name}_power.cpp"),
                                    {"sensor_name":sensor_name,**sensor}))
         
 
@@ -174,11 +173,11 @@ def main(input_file, input_folder, template_dir, output_dir):
                         "name":harvester_name,
                         "params":t_params
                     })
-        template_generators.append(Template_generator(template_dir/"src"/"harvester.cpp",
-                                   base_src_dir/f"harvester_{harvester_name}.cpp",
+        template_generators.append(Template_generator(os.path.join(template_dir, "src", "harvester.cpp"),
+                                   os.path.join(base_src_dir, f"harvester_{harvester_name}.cpp"),
                                    {"harvester_name":harvester_name,**harvester}))
-        template_generators.append(Template_generator(template_dir/"include"/"harvester.hpp",
-                                   base_header_dir/f"harvester_{harvester_name}.hpp",
+        template_generators.append(Template_generator(os.path.join(template_dir, "include", "harvester.hpp"),
+                                   os.path.join(base_header_dir, f"harvester_{harvester_name}.hpp"),
                                    {"harvester_name":harvester_name,**harvester}))
         if "converter" in harvester and "lut" in harvester["converter"]:
             if "tracing" in harvester["converter"]:
@@ -189,56 +188,56 @@ def main(input_file, input_folder, template_dir, output_dir):
                             "name":harvester_name,
                             "params":t_params
                         })
-            template_generators.append(Template_generator(template_dir/"src"/"converter"/"lut_converter.cpp",
-                                   base_src_dir/"converter"/f"{harvester_name}_converter.cpp",
+            template_generators.append(Template_generator(os.path.join(template_dir, "src", "converter", "lut_converter.cpp"),
+                                   os.path.join(base_src_dir, "converter", f"{harvester_name}_converter.cpp"),
                                    {"name":harvester_name,"unit":"harvester",**harvester,**harvester["converter"]}))
-            template_generators.append(Template_generator(template_dir/"include"/"converter"/"lut_converter.hpp",
-                                   base_header_dir/"converter"/f"{harvester_name}_converter.hpp",
+            template_generators.append(Template_generator(os.path.join(template_dir, "include", "converter", "lut_converter.hpp"),
+                                   os.path.join(base_header_dir, "converter", f"{harvester_name}_converter.hpp"),
                                    {"name":harvester_name,"unit":"harvester",**harvester,**harvester["converter"]}))
     
     # Config.h statement
-    template_generators.append(Template_generator(template_dir/"include"/"config.hpp",
-                               base_header_dir/"config.hpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "include", "config.hpp"),
+                               os.path.join(base_header_dir, "config.hpp"),
                                {**settings}))
     
-    template_generators.append(Template_generator(template_dir/"include"/"messy_request.hpp",
-                               base_header_dir/"messy_request.hpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "include", "messy_request.hpp"),
+                               os.path.join(base_header_dir, "messy_request.hpp"),
                                {**settings}))
     
-    template_generators.append(Template_generator(template_dir/"src"/"messy_request.cpp",
-                               base_src_dir/"messy_request.cpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "src", "messy_request.cpp"),
+                               os.path.join(base_src_dir, "messy_request.cpp"),
                                {**settings}))
 
-    template_generators.append(Template_generator(template_dir/"include"/"lut.hpp",
-                               base_header_dir/"lut.hpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "include", "lut.hpp"),
+                               os.path.join(base_header_dir, "lut.hpp"),
                                {**settings}))
     
-    template_generators.append(Template_generator(template_dir/"src"/"lut.cpp",
-                               base_src_dir/"lut.cpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "src", "lut.cpp"),
+                               os.path.join(base_src_dir, "lut.cpp"),
                                {**settings}))
 
-    template_generators.append(Template_generator(template_dir/"include"/"functional_bus.hpp",
-                               base_header_dir/"functional_bus.hpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "include", "functional_bus.hpp"),
+                               os.path.join(base_header_dir, "functional_bus.hpp"),
                                {**settings}))
     
-    template_generators.append(Template_generator(template_dir/"src"/"functional_bus.cpp",
-                               base_src_dir/"functional_bus.cpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "src", "functional_bus.cpp"),
+                               os.path.join(base_src_dir, "functional_bus.cpp"),
                                {**settings}))
     
-    template_generators.append(Template_generator(template_dir/"include"/"power_bus.hpp",
-                               base_header_dir/"power_bus.hpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "include", "power_bus.hpp"),
+                               os.path.join(base_header_dir, "power_bus.hpp"),
                                {**settings}))
     
-    template_generators.append(Template_generator(template_dir/"src"/"power_bus.cpp",
-                               base_src_dir/"power_bus.cpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "src", "power_bus.cpp"),
+                               os.path.join(base_src_dir, "power_bus.cpp"),
                                {**settings}))
     
-    template_generators.append(Template_generator(template_dir/"include"/"converter"/"load_converter.hpp",
-                               base_header_dir/"converter"/"load_converter.hpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "include", "converter", "load_converter.hpp"),
+                               os.path.join(base_header_dir, "converter", "load_converter.hpp"),
                                {**settings}))
 
-    template_generators.append(Template_generator(template_dir/"src"/"converter"/"load_converter.cpp",
-                               base_src_dir/"converter"/"load_converter.cpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "src", "converter", "load_converter.cpp"),
+                               os.path.join(base_src_dir, "converter", "load_converter.cpp"),
                                {**settings}))
     
     if "converter" in settings["core"] and "lut" in settings["core"]["converter"]:
@@ -249,15 +248,15 @@ def main(input_file, input_folder, template_dir, output_dir):
                     "name":"core",
                     "params":t_params
                 })
-        template_generators.append(Template_generator(template_dir/"src"/"converter"/"lut_converter.cpp",
-                                base_src_dir/"converter"/"core_converter.cpp",
+        template_generators.append(Template_generator(os.path.join(template_dir, "src", "converter", "lut_converter.cpp"),
+                                os.path.join(base_src_dir, "converter", "core_converter.cpp"),
                                 {"name":"core","unit":"core",**settings["core"],**settings["core"]["converter"]}))
-        template_generators.append(Template_generator(template_dir/"include"/"converter"/"lut_converter.hpp",
-                                base_header_dir/"converter"/"core_converter.hpp",
+        template_generators.append(Template_generator(os.path.join(template_dir, "include", "converter", "lut_converter.hpp"),
+                                os.path.join(base_header_dir, "converter", "core_converter.hpp"),
                                 {"name":"core","unit":"core",**settings["core"],**settings["core"]["converter"]}))
     
-    #template_generators.append(Template_generator(template_dir/"include"/"adapters"/"iss_adapter.hpp",
-    #                           adapters_header_dir/"iss_adapter.hpp",
+    #template_generators.append(Template_generator(template_dir+"include"+"adapters"+"iss_adapter.hpp",
+    #                           adapters_header_dir+"iss_adapter.hpp",
     #                           {**settings}))
     
     adapter_used={
@@ -276,32 +275,32 @@ def main(input_file, input_folder, template_dir, output_dir):
             "adapter_filenames":"adapter_gvsoc_gap9"
         }
     if adapter_used["adapter_filenames"]!="iss_adapter":
-        template_generators.append(Template_generator(template_dir/"include"/"adapters"/f"{adapter_used['adapter_filenames']}.hpp",
-                                adapters_header_dir/f"{adapter_used['adapter_filenames']}.hpp",
+        template_generators.append(Template_generator(os.path.join(template_dir, "include", "adapters", f"{adapter_used['adapter_filenames']}.hpp"),
+                                os.path.join(adapters_header_dir, f"{adapter_used['adapter_filenames']}.hpp"),
                                 {**settings,**settings["core"]}))
 
-        template_generators.append(Template_generator(template_dir/"src"/"adapters"/f"{adapter_used['adapter_filenames']}.cpp",
-                                adapters_src_dir/f"{adapter_used['adapter_filenames']}.cpp",
+        template_generators.append(Template_generator(os.path.join(template_dir, "src", "adapters", f"{adapter_used['adapter_filenames']}.cpp"),
+                                os.path.join(adapters_src_dir, f"{adapter_used['adapter_filenames']}.cpp"),
                                 {**settings,**settings["core"]}))
 
-    template_generators.append(Template_generator(template_dir/"include"/"core.hpp",
-                               base_header_dir/"core.hpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "include", "core.hpp"),
+                               os.path.join(base_header_dir, "core.hpp"),
                                {**settings,**settings["core"],**adapter_used}))
 
-    template_generators.append(Template_generator(template_dir/"src"/"core.cpp",
-                               base_src_dir/"core.cpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "src", "core.cpp"),
+                               os.path.join(base_src_dir, "core.cpp"),
                                {**settings,**settings["core"]}))
     
-    template_generators.append(Template_generator(template_dir/"include"/"core_power.hpp",
-                               base_header_dir/"core_power.hpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "include", "core_power.hpp"),
+                               os.path.join(base_header_dir, "core_power.hpp"),
                                {**settings,**settings["core"]}))
 
-    template_generators.append(Template_generator(template_dir/"src"/"core_power.cpp",
-                               base_src_dir/"core_power.cpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "src", "core_power.cpp"),
+                               os.path.join(base_src_dir, "core_power.cpp"),
                                {**settings,**settings["core"]}))
 
-    template_generators.append(Template_generator(template_dir/"src"/"main.cpp",
-                               base_src_dir/"main.cpp",
+    template_generators.append(Template_generator(os.path.join(template_dir, "src", "main.cpp"),
+                               os.path.join(base_src_dir, "main.cpp"),
                                {**settings}))
 
     generate_at_from_with(template_generators=template_generators)

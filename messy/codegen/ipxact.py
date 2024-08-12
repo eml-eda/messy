@@ -81,6 +81,7 @@ def process_bus(file_path, requirements, design):
     
     design["resolution"] = json_data["vendorExtensions"]["resolution"][0]
     design["tracing"] = {"messy_trace":{"filename":json_data["vendorExtensions"]["filename"], "resolution":json_data["vendorExtensions"]["resolution"][1]}}
+    design["tracing"]["messy_trace"]["resolution"]["mult"] = int(design["tracing"]["messy_trace"]["resolution"]["mult"])
     design["bus"] = read_params(json_data["model"]["instantiations"]["componentInstantiation"]["moduleParameters"]["moduleParameter"], {})
 
     return design
