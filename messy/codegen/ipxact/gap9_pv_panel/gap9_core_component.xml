@@ -28,7 +28,7 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
           </ipxact:moduleParameter>
           <ipxact:moduleParameter parameterId="iss" resolve="user" type="string">
             <ipxact:name>iss</ipxact:name>
-            <ipxact:value>gvsoc_gap9</ipxact:value>
+            <ipxact:value>gvsoc</ipxact:value>
           </ipxact:moduleParameter>
         </ipxact:moduleParameters>
 
@@ -83,9 +83,9 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
         <path>
             ./gvsoc_deps/gvsoc_config.json
         </path>
-        <axipath>
-            /chip/soc/axi_proxy
-        </axipath>
+        <axi_path>
+            /chip/axi_proxy
+        </axi_path>
     </config>
     <class>core</class>
   </ipxact:vendorExtensions>

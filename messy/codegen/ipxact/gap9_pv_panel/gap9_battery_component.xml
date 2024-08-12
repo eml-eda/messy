@@ -54,6 +54,11 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
         </self_discharge>
         <class>harvester</class>
         <harvester_type>battery</harvester_type>
+        <tracing>
+            <messy_trace>
+                <battery>SoC</battery>
+            </messy_trace>
+        </tracing>
     </ipxact:vendorExtensions>
 
     <ipxact:ports>

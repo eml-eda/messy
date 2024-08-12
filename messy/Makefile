@@ -61,6 +61,7 @@ clean:
 
 codegen: clean
 	echo "Generating code"
+#	python3 codegen/codegen.py -f $(file)
 	python3 codegen/codegen_ipxact.py -f $(file)
 
 run: $(TARGETDIR)/$(EXE)

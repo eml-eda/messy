@@ -26,7 +26,7 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:name>input_variable</ipxact:name>
             <ipxact:value>current</ipxact:value>
           </ipxact:moduleParameter>
-          <ipxact:moduleParameter parameterId="out_dir" resolve="user" type="bool">
+          <ipxact:moduleParameter parameterId="out_dir" resolve="user" type="string">
             <ipxact:name>out_dir</ipxact:name>
             <ipxact:value>false</ipxact:value>
           </ipxact:moduleParameter>
