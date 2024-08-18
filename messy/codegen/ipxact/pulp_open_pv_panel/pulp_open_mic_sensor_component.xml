@@ -3,11 +3,10 @@
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.accellera.org/
 XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
   <ipxact:vendor>POLITO</ipxact:vendor>
-  <ipxact:library>GAP9</ipxact:library>
-  <ipxact:name>core</ipxact:name>
+  <ipxact:library>pulp_open</ipxact:library>
+  <ipxact:name>mic_sensor</ipxact:name>
   <ipxact:version>1.0</ipxact:version>
   <ipxact:model>
-    <!-- Here the question is whether or not we should mention the views at all-->
     <ipxact:views>
       <ipxact:view>
         <ipxact:name>interface</ipxact:name>
@@ -19,21 +18,25 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
       <ipxact:componentInstantiation>
         <ipxact:name>tlms-interface</ipxact:name>
         <ipxact:language>system-c</ipxact:language>
-        <ipxact:libraryName>gap9lib</ipxact:libraryName>
-        <ipxact:moduleName>core</ipxact:moduleName>
+        <ipxact:libraryName>pulp_open</ipxact:libraryName>
+        <ipxact:moduleName>mic_sensor</ipxact:moduleName>
         <ipxact:moduleParameters>
           <ipxact:moduleParameter parameterId="vref" resolve="user" type="float">
             <ipxact:name>vref</ipxact:name>
-            <ipxact:value>1.8</ipxact:value>
+            <ipxact:value>3.3</ipxact:value>
           </ipxact:moduleParameter>
-          <ipxact:moduleParameter parameterId="iss" resolve="user" type="string">
-            <ipxact:name>iss</ipxact:name>
-            <ipxact:value>gvsoc</ipxact:value>
+          <ipxact:moduleParameter parameterId="power" resolve="user" type="boolean">
+            <ipxact:name>power</ipxact:name>
+            <ipxact:value>true</ipxact:value>
+          </ipxact:moduleParameter>
+          <ipxact:moduleParameter parameterId="register_memory" resolve="user" type="int">
+            <ipxact:name>register_memory</ipxact:name>
+            <ipxact:value>256</ipxact:value>
           </ipxact:moduleParameter>
         </ipxact:moduleParameters>
 
         <ipxact:fileSetRef>
-          <ipxact:localName>fs-core-interface</ipxact:localName>
+          <ipxact:localName>fs-mic_sensor-interface</ipxact:localName>
         </ipxact:fileSetRef>
 
       </ipxact:componentInstantiation>
@@ -45,7 +48,6 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:port>
                 <ipxact:name>V</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>provides</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -59,7 +61,6 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:port>
                 <ipxact:name>I</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>provides</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -76,18 +77,26 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
   </ipxact:model>
 
   <ipxact:vendorExtensions>
-    <messy_trace>
-        <core_I>current</core_I>
-    </messy_trace>
-    <config>
-        <path>
-            ./gvsoc_deps/gvsoc_config.json
-        </path>
-        <axi_path>
-            /chip/axi_proxy
-        </axi_path>
-    </config>
-    <class>core</class>
+    <states>
+        <state>
+          <read>
+              <current>0.12</current>
+              <delay>30</delay>
+          </read>
+        </state>
+        <state>
+          <write>
+              <current>0.16</current>
+              <delay>30</delay>
+          </write>
+        </state>
+        <state>
+          <idle>
+              <current>0.002</current>
+          </idle>
+        </state>
+    </states>
+    <class>load</class>
   </ipxact:vendorExtensions>
 
 </ipxact:component>

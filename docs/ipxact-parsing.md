@@ -9,7 +9,7 @@ It utilizes functions from the `messy/codegen/ipxact.py` module
 The script that will be used is called `messy/codegen/codegen_ipxact.py` and can be used like this:
 
 ```shell
-python codegen_ipxact.py -f ipxact/gap9/gap9_design.xml
+python codegen_ipxact.py -f ipxact/pulp_open_pv_panel/pulp_open_design.xml
 ```
 
 The **-f** flag specifies a path to the IPXACT top-level design file.

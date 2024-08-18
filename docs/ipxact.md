@@ -4,20 +4,20 @@ This module will explain how the IPXACT design is constructed from a .json desig
 
 More about IPXACT can be read [here](https://www.accellera.org/images/downloads/standards/ip-xact/IP-XACT_User_Guide_2018-02-16.pdf)
 
-This example is made for the following design - `messy/messy/codegen/gap9_pv_panel.json`:
+This example is made for the following design - `messy/messy/codegen/pulp_open_pv_panel.json`:
 
 ## Introduction
 
 The IPXACT format assumes the presence of multiple files to describe one design. 
 
-The main file is a design file `messy/codegen/ipxact/gap9_pv_panel/gap9_design.xml`, it describes all the components present and their interconnections.
+The main file is a design file `messy/codegen/ipxact/pulp_open_pv_panel/pulp_open_design.xml`, it describes all the components present and their interconnections.
 
 An example of a component instance:
 
 ```XML
 <ipxact:componentInstance>
-    <ipxact:instanceName>gap9_core</ipxact:instanceName>
-    <ipxact:componentRef vendor="POLITO" library="GAP9" name="core" version="1.0"/>
+    <ipxact:instanceName>pulp_open_core</ipxact:instanceName>
+    <ipxact:componentRef vendor="POLITO" library="pulp_open" name="core" version="1.0"/>
 </ipxact:componentInstance>
 ```
 

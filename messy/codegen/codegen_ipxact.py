@@ -97,7 +97,7 @@ def main(input_file, input_folder, template_dir, output_dir):
             design["peripherals"]["sensors"] = process_sensor(path_to_component, component["componentRef"], design["peripherals"]["sensors"])
 
     settings = design
-
+    
     settings["utils"]={
         "get_signals":get_signals,
     }

@@ -3,11 +3,10 @@
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.accellera.org/
 XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
   <ipxact:vendor>POLITO</ipxact:vendor>
-  <ipxact:library>GAP9</ipxact:library>
-  <ipxact:name>core_converter</ipxact:name>
+  <ipxact:library>pulp_open</ipxact:library>
+  <ipxact:name>bus</ipxact:name>
   <ipxact:version>1.0</ipxact:version>
   <ipxact:model>
-    <!-- Here the question is whether or not we should mention the views at all-->
     <ipxact:views>
       <ipxact:view>
         <ipxact:name>interface</ipxact:name>
@@ -19,21 +18,17 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
       <ipxact:componentInstantiation>
         <ipxact:name>tlms-interface</ipxact:name>
         <ipxact:language>system-c</ipxact:language>
-        <ipxact:libraryName>gap9lib</ipxact:libraryName>
-        <ipxact:moduleName>core_converter</ipxact:moduleName>
+        <ipxact:libraryName>pulp_open</ipxact:libraryName>
+        <ipxact:moduleName>bus</ipxact:moduleName>
         <ipxact:moduleParameters>
-          <ipxact:moduleParameter parameterId="input_variable" resolve="user" type="string">
-            <ipxact:name>input_variable</ipxact:name>
-            <ipxact:value>current</ipxact:value>
-          </ipxact:moduleParameter>
-          <ipxact:moduleParameter parameterId="out_dir" resolve="user" type="string">
-            <ipxact:name>out_dir</ipxact:name>
-            <ipxact:value>false</ipxact:value>
+          <ipxact:moduleParameter parameterId="vref" resolve="user" type="float">
+            <ipxact:name>vref</ipxact:name>
+            <ipxact:value>3.3</ipxact:value>
           </ipxact:moduleParameter>
         </ipxact:moduleParameters>
 
         <ipxact:fileSetRef>
-          <ipxact:localName>fs-core-converter-interface</ipxact:localName>
+          <ipxact:localName>fs-bus-interface</ipxact:localName>
         </ipxact:fileSetRef>
 
       </ipxact:componentInstantiation>
@@ -43,9 +38,8 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
         <ipxact:ports>
 
             <ipxact:port>
-                <ipxact:name>V_in</ipxact:name>
+                <ipxact:name>V_core</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>requires</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -57,9 +51,8 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             </ipxact:port>
 
             <ipxact:port>
-                <ipxact:name>I_in</ipxact:name>
+                <ipxact:name>I_core</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>requires</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -71,10 +64,9 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             </ipxact:port>
 
             <ipxact:port>
-                <ipxact:name>V_out</ipxact:name>
+                <ipxact:name>V_sensors</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
-                    <ipxact:initiative>provides</ipxact:initiative>
+                    <ipxact:initiative>requires</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
                             <ipxact:typeName>double</ipxact:typeName>
@@ -85,10 +77,62 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             </ipxact:port>
 
             <ipxact:port>
-                <ipxact:name>I_out</ipxact:name>
+                <ipxact:name>I_sensors</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
-                    <ipxact:initiative>provides</ipxact:initiative>
+                    <ipxact:initiative>requires</ipxact:initiative>
+                    <ipxact:transTypeDefs>
+                        <ipxact:transTypeDef>
+                            <ipxact:typeName>double</ipxact:typeName>
+                            <ipxact:viewRef>interface</ipxact:viewRef>
+                        </ipxact:transTypeDef>
+                    </ipxact:transTypeDefs>
+                </ipxact:transactional>
+            </ipxact:port>
+
+            <ipxact:port>
+                <ipxact:name>V_harvesters</ipxact:name>
+                <ipxact:transactional>
+                    <ipxact:initiative>requires</ipxact:initiative>
+                    <ipxact:transTypeDefs>
+                        <ipxact:transTypeDef>
+                            <ipxact:typeName>double</ipxact:typeName>
+                            <ipxact:viewRef>interface</ipxact:viewRef>
+                        </ipxact:transTypeDef>
+                    </ipxact:transTypeDefs>
+                </ipxact:transactional>
+            </ipxact:port>
+
+            <ipxact:port>
+                <ipxact:name>I_harvesters</ipxact:name>
+                <ipxact:transactional>
+                    <ipxact:initiative>requires</ipxact:initiative>
+                    <ipxact:transTypeDefs>
+                        <ipxact:transTypeDef>
+                            <ipxact:typeName>double</ipxact:typeName>
+                            <ipxact:viewRef>interface</ipxact:viewRef>
+                        </ipxact:transTypeDef>
+                    </ipxact:transTypeDefs>
+                </ipxact:transactional>
+            </ipxact:port>
+
+            <ipxact:port>
+                <ipxact:name>En_battery</ipxact:name>
+                <ipxact:wire>
+                    <ipxact:direction>Out</ipxact:direction>
+                </ipxact:wire>
+            </ipxact:port>
+
+            <ipxact:port>
+                <ipxact:name>En_photovoltaic</ipxact:name>
+                <ipxact:wire>
+                    <ipxact:direction>Out</ipxact:direction>
+                </ipxact:wire>
+            </ipxact:port>
+
+            <ipxact:port>
+                <ipxact:name>SOC</ipxact:name>
+                <ipxact:transactional>
+                    <ipxact:initiative>requires</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
                             <ipxact:typeName>double</ipxact:typeName>
@@ -104,15 +148,13 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
   </ipxact:model>
 
   <ipxact:vendorExtensions>
-    <lut>
-        <efficiency_values>
-          [42.7039, 50.2146, 64.1631, 64.8069, 71.6738, 73.8197, 74.4635, 75.3219, 77.0386, 77.897, 82.4034, 84.1202, 84.7639, 85.4077, 86.0515, 86.2661, 86.2661, 86.4807, 86.9099, 87.7682, 87.7682, 87.9828, 87.9828, 88.1974, 87.9828, 88.1974, 88.1974, 88.1974, 88.412, 88.6266, 87.5536, 87.5536, 87.7682, 88.6266, 88.8412, 88.8412, 89.0558, 90.1288, 90.3433, 90.5579, 90.5579, 90.7725, 90.7725, 91.2017, 90.7725, 90.7725, 90.1288, 88.412, 84.9785]
-        </efficiency_values>
-
-        <input_values>
-          [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400]
-        </input_values>
-    </lut>
+    <resolution>SC_MS</resolution>
+    <filename>messy_trace.log</filename>
+    <resolution>
+        <unit>SC_MS</unit>
+        <mult>1</mult>
+    </resolution>
+    <class>bus</class>
   </ipxact:vendorExtensions>
 
 </ipxact:component>

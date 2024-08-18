@@ -4,7 +4,7 @@
 XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
     <!-- Vendor and Library Information -->
     <ipxact:vendor>POLITO</ipxact:vendor>
-    <ipxact:library>GAP9</ipxact:library>
+    <ipxact:library>pulp_open</ipxact:library>
     <ipxact:name>photovoltaic</ipxact:name>
     <ipxact:version>1.0</ipxact:version>
     
@@ -12,7 +12,7 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
       <ipxact:componentInstantiation>
         <ipxact:name>tlms-interface</ipxact:name>
         <ipxact:language>system-c</ipxact:language>
-        <ipxact:libraryName>gap9lib</ipxact:libraryName>
+        <ipxact:libraryName>pulp_open</ipxact:libraryName>
         <ipxact:moduleName>photovoltaic</ipxact:moduleName>
         <ipxact:moduleParameters>
         <ipxact:moduleParameter parameterId="harvester_type" resolve="user" type="string">

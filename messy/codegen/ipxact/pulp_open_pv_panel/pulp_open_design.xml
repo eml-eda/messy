@@ -2,60 +2,60 @@
 <ipxact:design xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.accellera.org/XMLSchema/
 IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
   <ipxact:vendor>POLITO</ipxact:vendor>
-  <ipxact:library>GAP9</ipxact:library>
-  <ipxact:name>gap9_design</ipxact:name>
+  <ipxact:library>pulp_open</ipxact:library>
+  <ipxact:name>pulp_open_design</ipxact:name>
   <ipxact:version>1.0</ipxact:version>
 
   <ipxact:componentInstances>
 
     <ipxact:componentInstance>
-      <ipxact:instanceName>gap9_bus</ipxact:instanceName>
-      <ipxact:componentRef vendor="POLITO" library="GAP9" name="bus" version="1.0"/>
+      <ipxact:instanceName>pulp_open_bus</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="bus" version="1.0"/>
     </ipxact:componentInstance>
 
     <ipxact:componentInstance>
-      <ipxact:instanceName>gap9_core</ipxact:instanceName>
-      <ipxact:componentRef vendor="POLITO" library="GAP9" name="core" version="1.0"/>
+      <ipxact:instanceName>pulp_open_core</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="core" version="1.0"/>
     </ipxact:componentInstance>
 
     <ipxact:componentInstance>
-      <ipxact:instanceName>gap9_core_converter</ipxact:instanceName>
-      <ipxact:componentRef vendor="POLITO" library="GAP9" name="core_converter" version="1.0"/>
+      <ipxact:instanceName>pulp_open_core_converter</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="core_converter" version="1.0"/>
     </ipxact:componentInstance>
 
     <ipxact:componentInstance>
-      <ipxact:instanceName>gap9_battery</ipxact:instanceName>
-      <ipxact:componentRef vendor="POLITO" library="GAP9" name="battery" version="1.0"/>
+      <ipxact:instanceName>pulp_open_battery</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="battery" version="1.0"/>
     </ipxact:componentInstance>
 
     <ipxact:componentInstance>
-      <ipxact:instanceName>gap9_battery_converter</ipxact:instanceName>
-      <ipxact:componentRef vendor="POLITO" library="GAP9" name="battery_converter" version="1.0"/>
+      <ipxact:instanceName>pulp_open_battery_converter</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="battery_converter" version="1.0"/>
     </ipxact:componentInstance>
 
     <ipxact:componentInstance>
-      <ipxact:instanceName>gap9_photovoltaic</ipxact:instanceName>
-      <ipxact:componentRef vendor="POLITO" library="GAP9" name="photovoltaic" version="1.0"/>
+      <ipxact:instanceName>pulp_open_photovoltaic</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="photovoltaic" version="1.0"/>
     </ipxact:componentInstance>
 
     <ipxact:componentInstance>
-      <ipxact:instanceName>gap9_photovoltaic_converter</ipxact:instanceName>
-      <ipxact:componentRef vendor="POLITO" library="GAP9" name="photovoltaic_converter" version="1.0"/>
+      <ipxact:instanceName>pulp_open_photovoltaic_converter</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="photovoltaic_converter" version="1.0"/>
     </ipxact:componentInstance>
 
     <ipxact:componentInstance>
-      <ipxact:instanceName>gap9_harvesters</ipxact:instanceName>
-      <ipxact:componentRef vendor="POLITO" library="GAP9" name="harvesters" version="1.0"/>
+      <ipxact:instanceName>pulp_open_harvesters</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="harvesters" version="1.0"/>
     </ipxact:componentInstance>
 
     <ipxact:componentInstance>
-      <ipxact:instanceName>gap9_mic_sensor</ipxact:instanceName>
-      <ipxact:componentRef vendor="POLITO" library="GAP9" name="mic_sensor" version="1.0"/>
+      <ipxact:instanceName>pulp_open_mic_sensor</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="mic_sensor" version="1.0"/>
     </ipxact:componentInstance>
 
     <ipxact:componentInstance>
-      <ipxact:instanceName>gap9_sensors</ipxact:instanceName>
-      <ipxact:componentRef vendor="POLITO" library="GAP9" name="sensors" version="1.0"/>
+      <ipxact:instanceName>pulp_open_sensors</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="sensors" version="1.0"/>
     </ipxact:componentInstance>
 
   </ipxact:componentInstances>
