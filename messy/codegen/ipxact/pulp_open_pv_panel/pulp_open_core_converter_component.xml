@@ -45,7 +45,6 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:port>
                 <ipxact:name>V_in</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>requires</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -59,7 +58,6 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:port>
                 <ipxact:name>I_in</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>requires</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -73,7 +71,6 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:port>
                 <ipxact:name>V_out</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>provides</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
@@ -87,7 +84,6 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:port>
                 <ipxact:name>I_out</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>provides</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>

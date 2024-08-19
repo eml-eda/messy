@@ -18,7 +18,7 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
       <ipxact:componentInstantiation>
         <ipxact:name>tlms-interface</ipxact:name>
         <ipxact:language>system-c</ipxact:language>
-        <ipxact:libraryName>pulp_open_lib</ipxact:libraryName>
+        <ipxact:libraryName>pulp_open</ipxact:libraryName>
         <ipxact:moduleName>core</ipxact:moduleName>
         <ipxact:moduleParameters>
           <ipxact:moduleParameter parameterId="vref" resolve="user" type="float">
@@ -57,7 +57,6 @@ XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/i
             <ipxact:port>
                 <ipxact:name>I</ipxact:name>
                 <ipxact:transactional>
-                    <!-- Question here - will it be an sc_port? It defines which value to put here-->
                     <ipxact:initiative>provides</ipxact:initiative>
                     <ipxact:transTypeDefs>
                         <ipxact:transTypeDef>
