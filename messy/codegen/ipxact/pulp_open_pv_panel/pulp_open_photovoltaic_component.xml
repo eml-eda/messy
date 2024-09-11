@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ipxact:component xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.accellera.org/
+XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
+    <!-- Vendor and Library Information -->
+    <ipxact:vendor>POLITO</ipxact:vendor>
+    <ipxact:library>pulp_open</ipxact:library>
+    <ipxact:name>photovoltaic</ipxact:name>
+    <ipxact:version>1.0</ipxact:version>
+    
+    <ipxact:instantiations>
+      <ipxact:componentInstantiation>
+        <ipxact:name>tlms-interface</ipxact:name>
+        <ipxact:language>system-c</ipxact:language>
+        <ipxact:libraryName>pulp_open</ipxact:libraryName>
+        <ipxact:moduleName>photovoltaic</ipxact:moduleName>
+        <ipxact:moduleParameters>
+        <ipxact:moduleParameter parameterId="harvester_type" resolve="user" type="string">
+            <ipxact:name>harvester_type</ipxact:name>
+            <ipxact:value>source</ipxact:value>
+        </ipxact:moduleParameter>
+    </ipxact:moduleParameters>
+
+        <ipxact:fileSetRef>
+          <ipxact:localName>fs-core-interface</ipxact:localName>
+        </ipxact:fileSetRef>
+
+      </ipxact:componentInstantiation>
+    </ipxact:instantiations>
+
+    <ipxact:vendorExtensions>
+        <vref>
+            <input_file>input_files/gmonths.txt</input_file>
+            <lut>
+                <input_values>[250,500,750,1000]</input_values>
+                <voltage_values>[2.9367,3.0710,3.1334,3.1689]</voltage_values>
+            </lut>
+        </vref>
+        <iref>
+            <input_file>input_files/gmonths.txt</input_file>
+            <lut>
+                <input_values>[250,500,750,1000]</input_values>
+                <current_values>[13.4031,27.2251,41.8848,56.7245]</current_values>
+            </lut>
+        </iref>
+    </ipxact:vendorExtensions>
+
+    <ipxact:ports>
+        <ipxact:port>
+            <ipxact:name>En</ipxact:name>
+            <ipxact:wire>
+                <ipxact:direction>In</ipxact:direction>
+            </ipxact:wire>
+        </ipxact:port>
+        <ipxact:port>
+            <ipxact:name>V</ipxact:name>
+            <ipxact:transactional>
+                <ipxact:initiative>provides</ipxact:initiative>
+                <ipxact:transTypeDefs>
+                    <ipxact:transTypeDef>
+                        <ipxact:typeName>double</ipxact:typeName>
+                        <ipxact:viewRef>interface</ipxact:viewRef>
+                    </ipxact:transTypeDef>
+                </ipxact:transTypeDefs>
+            </ipxact:transactional>
+        </ipxact:port>
+        <ipxact:port>
+            <ipxact:name>I</ipxact:name>
+            <ipxact:transactional>
+                <ipxact:initiative>provides</ipxact:initiative>
+                <ipxact:transTypeDefs>
+                    <ipxact:transTypeDef>
+                        <ipxact:typeName>double</ipxact:typeName>
+                        <ipxact:viewRef>interface</ipxact:viewRef>
+                    </ipxact:transTypeDef>
+                </ipxact:transTypeDefs>
+            </ipxact:transactional>
+        </ipxact:port>
+    </ipxact:ports>
+</ipxact:component>

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ipxact:design xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.accellera.org/XMLSchema/
+IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
+  <ipxact:vendor>POLITO</ipxact:vendor>
+  <ipxact:library>pulp_open</ipxact:library>
+  <ipxact:name>pulp_open_design</ipxact:name>
+  <ipxact:version>1.0</ipxact:version>
+
+  <ipxact:componentInstances>
+
+    <ipxact:componentInstance>
+      <ipxact:instanceName>pulp_open_bus</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="bus" version="1.0"/>
+    </ipxact:componentInstance>
+
+    <ipxact:componentInstance>
+      <ipxact:instanceName>pulp_open_core</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="core" version="1.0"/>
+    </ipxact:componentInstance>
+
+    <ipxact:componentInstance>
+      <ipxact:instanceName>pulp_open_core_converter</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="core_converter" version="1.0"/>
+    </ipxact:componentInstance>
+
+    <ipxact:componentInstance>
+      <ipxact:instanceName>pulp_open_battery</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="battery" version="1.0"/>
+    </ipxact:componentInstance>
+
+    <ipxact:componentInstance>
+      <ipxact:instanceName>pulp_open_battery_converter</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="battery_converter" version="1.0"/>
+    </ipxact:componentInstance>
+
+    <ipxact:componentInstance>
+      <ipxact:instanceName>pulp_open_photovoltaic</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="photovoltaic" version="1.0"/>
+    </ipxact:componentInstance>
+
+    <ipxact:componentInstance>
+      <ipxact:instanceName>pulp_open_photovoltaic_converter</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="photovoltaic_converter" version="1.0"/>
+    </ipxact:componentInstance>
+
+    <ipxact:componentInstance>
+      <ipxact:instanceName>pulp_open_harvesters</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="harvesters" version="1.0"/>
+    </ipxact:componentInstance>
+
+    <ipxact:componentInstance>
+      <ipxact:instanceName>pulp_open_mic_sensor</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="mic_sensor" version="1.0"/>
+    </ipxact:componentInstance>
+
+    <ipxact:componentInstance>
+      <ipxact:instanceName>pulp_open_sensors</ipxact:instanceName>
+      <ipxact:componentRef vendor="POLITO" library="pulp_open" name="sensors" version="1.0"/>
+    </ipxact:componentInstance>
+
+  </ipxact:componentInstances>
+
+  <ipxact:adHocConnections>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>core_I_to_core_converter_I_out</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="core" portRef="I"/>
+        <ipxact:internalPortReference componentRef="core_converter" portRef="I_out"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>core_V_to_core_converter_V_out</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="core" portRef="V"/>
+        <ipxact:internalPortReference componentRef="core_converter" portRef="V_out"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>bus_I_core_to_core_converter_I_in</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="bus" portRef="I_core"/>
+        <ipxact:internalPortReference componentRef="core_converter" portRef="I_in"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>bus_V_core_to_core_converter_V_in</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="bus" portRef="V_core"/>
+        <ipxact:internalPortReference componentRef="core_converter" portRef="V_in"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>battery_I_to_battery_converter_I_out</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="battery" portRef="I"/>
+        <ipxact:internalPortReference componentRef="battery_converter" portRef="I_out"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>battery_V_to_battery_converter_V_out</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="battery" portRef="V"/>
+        <ipxact:internalPortReference componentRef="battery_converter" portRef="V_out"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>photovoltaic_I_to_photovoltaic_converter_I_out</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="photovoltaic" portRef="I"/>
+        <ipxact:internalPortReference componentRef="photovoltaic_converter" portRef="I_out"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>photovoltaic_V_to_photovoltaic_converter_V_out</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="photovoltaic" portRef="V"/>
+        <ipxact:internalPortReference componentRef="photovoltaic_converter" portRef="V_out"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>harvesters_I_out_to_battery_converter_I_in</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="harvesters" portRef="I_out"/>
+        <ipxact:internalPortReference componentRef="battery_converter" portRef="I_in"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>harvesters_V_out_to_battery_converter_V_in</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="harvesters" portRef="V_out"/>
+        <ipxact:internalPortReference componentRef="battery_converter" portRef="V_in"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>battery_En_to_bus_En_battery</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="battery" portRef="En"/>
+        <ipxact:internalPortReference componentRef="bus" portRef="En_battery"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>photovoltaic_En_to_bus_En_photovoltaic</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="photovoltaic" portRef="En"/>
+        <ipxact:internalPortReference componentRef="bus" portRef="En_photovoltaic"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>battery_SOC_to_bus_SOC</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="battery" portRef="SOC"/>
+        <ipxact:internalPortReference componentRef="bus" portRef="SOC"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>harvesters_I_in_to_bus_I_harvesters</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="harvesters" portRef="I_in"/>
+        <ipxact:internalPortReference componentRef="battery_converter" portRef="I_harvester"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>harvesters_V_in_to_bus_V_harvesters</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="harvesters" portRef="V_in"/>
+        <ipxact:internalPortReference componentRef="bus" portRef="V_harvesters"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>mic_sensor_I_in_to_sensors_I_out</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="mic_sensors" portRef="I_in"/>
+        <ipxact:internalPortReference componentRef="sensors" portRef="I_out"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>mic_sensor_V_in_to_sensors_V_out</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="mic_sensors" portRef="V_in"/>
+        <ipxact:internalPortReference componentRef="sensors" portRef="V_out"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>sensors_I_in_to_bus_I_sensors</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="sensors" portRef="I_in"/>
+        <ipxact:internalPortReference componentRef="battery_converter" portRef="I_sensors"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+    <ipxact:adHocConnection>
+      <ipxact:name>sensors_V_in_to_bus_V_sensors</ipxact:name>
+      <ipxact:portReferences>
+        <ipxact:internalPortReference componentRef="sensors" portRef="V_in"/>
+        <ipxact:internalPortReference componentRef="bus" portRef="V_sensors"/>
+      </ipxact:portReferences>
+    </ipxact:adHocConnection>
+
+  </ipxact:adHocConnections>
+</ipxact:design>

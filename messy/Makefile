@@ -74,7 +74,10 @@ codegen: clean
 	echo "Generating code"
 	python3 codegen/codegen.py -f $(file)
 
-# Run target to build and execute the program
+codegen_ipxact: clean
+	echo "Generating code from an IPXACT description"
+	python3 codegen/codegen_ipxact.py -f $(file)
+
 run: $(TARGETDIR)/$(EXE)
 	@echo "Running $(EXE)"
 	cd $(PULP_SDK);\
