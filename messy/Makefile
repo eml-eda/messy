@@ -97,6 +97,12 @@ ultraclean: clean
 	rm -f flash.bin
 	rm -f efuse_preload.data
 	rm -f chip.soc.mram.bin
+	rm -rf gvsoc_deps
+	rm -f all.vcd
+	rm -f all.vcd.hier
+	rm -f request_adresses.log
+	rm -f request_sizes.log
+	rm -f messy_trace.log
 
 Makefile.deps:
 	$(GCC_PATH)$(CC) $(CFLAGS) $(INCDIR) -M $(SOURCES) $(SRCS_BUS) >> Makefile.deps
@@ -127,7 +133,7 @@ help:
 	@echo "  all       		: Build the executable"
 	@echo "  clean     		: Remove build and generated files"
 	@echo "  codegen   		: Generate code. Usage example: make codegen file=/messy/messy/codegen/pulp_open.json"
-	@echo "  ultraclean		: Perform a clean and remove additional files"
+	@echo "  ultraclean		: Perform a clean and remove additional files, such as .log, .csv and GvSoC configuration files"
 	@echo "  run       		: Build the executable and run it without regenerating the code"
 	@echo "  application 		: Build and run the specified application. Usage example: make application app=/messy/examples/helloworld"
 	@echo "  help      		: Display this help message"
