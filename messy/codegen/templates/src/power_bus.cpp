@@ -19,9 +19,9 @@ void Power_bus::initialize() {}
  * - Initializes the `total_current` to 0.
  * - Loops through the current sensors to read and accumulate their current values.
  * - Reads the current from the core and adds it to `total_current`.
- * - If there are any current sources, their values are read and subtracted from `total_current`.
+ * - If there are any current sources, their values are read and subtracted from `total_current`. The current sources are assumed to be supplying current to the system, so they are subtracted from the total current.
  * - If there are any batteries, the total current is divided by the number of batteries,
- *   and the value is written to each battery.
+ *   and the value is written to each battery, representing the current drawn from each battery.
  *
  * @note The number of sensors, sources, and batteries is determined by the constants
  * `NUM_SENSORS`, `NUM_SOURCES`, and `NUM_BATTERIES` respectively.
