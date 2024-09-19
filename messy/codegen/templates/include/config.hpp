@@ -33,21 +33,18 @@
  * 
  * - SC_SEC: 1s
  * - SC_MS: 1ms
- * - SC_US: 1us
- * - SC_NS: 1ns
  * 
  * The preferred value is SC_MS, as it provides a good trade-off between simulation time and accuracy. 
  */
 #define SIM_RESOLUTION ${resolution}
-
 
 /**
  * @brief Length of the simulation. The measurement unit is defined by SIM_RESOLUTION.
  */
 #define SIM_LEN 1000000
 
-
 % for sensor_name,sensor in peripherals["sensors"].items():
+
 /**
  * @brief Base address for the ${sensor_name} sensor.
  */
@@ -56,10 +53,10 @@
 /**
  * @brief Enum defining the states for the ${sensor_name} sensor.
  */
-typedef enum{
-    ${sensor_name}_OFF__
+typedef enum {
+    ${sensor_name}_OFF__,
     % for s_state_name in sensor["states"]:
-    ,${sensor_name}_${s_state_name}
+    ${sensor_name}_${s_state_name},
     % endfor 
 } ${sensor_name}_states;
 % endfor

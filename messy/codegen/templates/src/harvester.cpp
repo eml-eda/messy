@@ -91,7 +91,7 @@ void Harvester_${harvester_name}_battery_voc::processing(){
     */
     // TODO: Quickfix for scaling resulution
     int scaling_factor_resulution;
-    if (SIM_RESOLUTION == 4)
+    if (SIM_RESOLUTION == SC_MS)
     {
         // MS
         scaling_factor_resulution = 1000;
