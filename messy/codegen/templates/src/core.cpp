@@ -68,7 +68,7 @@ void Core::run_next_sc(){
  * ISS adapter and stopping the SystemC simulation.
  */
 void Core::close(){
-    // wait until next resolutional value(next ms)
+    // wait until next resolutional value (next ms)
     wait(get_resolution_val(${resolution})-(next_timestamp%get_resolution_val(${resolution})),sc_core::SC_PS);
     delete_n_requests(request_queue_size());
     this->iss_adapter->close();
@@ -195,6 +195,18 @@ void Core::handle_req(MessyRequest *req)
 }
 
 
+/**
+ * @brief Requests a delay in the execution based on the given parameters.
+ *
+ * This function calculates a target time by adding the product of 
+ * `time_to_skip` and the resolution value to the `start_time`. It then 
+ * continues execution in a loop until the current timestamp reaches the 
+ * calculated target time or the ISS adapter signals that it has finished.
+ *
+ * @param start_time The initial time from which the delay is calculated.
+ * @param time_to_skip The amount of time units to skip.
+ * @param resolution The resolution value used to calculate the delay.
+ */
 void Core::request_delay(double start_time,int time_to_skip,int resolution){
     double time = (time_to_skip*get_resolution_val(${resolution}))+start_time;
     while(next_timestamp<time && !this->iss_adapter->finished)

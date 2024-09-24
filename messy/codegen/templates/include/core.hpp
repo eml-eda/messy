@@ -9,17 +9,23 @@
 
 class Core : public sc_module {
   public:
-    sc_core::sc_out<unsigned int> request_address;
-    sc_core::sc_out<uint8_t *> request_data;
-    sc_core::sc_out<unsigned int> request_size;
-    sc_core::sc_out<bool> functional_bus_flag;
-    sc_core::sc_out<bool> request_ready;
-    sc_core::sc_in<bool> request_go;
-    sc_core::sc_in<uint8_t *> request_value;
-    sc_core::sc_in<int> idx_sensor;
-    // Power Port
-    sc_core::sc_out<double> power_signal;
+    // Input Ports
+    sc_core::sc_in<bool> request_go; /**< Flag indicating if the request can proceed */
+    sc_core::sc_in<uint8_t *> request_value; /**< Value of the request */
+    sc_core::sc_in<int> idx_sensor; /**< Index of the sensor */
 
+    // Output Ports
+    sc_core::sc_out<unsigned int> request_address; /**< Address of the request */
+    sc_core::sc_out<uint8_t *> request_data; /**< Data of the request */
+    sc_core::sc_out<unsigned int> request_size; /**< Size of the request */
+    sc_core::sc_out<bool> functional_bus_flag; /**< Flag for the functional bus */
+    sc_core::sc_out<bool> request_ready; /**< Flag indicating if the request is ready */
+
+
+    // Power Port
+    sc_core::sc_out<double> power_signal; /**< Power signal output */
+
+    // Variables
     int simulation_iters = 0;  /**< Number of simulation iterations. It gets incremented every time the continue_messy method is executed */
     double tot_power = 0.0; /**< Total power consumed. It gets accumulated every time the continue_messy is executed, by summing to the total power the instant power returned by gvsoc */
 
