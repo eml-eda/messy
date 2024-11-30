@@ -8,7 +8,7 @@ Messy is an open-source framework that integrates functional RISC-V simulation (
 
 # Reference
 
-If you enjoy and use Messy on your works, please acknowledge our paper: https://arxiv.org/abs/2404.01861 :
+If you enjoy and use Messy on your works, please acknowledge our paper: https://dl.acm.org/doi/10.1145/3637543.3652873
 ```
 @inproceedings{10.1145/3637543.3652873,
       author = {Hamdi, Mohamed Amine and Pollo, Giovanni and Risso, Matteo and Haugou, Germain and Burrello, Alessio and Macii, Enrico and Poncino, Massimo and Vinco, Sara and Pagliari, Daniele Jahier},
