@@ -183,7 +183,7 @@ RUN rm systemc-ams.tar
 # Change directory to systemc-ams-2.3.4
 WORKDIR systemc-ams
 
-# # Configure SystemC AMS
+# Configure SystemC AMS
 RUN ./configure --with-systemc=/usr/local/systemc --prefix=/usr/local/systemc-ams --disable-systemc_compile_check CXXFLAGS="-DSC_CPLUSPLUS=201402L"
 
 # Build SystemC AMS
@@ -208,9 +208,18 @@ RUN chmod 777 /messy/messy/Makefile
 # Create a user with the same user id and group id as the host user
 RUN groupadd -g ${GROUP_ID} docker_group && useradd -u ${USER_ID} -g docker_group docker_user
 
+# Set password for docker_user
+RUN echo "docker_user:docker_user" | chpasswd
+
+# Add docker_user to sudo group
+RUN usermod -aG sudo docker_user
+
 RUN echo "source /pulp-sdk/configs/pulp-open.sh" >> /root/.bashrc
 
 RUN mkdir /home/docker_user
+
+RUN chown docker_user:docker_group /home/docker_user
+
 RUN mkdir /home/docker_user/.vscode-server
 RUN chmod 777 -R /home/docker_user/.vscode-server
 
