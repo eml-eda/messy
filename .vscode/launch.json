@@ -5,7 +5,32 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "codegen.py Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "/messy/messy",
+            "program": "codegen/codegen.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-f",
+                "codegen/pulp_open.json"
+            ],
+        },
+        {
+            "name": "messy.py Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/messy/messy/messy.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-f",
+                "codegen/pulp-open.json",
+                "-a",
+                "/messy/examples/helloworld"
+            ],
+        },
+        {
+            "name": "Executable Debug",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/messy/bin/run",

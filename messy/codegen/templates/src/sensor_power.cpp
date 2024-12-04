@@ -8,6 +8,20 @@ void Sensor_${sensor_name}_power::set_attributes()
 
 void Sensor_${sensor_name}_power::initialize() {}
 
+/**
+ * @warning This function should not be called directly. It is called by the SystemC-AMS kernel.
+ * 
+ * @brief Process the functional signal and output voltage and current state.
+ * 
+ * This method reads the current functional state of the sensor and updates
+ * the voltage and current values accordingly. The voltage and current values
+ * are based on predefined states and associated current consumption. 
+ * 
+ * The available states are:
+ % for state_name,state in states.items():
+ *   ${sensor_name}_${state_name} : Voltage = ${sensor_name}_VREF, Current = ${state["current"]}
+ % endfor
+ */
 void Sensor_${sensor_name}_power::processing()
 {
     % for state_name,state in states.items():

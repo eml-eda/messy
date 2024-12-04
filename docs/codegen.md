@@ -123,13 +123,13 @@ int main(void)
 
 As we can see in the code example (taken from the `read_sensor.c`), to define the address of the `mic_click_sensor` we just need to add `0x0` to the `AXI_BASE_ADDRESS`. This is because the used configuration, which is the `pulp_open.json`, only contains one sensor. 
 
-Supposing we have two sensors with a `memory_map` of 256 and we want to access the memory of the second one, we should add to `AXI_BASE` the offset (which is 256) with the respect to the starting address. 
+Supposing we have two sensors with a `memory_map` of 256 (0x100 in hexadecimal) and we want to access the memory of the second one, we should add to `AXI_BASE` the offset (which is 256, 0x100 in hexadecimal) with the respect to the starting address. 
 
 | Name | Base Address | Memory Register Size | Offset w.r.t AXI_BASE |
 | ----| ----| ----|----|
 | AXI_BASE| 0x20000000 |-| 0|
-| sensor1| 0x20000000|256| 0|
-| sensor2 |0x20000256|256| 256|
+| sensor1| 0x20000000|0x100| 0|
+| sensor2 |0x20000100|0x100| 0x100|
 
 ## States
 
