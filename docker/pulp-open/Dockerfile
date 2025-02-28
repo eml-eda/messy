@@ -8,6 +8,8 @@ RUN apt update && apt upgrade -y
 RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
     autoconf \
     automake \
+    autotools-dev \
+    bc \
     bison \
     build-essential \
     cmake \
@@ -15,71 +17,42 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
     device-tree-compiler \
     doxygen \
     flex \
+    gawk \
+    gdb \
     git \
+    gperf \
     graphicsmagick-libmagick-dev-compat \
     graphviz \
     gtkwave \
     libfdt-dev \
     libftdi-dev \
     libftdi1 \
+    libgl1-mesa-dev \
+    libgmp-dev \
     libjpeg-dev \
+    libmpc-dev \
+    libmpfr-dev \
+    libqt5charts5-dev \
+    libqt6serialport6-dev \
     libsdl2-dev \
     libsdl2-ttf-dev \
     libsndfile1-dev \
     libtool \
     libusb-1.0-0-dev \
     ninja-build \
-    pkg-config \
-    python3-pip \
-    qtbase5-dev \
-    libqt5charts5-dev \
-    rsync \
-    texinfo \
-    wget \
-    qt6-base-dev \
-    libqt6serialport6-dev \
-    libgl1-mesa-dev \
-    unzip \
-    sudo \
-    gdb \
-    autoconf \
-    automake \
-    autotools-dev \
-    curl \
-    libmpc-dev \
-    libmpfr-dev \
-    libgmp-dev \
-    gawk \
-    build-essential \
-    bison \
-    flex \
-    texinfo \
-    gperf \
-    libtool \
     patchutils \
-    bc \
-    zlib1g-dev \
-    build-essential \
-    git \
-    libftdi-dev \
-    libftdi1 \
-    doxygen \
-    python3-pip \
-    libsdl2-dev \
-    curl \
-    cmake \
-    libusb-1.0-0-dev \
-    scons \
-    gtkwave \
-    libsndfile1-dev \
-    rsync \
-    autoconf \
-    automake \
-    texinfo \
-    libtool \
     pkg-config \
-    libsdl2-ttf-dev \
-    vim
+    python3-pip \
+    qt6-base-dev \
+    qtbase5-dev \
+    rsync \
+    scons \
+    sudo \
+    texinfo \
+    unzip \
+    vim \
+    wget \
+    zlib1g-dev
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
