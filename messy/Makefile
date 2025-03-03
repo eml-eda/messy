@@ -116,17 +116,17 @@ application:
 	cd $(app);\
 	echo "Building application";\
 	make all gvsoc.prepare platform=gvsoc runner_args="--vcd --event=.*";\
-	cp BUILD/PULP/GCC_RISCV/gvsoc_config.json /messy/messy/gvsoc_deps/;\
-	cp BUILD/PULP/GCC_RISCV/efuse_preload.data /messy/messy/gvsoc_deps/;\
-	cp BUILD/PULP/GCC_RISCV/flash.bin /messy/messy/gvsoc_deps/;\
-	cp BUILD/PULP/GCC_RISCV/chip.soc.mram.bin /messy/messy/gvsoc_deps/;\
-	cp BUILD/PULP/GCC_RISCV/spiflash.bin /messy/messy/gvsoc_deps/;\
-	cp BUILD/PULP/GCC_RISCV/hyperflash.bin /messy/messy/gvsoc_deps/;\
+    [ -f BUILD/PULP/GCC_RISCV/gvsoc_config.json ] && cp BUILD/PULP/GCC_RISCV/gvsoc_config.json /messy/messy/gvsoc_deps/;\
+    [ -f BUILD/PULP/GCC_RISCV/efuse_preload.data ] && cp BUILD/PULP/GCC_RISCV/efuse_preload.data /messy/messy/gvsoc_deps/;\
+    [ -f BUILD/PULP/GCC_RISCV/flash.bin ] && cp BUILD/PULP/GCC_RISCV/flash.bin /messy/messy/gvsoc_deps/;\
+    [ -f BUILD/PULP/GCC_RISCV/chip.soc.mram.bin ] && cp BUILD/PULP/GCC_RISCV/chip.soc.mram.bin /messy/messy/gvsoc_deps/;\
+    [ -f BUILD/PULP/GCC_RISCV/spiflash.bin ] && cp BUILD/PULP/GCC_RISCV/spiflash.bin /messy/messy/gvsoc_deps/;\
+    [ -f BUILD/PULP/GCC_RISCV/hyperflash.bin ] && cp BUILD/PULP/GCC_RISCV/hyperflash.bin /messy/messy/gvsoc_deps/;\
 	sed -i 's:"spiflash.bin":"/messy/messy/gvsoc_deps/spiflash.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json;\
 	sed -i 's:"efuse_preload.data":"/messy/messy/gvsoc_deps/efuse_preload.data":g' /messy/messy/gvsoc_deps/gvsoc_config.json;\
 	sed -i 's:"chip.soc.mram.bin":"/messy/messy/gvsoc_deps/chip.soc.mram.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json;\
 	sed -i 's:"flash.bin":"/messy/messy/gvsoc_deps/flash.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json;\
-	sed -i 's:"hyperflash.bin":"/messy/messy/gvsoc_deps/hyperflash.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json 
+	sed -i 's:"hyperflash.bin":"/messy/messy/gvsoc_deps/hyperflash.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json
 
 help:
 	@echo "Available targets:"

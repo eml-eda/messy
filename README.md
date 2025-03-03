@@ -8,15 +8,17 @@ Messy is an open-source framework that integrates functional RISC-V simulation (
 
 # Reference
 
-If you enjoy and use Messy on your works, please acknowledge our paper: https://arxiv.org/abs/2404.01861 :
+If you enjoy and use Messy on your works, please acknowledge our paper: https://dl.acm.org/doi/10.1145/3637543.3652873
 ```
-@misc{hamdi2024integrating,
-      title={Integrating SystemC-AMS Power Modeling with a RISC-V ISS for Virtual Prototyping of Battery-operated Embedded Devices}, 
-      author={Mohamed Amine Hamdi and Giovanni Pollo and Matteo Risso and Germain Haugou and Alessio Burrello and Enrico Macii and Massimo Poncino and Sara Vinco and Daniele Jahier Pagliari},
-      year={2024},
-      eprint={2404.01861},
-      archivePrefix={arXiv},
-      primaryClass={eess.SY}
+@inproceedings{10.1145/3637543.3652873,
+      author = {Hamdi, Mohamed Amine and Pollo, Giovanni and Risso, Matteo and Haugou, Germain and Burrello, Alessio and Macii, Enrico and Poncino, Massimo and Vinco, Sara and Pagliari, Daniele Jahier},
+      title = {Integrating SystemC-AMS Power Modeling with a RISC-V ISS for Virtual Prototyping of Battery-operated Embedded Devices},
+      year = {2024},
+      isbn = {9798400704925},
+      url = {https://doi.org/10.1145/3637543.3652873},
+      doi = {10.1145/3637543.3652873},
+      booktitle = {Proceedings of the 21st ACM International Conference on Computing Frontiers: Workshops and Special Sessions},
+      keywords = {Design Space Exploration, Power, RISC-V, SystemC, Virtual Prototyping},
 }
 ```
 
