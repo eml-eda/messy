@@ -228,8 +228,8 @@ void Core::handle_req(MessyRequest *req)
  * @see continue_messy
  * @see get_resolution_val
  */
-void Core::request_delay(double start_time,int time_to_skip,int resolution){
-    double time = (time_to_skip*get_resolution_val(${resolution}))+start_time;
+void Core::request_delay(double start_time,int time_to_skip,sc_core::sc_time_unit resolution){
+    double time = (time_to_skip*get_resolution_val(resolution))+start_time;
     while(next_timestamp<time && !this->iss_adapter->finished)
         this->continue_messy(false);
 }

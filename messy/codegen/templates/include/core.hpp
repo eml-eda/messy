@@ -63,7 +63,7 @@ class Core : public sc_module {
      * @param time_to_skip The amount of time to skip.
      * @param resolution The resolution of the delay.
      */
-    void request_delay(double start_time, int time_to_skip, int resolution);
+    void request_delay(double start_time, int time_to_skip, sc_core::sc_time_unit resolution);
     
     /**
      * @brief Handles a request.
