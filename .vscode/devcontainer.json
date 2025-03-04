@@ -10,8 +10,15 @@
                         "path": "/bin/bash",
                         "icon": "terminal-bash"
                     }
-                }
-            }
+                },
+                "python.defaultInterpreterPath": "/usr/bin/python3"
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-vscode.cpptools",
+                "ms-python.vscode-pylance",
+                "ms-python.debugpy"
+            ]
         }
     }
 }

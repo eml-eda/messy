@@ -61,5 +61,9 @@ nav:
   - "Debugging": debugging.md
   - "Tracing": tracing.md
   - "How to build the documentation": how-to-build-docs.md
+  - "Messy": messy.md
+  - "IPXACT": ipxact.md
+  - "IPXACT-Parsing": ipxact-parsing.md
+  - "Timing": timing.md
 
 

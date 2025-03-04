@@ -12,6 +12,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Europe/Rome apt install -y \
     bc \
     bison \
     build-essential \
+    clang-format \
     cmake \
     curl \
     device-tree-compiler \
