@@ -22,6 +22,7 @@ def run_messy(
         subprocess.run(["make","clean"])
     if "codegen" not in skip and config_filename.suffix == ".json":
         subprocess.run(["make","codegen",f"file={Path(config_filename).absolute()}"])
+        subprocess.run(["make", "format"])
     if "codegen_ipxact" not in skip and config_filename.suffix == ".xml":
         subprocess.run(["make","codegen_ipxact",f"file={Path(config_filename).absolute()}"])
     if "application" not in skip:

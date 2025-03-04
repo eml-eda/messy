@@ -74,6 +74,10 @@ codegen: clean
 	echo "Generating code"
 	python3 codegen/codegen.py -f $(file)
 
+# Rule to format all the generated code
+format:
+	clang-format -i src/*.cpp include/*.hpp
+
 codegen_ipxact: clean
 	echo "Generating code from an IPXACT description"
 	python3 codegen/codegen_ipxact.py -f $(file)
