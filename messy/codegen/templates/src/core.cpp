@@ -38,6 +38,9 @@ int64_t get_resolution_val(sc_core::sc_time_unit time_unit){
  * This function starts up the ISS adapter and enters a loop that continues
  * processing until the ISS adapter signals it has finished. Once the loop
  * exits, the core process is closed.
+ * 
+ * @see continue_messy
+ * @see close
  */
 void Core::run()
 {
@@ -52,8 +55,11 @@ void Core::run()
 /**
  * @brief Executes the next simulation cycle.
  *
- * This function waits until the next simulation timestamp is reached and then
- * updates the current simulation timestamp.
+ * This function suspends execution until the next simulation timestamp is reached,
+ * then updates the current simulation timestamp to match the SystemC time.
+ * 
+ * @note This function uses SystemC's wait() mechanism to synchronize with the
+ * simulation clock.
  */
 void Core::run_next_sc(){
     wait(next_timestamp-sc_time_stamp().to_double(),sc_core::SC_PS);
@@ -93,12 +99,20 @@ void Core::handle_req_queue(){
 
 
 /**
- * @brief Continues the simulation process for the Core.
+ * @brief Advances the simulation by one step.
  *
- * This function advances the simulation by executing events, updating power consumption,
- * and handling the request queue if specified. It also increments the simulation iteration count.
+ * This function performs the following operations:
+ * 1. Executes events scheduled by the ISS until the current SystemC timestamp
+ * 2. Updates the next timestamp to the next scheduled event
+ * 3. Accumulates power consumption statistics
+ * 4. Increments the simulation iteration counter
+ * 5. Optionally processes the request queue
+ * 6. Advances to the next SystemC timestamp
  *
- * @param handle_req_queue A boolean flag indicating whether to handle the request queue.
+ * @param handle_req_queue If true, processes pending requests in the queue; if false, 
+ *                         skips request processing for this simulation step
+ * @see handle_req_queue
+ * @see run_next_sc
  */
 void Core::continue_messy(bool handle_req_queue){
 
@@ -121,30 +135,33 @@ void Core::continue_messy(bool handle_req_queue){
 }
 
 /**
- * @brief Handles a request by connecting signals with the SystemC simulator signals.
+ * @brief Processes a single request by interacting with the functional bus.
  *
- * This function processes a request by either reading from or writing to the functional bus.
- * It sets the appropriate signals, waits for the operation to complete, and then handles the 
- * data transfer between the request and the internal memory.
+ * This function handles both read and write requests:
+ * 
+ * For read requests:
+ * - Sets the functional bus flag to true to indicate read operation
+ * - Signals that a request is ready to be processed
+ * - Transfers the request address and size to the bus
+ * - Waits for operation completion
+ * - Checks for segmentation faults
+ * - Copies data from the bus to the request's data buffer
+ * 
+ * For write requests:
+ * - Transfers data from the request to the bus
+ * - Sets the functional bus flag to false to indicate write operation
+ * - Signals that a request is ready to be processed
+ * - Transfers the request address and size to the bus
+ * - Waits for operation completion
+ * - Checks for segmentation faults
+ * 
+ * In both cases, the function notifies the ISS adapter after request completion.
  *
- * @param req Pointer to a MessyRequest object containing the request details.
- *
- * The function performs the following steps:
- * - If the request is a read request:
- *   - Sets the functional bus flag and request ready signals.
- *   - Writes the request address and size to the corresponding signals.
- *   - Waits for the operation to complete.
- *   - Checks for segmentation fault by reading the idx_sensor signal.
- *   - If idx_sensor is negative, closes the core.
- *   - Reads the data from the request value signal into the request data.
- * - If the request is a write request:
- *   - Writes the request data to the request data signal.
- *   - Clears the functional bus flag and sets the request ready signal.
- *   - Writes the request address and size to the corresponding signals.
- *   - Waits for the operation to complete.
- *   - Checks for segmentation fault by reading the idx_sensor signal.
- *   - If idx_sensor is negative, closes the core.
- * - Calls the custom_reply method of the iss_adapter to send a reply for the request.
+ * @param req Pointer to a MessyRequest object containing request parameters and data buffers
+ * @throws None, but will terminate simulation if a segmentation fault is detected
+ * 
+ * @see MessyRequest
+ * @see close
  */
 void Core::handle_req(MessyRequest *req)
 {
@@ -196,16 +213,20 @@ void Core::handle_req(MessyRequest *req)
 
 
 /**
- * @brief Requests a delay in the execution based on the given parameters.
+ * @brief Introduces a time delay in the simulation execution.
  *
- * This function calculates a target time by adding the product of 
- * `time_to_skip` and the resolution value to the `start_time`. It then 
- * continues execution in a loop until the current timestamp reaches the 
- * calculated target time or the ISS adapter signals that it has finished.
+ * This function calculates a target timestamp by adding a specified time delay 
+ * to the given start time, then continuously advances the simulation until either:
+ * 1. The target timestamp is reached, or
+ * 2. The ISS adapter signals completion
  *
- * @param start_time The initial time from which the delay is calculated.
- * @param time_to_skip The amount of time units to skip.
- * @param resolution The resolution value used to calculate the delay.
+ * @param start_time The reference timestamp in picoseconds from which to calculate the delay
+ * @param time_to_skip The number of time units to skip
+ * @param resolution The resolution unit for the time_to_skip parameter
+ * 
+ * @note The actual delay is calculated as time_to_skip * resolution value in picoseconds
+ * @see continue_messy
+ * @see get_resolution_val
  */
 void Core::request_delay(double start_time,int time_to_skip,int resolution){
     double time = (time_to_skip*get_resolution_val(${resolution}))+start_time;
