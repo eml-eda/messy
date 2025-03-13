@@ -59,6 +59,8 @@ nav:
   - "Sensors": sensors.md
   - "LUT": lut.md
   - "Core": core.md
+  - "Communication Example": communication-example.md
+  - "Functional Bus": functional-bus.md
   - "Resolution": resolution.md
   - "Debugging": debugging.md
   - "Tracing": tracing.md
