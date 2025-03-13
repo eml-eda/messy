@@ -9,7 +9,7 @@ theme:
   name: material
   features:
     - content.code.copy
-  theme:
+    - content.code.annotate
   icon:
     admonition:
       note: octicons/tag-16
@@ -40,7 +40,8 @@ theme:
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - attr_list
+  - md_in_html
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -57,6 +58,7 @@ nav:
   - "Harvesters": harvesters.md
   - "Sensors": sensors.md
   - "LUT": lut.md
+  - "Core": core.md
   - "Resolution": resolution.md
   - "Debugging": debugging.md
   - "Tracing": tracing.md
