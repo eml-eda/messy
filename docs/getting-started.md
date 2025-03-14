@@ -17,5 +17,3 @@ For details on what the Dockerfile does and how to build the image, please refer
 ## Run some examples
 
 There are a few examples in `examples` folder, try one of them as is shown in [Simulator](simulator.md).
-
-You can use one of the configuration or define a new one following the documentation in [Codegen](codegen.md).

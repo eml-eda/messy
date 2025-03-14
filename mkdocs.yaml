@@ -51,23 +51,28 @@ markdown_extensions:
 nav:
   - Home: index.md
   - "Getting started": getting-started.md
-  - "Docker": docker.md
-  - "Simulator": simulator.md
-  - "Codegen": codegen.md
-  - "Converters": converters.md
-  - "Harvesters": harvesters.md
-  - "Sensors": sensors.md
-  - "LUT": lut.md
-  - "Core": core.md
-  - "Communication Example": communication-example.md
-  - "Functional Bus": functional-bus.md
-  - "Resolution": resolution.md
-  - "Debugging": debugging.md
-  - "Tracing": tracing.md
-  - "How to build the documentation": how-to-build-docs.md
-  - "Messy": messy.md
-  - "IPXACT": ipxact.md
-  - "IPXACT-Parsing": ipxact-parsing.md
-  - "Timing": timing.md
+  - "Examples":
+    - "Simulator": simulator.md
+  - "Flow":
+    - "Codegen": codegen.md
+  - "Timing and Communication":
+    - "Timing": timing.md
+    - "Communication Example": communication-example.md
+  - "IPXACT":
+    - "IPXACT": ipxact.md
+    - "IPXACT-Parsing": ipxact-parsing.md
+  - "Building Blocks":
+    - "Sensors": sensors.md
+    - "Harvesters": harvesters.md
+    - "Converters": converters.md
+    - "LUT": lut.md
+    - "Core": core.md
+    - "Functional Bus": functional-bus.md
+  - Others:
+    - "Docker": docker.md
+    - "Resolution": resolution.md
+    - "Debugging": debugging.md
+    - "Tracing": tracing.md
+    - "How to build the documentation": how-to-build-docs.md
 
 
