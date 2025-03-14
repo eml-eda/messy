@@ -28,6 +28,7 @@ The middle main component of the system is the [functional bus](functional-bus.m
 
 ## Write Request
 
+### Core
 When a write request is made, the [core](core.md) sets the following signals:
 
 - **request_address**: is set to the address of the sensor memory that is being accessed
@@ -51,6 +52,8 @@ sequenceDiagram
     Core->>Functional_bus: request_ready = true
     Core->>Core: wait(request_go)
 ```
+
+### Functional Bus
 
 The context is then passed to the [functional bus](functional-bus.md), which is waiting on the hilighted `wait()` statement in the following code.
 
@@ -108,7 +111,90 @@ sequenceDiagram
     Functional_bus->>Functional_bus: wait(request_ready, go_sensors)
 ```
 
+### Sensor
+The context, is then passed to the sensor, which wakes up and executes the write request. Inside the sensor, the size of the request is read and then the data is written to the sensor memory. Additionally the sensor requests a delay to the [core](core.md) to simulate the time it takes to write the data.
 
+The following code snippet shows how the sensor handles the request.
+
+``` cpp
+
+void Sensor_mic_click_functional::sensor_logic() {
+    while (true) {
+        if (enable.read() == true) {
+            if (ready.read() == true) {
+                // ... other code
+            } else {
+                // Write data to the register memory
+                for (unsigned int i = 0; i < req_size_val; i++)
+                    register_memory[i + add] = req_core_val_addr[i];
+             
+                // Request delay for the write operation
+                double start_time = sc_time_stamp().to_double(); ///< Get the current simulation time
+                core->request_delay(start_time, 30, SIM_RESOLUTION); 
+            }
+```
+
+When the sensor has completed the write request, it sets the `go` signal to true, to indicate that the request has been completed. Additionally, it also set the power consumption of the write state, that is used by the power instance of the sensor to calculate the power consumption. Finally, the sensor stops on a `wait()` statement, waiting for a change on the `ready` signal. 
+
+This change in the `go` signal, which was previously set to false, wakes up the [functional bus](functional-bus.md). 
+
+```mermaid
+sequenceDiagram
+    participant Core
+    participant Functional_bus
+    participant Sensor
+
+    Sensor->>Sensor: wait(ready_sensor)
+    Functional_bus->>Functional_bus: wait(request_ready, go_sensors)
+    Core->>Functional_bus: request_address = address
+    Core->>Functional_bus: request_data = data
+    Core->>Functional_bus: request_size = size
+    Core->>Functional_bus: functional_bus_flag = false
+    Core->>Functional_bus: request_ready = true
+    Core->>Core: wait(request_go)
+
+    Note over Functional_bus: Functional bus wakes up
+    Functional_bus->>Sensor: address_out_sensor = address
+    Functional_bus->>Sensor: data_out_sensor = data
+    Functional_bus->>Sensor: size_out_sensor = size
+    Functional_bus->>Sensor: flag_out_sensor = false
+    Functional_bus->>Sensor: ready_sensor = true 
+    Functional_bus->>Functional_bus: wait(request_ready, go_sensors)
+
+    Note over Sensor: Sensor wakes up
+    Note over Sensor: Write data to the register memory
+    Note over Sensor: Request delay for the write operation
+    Sensor->>Functional_bus: go = true
+    Sensor->> Functional_bus: data_out = pointer to the data
+    Sensor->>Sensor: wait(ready)    
+
+```
+
+### Functional Bus
+
+The [functional bus](functional-bus.md) wakes up, sets the `request_go` signal to true, to indicate that the request has been completed. Additionally it sets the `ready_sensor` signal to false, to indicate that the sensor has completed the request and the `request_value` to the output of the sensors. Finally, the [functional bus](functional-bus.md) stops on a `wait()` statement, waiting for both the `request_go` and the `go_sensors` signals to become false. 
+
+The following code snippet shows where the [functional bus](functional-bus.md) stops on the `wait()` statement.
+
+``` cpp hl_lines="11"
+void Functional_bus::processing_data(){
+    while (true){
+        // ... other code
+
+        if(selected_sensor>=0){
+            // Check if a valid sensor was selected
+            response();
+            
+            // Wait until the sensor and request are no longer ready
+            while (go_sensors[selected_sensor].read() != false && request_ready.read() != false) {
+                wait();
+            }
+            // Indicate that the request processing is complete
+            request_go.write(false);
+        }
+    }
+}
+```
 
 
 ```mermaid
@@ -131,10 +217,129 @@ sequenceDiagram
     Functional_bus->>Sensor: data_out_sensor = data
     Functional_bus->>Sensor: size_out_sensor = size
     Functional_bus->>Sensor: flag_out_sensor = false
-    Functional_bus->>Sensor: ready_sensor = true
+    Functional_bus->>Sensor: ready_sensor = true 
     Functional_bus->>Functional_bus: wait(request_ready, go_sensors)
 
     Note over Sensor: Sensor wakes up
+    Note over Sensor: Write data to the register memory
+    Note over Sensor: Request delay for the write operation
+    Sensor->>Functional_bus: go = true
+    Sensor->> Functional_bus: data_out = pointer to the data
+    Sensor->>Sensor: wait(ready)    
+
+    Note over Functional_bus: Functional bus wakes up
+    Functional_bus->>Core: request_go = true
+    Functional_bus->>Core: request_value = data_out
+    Functional_bus->>Sensor: ready_sensor = false
+    Functional_bus->>Functional_bus: wait(request_ready == false, go_sensors == false)
+
 ```
+
+### Sensor & Core
+
+The context is then switched to the core and to the sensor. Thanks to a change on the `request_go` the core wakes up and sets the `request_ready` signal to false, to indicate that the request has been completed. The sensor, instead, is woke up by a change on the `ready` signal, and sets the `go` signal to false, to indicate that the request has been completed also on its side.
+
+
+```mermaid
+sequenceDiagram
+    participant Core
+    participant Functional_bus
+    participant Sensor
+
+    Sensor->>Sensor: wait(ready_sensor)
+    Functional_bus->>Functional_bus: wait(request_ready, go_sensors)
+    Core->>Functional_bus: request_address = address
+    Core->>Functional_bus: request_data = data
+    Core->>Functional_bus: request_size = size
+    Core->>Functional_bus: functional_bus_flag = false
+    Core->>Functional_bus: request_ready = true
+    Core->>Core: wait(request_go)
+
+    Note over Functional_bus: Functional bus wakes up
+    Functional_bus->>Sensor: address_out_sensor = address
+    Functional_bus->>Sensor: data_out_sensor = data
+    Functional_bus->>Sensor: size_out_sensor = size
+    Functional_bus->>Sensor: flag_out_sensor = false
+    Functional_bus->>Sensor: ready_sensor = true 
+    Functional_bus->>Functional_bus: wait(request_ready, go_sensors)
+
+    Note over Sensor: Sensor wakes up
+    Note over Sensor: Write data to the register memory
+    Note over Sensor: Request delay for the write operation
+    Sensor->>Functional_bus: go = true
+    Sensor->> Functional_bus: data_out = pointer to the data
+    Sensor->>Sensor: wait(ready)    
+
+    Note over Functional_bus: Functional bus wakes up
+    Functional_bus->>Core: request_go = true
+    Functional_bus->>Core: request_value = data_out
+    Functional_bus->>Sensor: ready_sensor = false
+    Functional_bus->>Functional_bus: wait(request_ready == false, go_sensors == false)
+
+    Note over Core: Core wakes up
+    Core->>Functional_bus: request_ready = false
+    Core->>Core: wait(request_go)
+    Note over Sensor: Sensor wakes up
+    Sensor->>Functional_bus: go = false
+    Sensor->>Sensor: wait(ready)
+```
+
+### Functional Bus & Core
+
+Finally, thanks to both the signal `request_ready` and `go_sensors` being false, the [functional bus](functional-bus.md) wakes up and sets the `request_go` signal to false, to indicate that the request is completed. The [functional bus](functional-bus.md) then stops on the `wait()` statement, waiting for the next request.
+On the other side, the [core](core.md) wakes up due to a change on the `request_go` signal, and exits the `handle_req` function. When a new re
+
+```mermaid
+sequenceDiagram
+    participant Core
+    participant Functional_bus
+    participant Sensor
+
+    Sensor->>Sensor: wait(ready_sensor)
+    Functional_bus->>Functional_bus: wait(request_ready, go_sensors)
+    Core->>Functional_bus: request_address = address
+    Core->>Functional_bus: request_data = data
+    Core->>Functional_bus: request_size = size
+    Core->>Functional_bus: functional_bus_flag = false
+    Core->>Functional_bus: request_ready = true
+    Core->>Core: wait(request_go)
+
+    Note over Functional_bus: Functional bus wakes up
+    Functional_bus->>Sensor: address_out_sensor = address
+    Functional_bus->>Sensor: data_out_sensor = data
+    Functional_bus->>Sensor: size_out_sensor = size
+    Functional_bus->>Sensor: flag_out_sensor = false
+    Functional_bus->>Sensor: ready_sensor = true 
+    Functional_bus->>Functional_bus: wait(request_ready, go_sensors)
+
+    Note over Sensor: Sensor wakes up
+    Note over Sensor: Write data to the register memory
+    Note over Sensor: Request delay for the write operation
+    Sensor->>Functional_bus: go = true
+    Sensor->> Functional_bus: data_out = pointer to the data
+    Sensor->>Sensor: wait(ready)    
+
+    Note over Functional_bus: Functional bus wakes up
+    Functional_bus->>Core: request_go = true
+    Functional_bus->>Core: request_value = data_out
+    Functional_bus->>Sensor: ready_sensor = false
+    Functional_bus->>Functional_bus: wait(request_ready == false, go_sensors == false)
+
+    Note over Core: Core wakes up
+    Core->>Functional_bus: request_ready = false
+    Core->>Core: wait(request_go)
+    Note over Sensor: Sensor wakes up
+    Sensor->>Functional_bus: go = false
+    Sensor->>Sensor: wait(ready)
+
+    Note over Functional_bus: Functional bus wakes up
+    Functional_bus->>Core: request_go = false
+    Functional_bus->>Functional_bus: wait(request_ready, go_sensors)
+    Note over Core: Core wakes up
+    Note over Core: Core exits handle_req
+```
+
+As you can see, the final situation of the system is the same as the initial one. The system is ready to handle a new request.
+
 
 ## Read Request
