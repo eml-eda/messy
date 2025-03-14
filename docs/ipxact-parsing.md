@@ -25,7 +25,7 @@ The parsing script works as follows:
 5. And then it's format is adjusted to match the initial JSON format (functions ***process_bus(), process_core() etc.***)
 6. For each component the version, library and vendor are checked (function ***sanity_check()***)
 
-> #### NB!
-> - Component filenaming convention is **component_name** + "_component.xml"
-> - It is needed for the correct work of the script
+!!! Warning
+    - Component filenaming convention is **component_name** + "_component.xml"
+    - It is needed for the correct work of the script
 

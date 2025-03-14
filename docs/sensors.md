@@ -59,8 +59,8 @@ The input signals are:
 ### Output Signals
 The output signals are:
 
-- **data_out**: This signal represents the **pointer** to the output data. This signal goes to the functional bus
-- **go**: This signal is used to signal that the sensor has completed the operation. It is set to `true` when the sensor has finished, to `false` otherwise. This signal goes to the functional bus
+- **data_out**: This signal represents the **pointer** to the output data. This signal goes to the [functional bus](functional-bus.md)
+- **go**: This signal is used to signal that the sensor has completed the operation. It is set to `true` when the sensor has finished, to `false` otherwise. This signal goes to the [functional bus](functional-bus.md)
 - **power_signal**: This signal represents the power state of the sensor. It is connected to the power instance of the sensor
 
 ## Power Instance
@@ -89,9 +89,10 @@ The output signals are:
 
 - **voltage_state**: This signal is used to define the voltage of the sensor. This signal is connected to the power bus and the load converter
 - **current_state**: This signal is used to define the current of the sensor. This signal is connected to the power bus
-## Definition
 
-The sensors are defined together with the rest of the system in a JSON configuration file, below for example there is defined a microphone sensor called `mic_click`:
+## Definition in the JSON Configuration File
+
+The sensors are defined together with the rest of the system in a JSON configuration file. Below for example there is defined a microphone sensor called `mic_click`:
 
 ```JSON
 "mic_click": {
@@ -120,11 +121,66 @@ The sensors are defined together with the rest of the system in a JSON configura
 
 Each sensor needs a certain amount of memory to interact with the system and this is simulated and setted thanks to the `register_memory` parameter. 
 
+Ideally each sensor could define a set of states, however currently the system supports only the reading state, the writing state and an idle state. 
 
-Ideally each sensor could define a set of states and model it in those states, however currently the system supports only the reading state, the writing state and an idle state. 
-
-Each state is defined considering the `current`, in mA, needed and optionally a timing `delay` in ms (how much time does the sensor stay in that state).
+Each state is defined considering the needed `current`, in mA, and optionally a timing `delay` in ms (how much time the sensor stay in that state).
 
 Tracing can be set as described in [Tracing](tracing.md).
 
 Finally, the information about the reference voltage can be set through the `vref` parameter.
+
+## State Machine
+
+The state machine of the sensor can be represented as follows:
+
+``` mermaid
+stateDiagram
+  state Off
+  state Write
+  state Read
+  state Idle
+
+  [*] --> Off
+  Off --> Read
+  Off --> Write
+  Read --> Idle
+  Write --> Idle
+  Idle --> Read
+  Idle --> Write
+```
+
+## Sensor Memory & Multiple Sensors
+
+As we previously described, there is a field called `register_memory`. This takes into account the memory space of the sensor. This is managed by the following lines of code in the `codegen.py`:
+
+```python
+for idx,(sensor_name,sensor) in enumerate(settings["peripherals"]["sensors"].items()):
+    sensor["base"] = baseaddress
+    sensor["ID"] = idx
+    baseaddress += 1 + sensor["register_memory"]
+```
+
+This loops over all the sensors in the JSON configuration file and assign the `baseaddress` to that sensor. For this reason, if we want one sensor before the other in the memory, is importan to define them correctly. The `baseaddress` is not to be confused with the `AXI_BASE`. In fact, GVSoC has some memory space that is fixed and cannot be touched, otherwise it causes segmantation faults. After that memory space, there is available memory space where the user can write whatever is needed.
+
+```c
+...
+#define AXI_BASE 0x20000000
+...
+int main(void)
+{
+    ...
+
+    int* mic_click_sensor = (volatile int *)AXI_BASE+0x0;
+    ...
+}
+```
+
+As we can see in the code example (taken from the `periodic_sensors.c`), to define the address of the `mic_click_sensor` we just need to add `0x0` to the `AXI_BASE_ADDRESS`. This is because the used configuration for this example, which is the `pulp_open.json`, only contains one sensor. For more details on the example refer to the [periodic sensor](periodic-sensor.md) page.
+
+Supposing we have two sensors with a `register_memory` of 256 (0x100 in hexadecimal) and we want to access the memory of the second one, we should add to `AXI_BASE` the offset (which is 256, 0x100 in hexadecimal) with the respect to the starting address. 
+
+| Name | Base Address | Memory Register Size | Offset w.r.t AXI_BASE |
+| ----| ----| ----|----|
+| AXI_BASE| 0x20000000 |-| 0|
+| sensor1| 0x20000000|0x100| 0|
+| sensor2 |0x20000100|0x100| 0x100|

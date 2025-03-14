@@ -52,22 +52,26 @@ nav:
   - Home: index.md
   - "Getting started": getting-started.md
   - "Examples":
-    - "Simulator": simulator.md
+    - "Hello World": hello-world.md
+    - "Periodic Sensor": periodic-sensor.md
   - "Flow":
+    - "Flow": flow.md
     - "Codegen": codegen.md
   - "Timing and Communication":
-    - "Timing": timing.md
-    - "Communication Example": communication-example.md
+    - "GVSoC - SystemC Timing": timing.md
+    - "SystemC Modules Timing": communication-example.md
   - "IPXACT":
     - "IPXACT": ipxact.md
     - "IPXACT-Parsing": ipxact-parsing.md
   - "Building Blocks":
+    - "Core": core.md
+    - "Functional Bus": functional-bus.md
+    - "Power Bus": power-bus.md
     - "Sensors": sensors.md
+    - "Adapter": adapter.md
     - "Harvesters": harvesters.md
     - "Converters": converters.md
     - "LUT": lut.md
-    - "Core": core.md
-    - "Functional Bus": functional-bus.md
   - Others:
     - "Docker": docker.md
     - "Resolution": resolution.md

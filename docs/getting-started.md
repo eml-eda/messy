@@ -16,4 +16,4 @@ For details on what the Dockerfile does and how to build the image, please refer
 
 ## Run some examples
 
-There are a few examples in `examples` folder, try one of them as is shown in [Simulator](simulator.md).
+There are a few examples in `examples` folder, try one of them as is shown in [Simulator](hello-world.md).
