@@ -50,10 +50,11 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - "What is MESSY": what-is-messy.md
   - "Getting started": getting-started.md
   - "Examples":
-    - "Hello World": hello-world.md
-    - "Periodic Sensor": periodic-sensor.md
+    - "Hello World": examples/hello-world.md
+    - "Periodic Sensor": examples/periodic-sensor.md
   - "Flow":
     - "Flow": flow.md
     - "Codegen": codegen.md

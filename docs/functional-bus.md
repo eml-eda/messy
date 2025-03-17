@@ -1,6 +1,6 @@
 The functional bus is one of the most important component of the whole system. It is the "man in the middle" between the [core](core.md) and the [sensors](sensors.md). It is responsible for managing the requests from the core and forwarding them to the sensors. It is also responsible for managing the responses from the sensors and forwarding them to the core.
 
-Differently from the other components, the functional bus does not have a dedicated power instance. The most similar thing to a power instance, is the [power bus](power-bus.md) that is used to exchange the power state of all the components of the system and forward it to the [battery](battery.md).
+Differently from the other components, the functional bus does not have a dedicated power instance. The most similar thing to a power instance, is the [power bus](power-bus.md) that is used to exchange the power state of all the components of the system and forward it to the [harvesters](harvesters.md).
 
 ## Functional Bus Instance
 

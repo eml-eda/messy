@@ -1,5 +1,3 @@
-# Docker getting started
-
 ## Requirements
 
 To build a Docker image, you need to have Docker installed on your machine. You can find the installation instructions [here](https://docs.docker.com/engine/install/). In addition to that you need to populate the `deps/` directory with the SystemC and SystemC-AMS `.tar` files. You can find them [here](https://www.accellera.org/downloads/standards/systemc) and [here](https://www.coseda-tech.com/systemc-ams-proof-of-concept). The Dockerfile expects the following files:

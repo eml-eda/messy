@@ -10,10 +10,13 @@ First, clone the repository to your local machine:
 git clone https://github.com/eml-eda/messy
 ```
 
-## Build a docker image
+## Build the docker image
 
-For details on what the Dockerfile does and how to build the image, please refer to the [Docker getting started](docker.md) file.
+For details on what the Dockerfile does and how to build the image, please refer to the [Docker](docker.md) file.
 
 ## Run some examples
 
-There are a few examples in `examples` folder, try one of them as is shown in [Simulator](hello-world.md).
+There are a few examples in `examples` folder. Try one of them:
+
+- [Hello World](examples/hello-world.md)
+- [Periodic Sensor](examples/periodic-sensor.md)

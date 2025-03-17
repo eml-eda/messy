@@ -175,7 +175,7 @@ int main(void)
 }
 ```
 
-As we can see in the code example (taken from the `periodic_sensors.c`), to define the address of the `mic_click_sensor` we just need to add `0x0` to the `AXI_BASE_ADDRESS`. This is because the used configuration for this example, which is the `pulp_open.json`, only contains one sensor. For more details on the example refer to the [periodic sensor](periodic-sensor.md) page.
+As we can see in the code example (taken from the `periodic_sensors.c`), to define the address of the `mic_click_sensor` we just need to add `0x0` to the `AXI_BASE_ADDRESS`. This is because the used configuration for this example, which is the `pulp_open.json`, only contains one sensor. For more details on the example refer to the [periodic sensor](examples/periodic-sensor.md) page.
 
 Supposing we have two sensors with a `register_memory` of 256 (0x100 in hexadecimal) and we want to access the memory of the second one, we should add to `AXI_BASE` the offset (which is 256, 0x100 in hexadecimal) with the respect to the starting address. 
 

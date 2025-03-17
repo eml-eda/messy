@@ -1,4 +1,6 @@
-Before running this example, you have launch the docker container. You can find the instructions in the [Docker](docker.md) page of the documentation.
+## How to run it
+
+Before running this example, you have launch the docker container. You can find the instructions in the [Docker](../docker.md) page of the documentation.
 
 When you are in the docker container, you have to go to the `messy` directory:
 
@@ -16,6 +18,8 @@ The parameters are:
 1. `-f` is the file name of the chosen system configuration
 2. `-a` is the path of the folder of the application
 
+## Explanation
+ 
 This code will build and execute the `helloworld` example. You should see the following output:
 
 ```

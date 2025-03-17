@@ -1,6 +1,26 @@
-To run this example, follow the same instruction already explained in the [hello-world](hello-world.md) example. Just remember to change the path of the application to `/messy/examples/periodic-sensor` when launching the python script.
+## How to run it
 
-This example, as the name suggest, is a simple example that periodically writes a value to the sensor memory. This example is useful to understand how to interact with the sensor memory and how the flow of a write operation works. For more information about the write request, please refer to the [Communication Example](communication-example.md) page.
+Before running this example, you have launch the docker container. You can find the instructions in the [Docker](../docker.md) page of the documentation.
+
+When you are in the docker container, you have to go to the `messy` directory:
+
+```bash
+cd /messy/messy/
+```
+
+Then we can run python:
+
+```bash
+python3 messy.py -f codegen/pulp_open.json -a /messy/examples/periodic-sensor
+```
+The parameters are:
+
+1. `-f` is the file name of the chosen system configuration
+2. `-a` is the path of the folder of the application
+
+## Explanation
+
+This example, as the name suggest, is a simple example that periodically writes a value to the sensor memory. This example is useful to understand how to interact with the sensor memory and how the flow of a write operation works. For more information about the write request, please refer to the [Communication Example](../communication-example.md) page.
 
 By adding some print statements inside the functional model of the sensor, we can see how the memory of the sensor is updated, each time a write occurs.
 
