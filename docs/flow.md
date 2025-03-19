@@ -40,6 +40,8 @@ As already mentioned, most of these templates have a predefined structure in ter
 
 The JSON is then parsed by the python script and the templates are filled with the necessary information and saved in the `messy/codegen/src` and `messy/codegen/include` folders respectively.
 
+For more details on these steps, please refer to the [codegen](codegen.md) documentation.
+
 ### Compilation
 
 The following step of the `messy.py` script is to compile both the GVSoC application and the SystemC/SystemC-AMS models. 
