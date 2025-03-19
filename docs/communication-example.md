@@ -5,7 +5,7 @@ The whole system works by means of requests, that can be of two types:
 - **Read**: the core wants to read data from a sensor
 - **Write**: the core wants to write data to a sensor
 
-When a request is made, the [text](core.md) need to set the corrected values to its output signals, to instruct the functional bus how to handle the request. The following code snippet shows how the core handles the request.
+When a request is made, the [core](core.md) need to set the corrected values to its output signals, to instruct the functional bus how to handle the request. The following code snippet shows how the core handles the request.
 
 ``` cpp
 void Core::handle_req(MessyRequest *req)
