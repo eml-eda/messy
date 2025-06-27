@@ -11,7 +11,7 @@ cd /messy/messy/
 Then we can run python:
 
 ```bash
-python3 messy.py -f codegen/pulp_open.json -a /messy/examples/periodic-sensor
+python3 messy.py -f codegen/pulp_open.json -a /messy/examples/periodic_sensors
 ```
 The parameters are:
 

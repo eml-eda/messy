@@ -19,7 +19,7 @@ int main(void)
     uint32_t errors = 10;
     uint32_t core_id = pi_core_id(), cluster_id = pi_cluster_id();
 
-    int *mic_click_sensor = (volatile int *)AXI_BASE + 0x0;
+    uint8_t *mic_click_sensor = (volatile int *)AXI_BASE + 0x0;
     for (int i = 0; i < NUM_ITERS; i++)
     {
         printf("[ITER %d/%d] %.2f Hours Elapsed\n", i, NUM_ITERS, i * PERIOD_HR);
