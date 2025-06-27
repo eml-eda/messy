@@ -86,6 +86,8 @@ RUN git clone --recursive https://github.com/pulp-platform/pulp-sdk.git
 
 WORKDIR /pulp-sdk
 
+RUN git checkout 2982d3d411361024869cd17d462a1d18a9974e82
+
 RUN git submodule update --remote --recursive
 
 RUN rm -r tools/gvsoc
