@@ -74,8 +74,10 @@ void Core::run_next_sc(){
  * ISS adapter and stopping the SystemC simulation.
  */
 void Core::close(){
-    // wait until next resolutional value (next ms)
-    wait(get_resolution_val(${resolution})-(next_timestamp%get_resolution_val(${resolution})),sc_core::SC_PS);
+    % if is_async:
+        // wait until next resolutional value (next ms)
+        wait(get_resolution_val(${resolution})-(next_timestamp%get_resolution_val(${resolution})),sc_core::SC_PS);
+    % endif
     delete_n_requests(request_queue_size());
     this->iss_adapter->close();
     sc_stop();
@@ -95,43 +97,6 @@ void Core::handle_req_queue(){
     for(int i = 0; i < core_requests_size; i++)   
         handle_req(get_request_at(i));
     delete_n_requests(core_requests_size);
-}
-
-
-/**
- * @brief Advances the simulation by one step.
- *
- * This function performs the following operations:
- * 1. Executes events scheduled by the ISS until the current SystemC timestamp
- * 2. Updates the next timestamp to the next scheduled event
- * 3. Accumulates power consumption statistics
- * 4. Increments the simulation iteration counter
- * 5. Optionally processes the request queue
- * 6. Advances to the next SystemC timestamp
- *
- * @param handle_req_queue If true, processes pending requests in the queue; if false, 
- *                         skips request processing for this simulation step
- * @see handle_req_queue
- * @see run_next_sc
- */
-void Core::continue_messy(bool handle_req_queue){
-
-    // Execute events at the current SystemC timestamp and update the next timestamp
-    next_timestamp = this->iss_adapter->exec_events_at(sc_timestamp);
-
-    // Accumulate the total power consumed up to the current timestamp
-    this->tot_power += this->iss_adapter->get_power_at(sc_timestamp);
-    
-    // Increment the simulation iteration count
-    simulation_iters++;
-    
-    // Handle the request queue if the flag is set
-    if(handle_req_queue)    
-        this->handle_req_queue();
-
-    // Run the next simulation cycle
-    this->run_next_sc();
-
 }
 
 /**
@@ -211,6 +176,55 @@ void Core::handle_req(MessyRequest *req)
     iss_adapter->custom_reply(req);   
 }
 
+void Core::grant_req(MessyRequest *req)
+{
+
+}
+
+void Core::reply_to_req(MessyRequest *req)
+{
+
+}
+
+
+/* ASYNC MODE FUNCTIONS */
+
+% if is_async:
+/**
+ * @brief Advances the simulation by one step.
+ *
+ * This function performs the following operations:
+ * 1. Executes events scheduled by the ISS until the current SystemC timestamp
+ * 2. Updates the next timestamp to the next scheduled event
+ * 3. Accumulates power consumption statistics
+ * 4. Increments the simulation iteration counter
+ * 5. Optionally processes the request queue
+ * 6. Advances to the next SystemC timestamp
+ *
+ * @param handle_req_queue If true, processes pending requests in the queue; if false, 
+ *                         skips request processing for this simulation step
+ * @see handle_req_queue
+ * @see run_next_sc
+ */
+void Core::continue_messy(bool handle_req_queue){
+
+    // Execute events at the current SystemC timestamp and update the next timestamp
+    next_timestamp = this->iss_adapter->exec_events_at(sc_timestamp);
+
+    // Accumulate the total power consumed up to the current timestamp
+    this->tot_power += this->iss_adapter->get_power_at(sc_timestamp);
+    
+    // Increment the simulation iteration count
+    simulation_iters++;
+    
+    // Handle the request queue if the flag is set
+    if(handle_req_queue)    
+        this->handle_req_queue();
+
+    // Run the next simulation cycle
+    this->run_next_sc();
+
+}
 
 /**
  * @brief Introduces a time delay in the simulation execution.
@@ -234,12 +248,46 @@ void Core::request_delay(double start_time,int time_to_skip,sc_core::sc_time_uni
         this->continue_messy(false);
 }
 
-void Core::grant_req(MessyRequest *req)
-{
 
+% else:
+/* SYNC MODE FUNCTIONS */
+
+/**
+ * @brief Advances the simulation by one step.
+ *
+ * This function performs the following operations:
+ * 1. Executes the ISS adapter
+ * 2. Increments the simulation iteration counter
+ * 3. Optionally processes the request queue
+ *
+ * @param handle_req_queue If true, processes pending requests in the queue; if false, 
+ *                         skips request processing for this simulation step
+ * @see handle_req_queue
+ */
+void Core::continue_messy(bool handle_req_queue)
+{
+    // Run the ISS adapter to execute the current simulation step
+    this->iss_adapter->exec();
+
+    // Accumulate the total power consumed up to the current timestamp
+    // TODO: power consumption is not implemented in synchronous mode
+    //this->tot_power += this->iss_adapter->get_power_at(sc_timestamp);
+
+    // Increment the simulation iteration count
+    simulation_iters++;
+    
+    // Handle the request queue if the flag is set
+    if(handle_req_queue)    
+        this->handle_req_queue();
 }
 
-void Core::reply_to_req(MessyRequest *req)
-{
 
+/**
+ * @brief Placeholder for time delay functionality in synchronous mode.
+ *
+ * In synchronous mode, this function returns immediately without performing any action.
+ */
+void Core::request_delay(double start_time,int time_to_skip,sc_core::sc_time_unit resolution)
+{
 }
+% endif

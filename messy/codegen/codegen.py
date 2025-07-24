@@ -358,22 +358,23 @@ def main(input_file, template_dir, output_dir):
             )
         )
 
-    # template_generators.append(Template_generator(template_dir/"include"/"adapters"/"iss_adapter.hpp",
-    #                           adapters_header_dir/"iss_adapter.hpp",
-    #                           {**settings}))
-
     adapter_used = {"adapter_class": "ISS_Adapter", "adapter_filenames": "iss_adapter"}
 
-    if "iss" in settings["core"] and settings["core"]["iss"] == "gvsoc":
+    # Available ISS adapters, add more here if needed
+    iss_adapter_map = {
+        "gvsoc": ("AdapterGvsoc", "adapter_gvsoc"),
+        "gvsoc_gap9": ("AdapterGvsocGap9", "adapter_gvsoc_gap9"),
+        "cheshire": ("AdapterCheshire", "adapter_cheshire"),
+    }
+    
+    iss_type = settings["core"].get("iss")
+    if iss_type in iss_adapter_map:
+        adapter_class, adapter_filenames = iss_adapter_map[iss_type]
         adapter_used = {
-            "adapter_class": "AdapterGvsoc",
-            "adapter_filenames": "adapter_gvsoc",
+            "adapter_class": adapter_class,
+            "adapter_filenames": adapter_filenames,
         }
-    if "iss" in settings["core"] and settings["core"]["iss"] == "gvsoc_gap9":
-        adapter_used = {
-            "adapter_class": "AdapterGvsocGap9",
-            "adapter_filenames": "adapter_gvsoc_gap9",
-        }
+
     if adapter_used["adapter_filenames"] != "iss_adapter":
         template_generators.append(
             Template_generator(
@@ -396,6 +397,10 @@ def main(input_file, template_dir, output_dir):
                 {**settings, **settings["core"]},
             )
         )
+
+    # If core["is_async"] is not set, default to True
+    if "is_async" not in settings["core"]:
+        settings["core"]["is_async"] = True
 
     template_generators.append(
         Template_generator(

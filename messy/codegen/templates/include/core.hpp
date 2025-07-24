@@ -7,6 +7,19 @@
 #include <string.h>
 #include <systemc.h>
 
+/**
+ * @brief Whether the core is asynchronous or not.
+ * 
+ * This flag indicates if the core operates in asynchronous mode.
+ * If true (default), the core will implement an asynchronous timing model,
+ * handling messy requests while running the ISS adapter.
+ */
+% if is_async:
+#define CORE_IS_ASYNC true
+% else:
+#define CORE_IS_ASYNC false
+% endif
+
 class Core : public sc_module {
   public:
     // Input Ports
