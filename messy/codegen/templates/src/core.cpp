@@ -239,6 +239,11 @@ void Core::grant_req(MessyRequest *req)
 
 }
 
+/**
+ * @brief Handles a response to a request. It gets called when one of our access gets its response.
+ * 
+ * @param req Pointer to the MessyRequest that received a response.
+ */
 void Core::reply_to_req(MessyRequest *req)
 {
 
