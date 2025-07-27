@@ -68,5 +68,5 @@ SC_MODULE(Functional_bus) {
   private:
     int selected_sensor = 0; /**< Index of the currently selected sensor */
 
-    Functional_bus() {}
+    Functional_bus() {} /**< Private default constructor to prevent direct instantiation without named ports. */
 };

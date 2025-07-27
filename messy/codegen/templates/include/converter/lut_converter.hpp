@@ -50,8 +50,23 @@ SCA_TDF_MODULE(${name}_converter)
                             voltage_in("voltage_in"),
                             current_out("current_out") {};
 
+    /**
+     * @brief Sets the attributes of the converter.
+     * 
+     * This function sets the timestep and delay for the `current_out` port.
+     */
     void set_attributes();
+    /**
+     * @brief Initializes the converter.
+     * 
+     * This function is called once at the beginning of the simulation to initialize the converter.
+     */
     void initialize();
+    /**
+     * @brief Processes the converter's functionality.
+     * 
+     * This function is called at each timestep to process the input signals and generate the output.
+     */
     void processing();
 
     /**

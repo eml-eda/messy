@@ -159,11 +159,25 @@ void AdapterGvsoc::custom_reply(MessyRequest* req){
     delete req;
 }
 
+/**
+ * @brief Handles granted requests from GVSOC.
+ * 
+ * This function is called when one of our access requests gets granted. Currently, it does nothing.
+ * 
+ * @param req Pointer to the Io_request that was granted.
+ */
 void AdapterGvsoc::grant(gv::Io_request *req)
 {
 
 }
 
+/**
+ * @brief Handles replies to requests from GVSOC.
+ * 
+ * This function is called when one of our access requests gets a reply. Currently, it does nothing.
+ * 
+ * @param req Pointer to the Io_request that received a reply.
+ */
 void AdapterGvsoc::reply(gv::Io_request *req)
 {
 

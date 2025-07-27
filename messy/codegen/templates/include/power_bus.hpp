@@ -33,8 +33,25 @@ SCA_TDF_MODULE(Power_bus) {
     SCA_CTOR(Power_bus) : core_current("Current_of_CPU"),
                           core_voltage("Voltage_of_CPU") {}
 
+    /**
+     * @brief Sets the attributes of the Power_bus module.
+     *
+     * This function sets the timestep for the input and output signals of the Power_bus module.
+     * It ensures that the module is triggered at the specified simulation resolution.
+     */
     void set_attributes();
+    /**
+     * @brief Initializes the Power_bus module.
+     *
+     * This function is called once at the beginning of the simulation to initialize the module.
+     */
     void initialize();
+    /**
+     * @brief Processes the Power_bus module's functionality.
+     *
+     * This function is called at each timestep to process the input current and voltage signals
+     * from various components and calculate the total current on the power bus.
+     */
     void processing();
 
   private:

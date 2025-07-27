@@ -27,8 +27,24 @@ SCA_TDF_MODULE(Harvester_${harvester_name})
 
     SCA_CTOR(Harvester_${harvester_name}): i("i"), v("v") {}
 
+    /**
+     * @brief Sets the attributes of the Harvester module.
+     * 
+     * This function sets the timestep for the output current (i) and voltage (v) signals.
+     */
     void set_attributes();
+    /**
+     * @brief Initializes the Harvester module.
+     * 
+     * This function opens the input files for iref and vref if they are defined.
+     */
     void initialize();
+    /**
+     * @brief Processes the Harvester module's functionality.
+     * 
+     * This function reads the input values for iref and vref from their respective files
+     * and writes the corresponding current and voltage values to the output ports.
+     */
     void processing();
 
     Harvester_${harvester_name}(){}
