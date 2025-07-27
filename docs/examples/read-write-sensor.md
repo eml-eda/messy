@@ -11,7 +11,7 @@ cd /messy/messy/
 Then we can run python:
 
 ```bash
-python3 messy.py -f codegen/pulp_open.json -a /messy/examples/helloworld
+python3 messy.py -f codegen/pulp_open.json -a /messy/examples/read_write_sensor
 ```
 The parameters are:
 
@@ -20,22 +20,12 @@ The parameters are:
 
 ## Explanation
  
-This code will build and execute the `helloworld` example. You should see the following output:
+This example demonstrates a simple read-write operation to a single sensor's memory. It writes a sequence of values to the sensor and then reads them back, printing the results to the console.
+
+You should see output similar to this:
 
 ```
-Entering main controller
-[31 0] Hello World!
-Cluster master core entry
-[0 7] Hello World!
-[0 6] Hello World!
-[0 5] Hello World!
-[0 4] Hello World!
-[0 3] Hello World!
-[0 2] Hello World!
-[0 0] Hello World!
-[0 1] Hello World!
-Cluster master core exit
-Bye !
+...
+Microphone sensor 10
+Microphone sensor 11
 ```
-
-

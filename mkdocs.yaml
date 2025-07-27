@@ -57,6 +57,9 @@ nav:
   - "Examples":
     - "Hello World": examples/hello-world.md
     - "Periodic Sensor": examples/periodic-sensor.md
+    - "Read Sensor": examples/read-sensor.md
+    - "Read Write Multiple Sensors": examples/read-write-multiple-sensors.md
+    - "Read Write Sensor": examples/read-write-sensor.md
   - "Core Concepts":
     - "Flow": flow.md
     - "Codegen": codegen.md
