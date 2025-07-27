@@ -1,29 +1,29 @@
 # Sensors
 
-Sensors are important components for this simulator. Every sensor can be composed by two separate instances:
+Sensors are crucial components in the MESSY framework, enabling the simulation of interactions between the virtual system and the physical world. Each sensor is comprised of two distinct instances:
 
-- **Functional**: this instance is responsible for define the internal characteristics of the sensor. This instance interfaces with the core through a bus
-- **Power**: this instance controls the state of the sensor and exposes its current and voltage
+- **Functional Instance**: This instance defines the internal characteristics and behavior of the sensor, interfacing with the core through a bus.
+- **Power Instance**: This instance manages the sensor's power states, exposing its current and voltage to the power bus.
 
 ## Functional Instance
-The functional instance is as follows: 
 
-![text](images/sensor_functional.png)
+The functional instance is a SystemC module that models the sensor's behavior. It communicates with the [Functional Bus](functional-bus.md) to read and write data.
+
+![Functional Sensor](images/sensor_functional.png)
 
 ### Signals Summary
-A summary of the signals is shown in the table below:
 
 | Signal | Direction | Connected to | Description |
 | --- | --- | --- | --- |
-| enable | input |  | Enable the sensor |
-| address | input | Functional bus | Address of the register to read or write |
-| data_in | input | Functional bus | Pointer to the input data |
-| req_size | input | Functional bus | Size of the data to read or write |
-| flag_wr | input | Functional bus | Flag to define if the sensor is going to read or write |
-| ready | input | Functional bus | Flag to define if the sensor is ready to read or write |
-| data_out | output | Functional bus | Pointer to the output data |
-| go | output | Functional bus | Signal that the sensor has completed the operation |
-| power_signal | output | Power bus | Power state of the sensor |
+| `enable` | input | - | Enables or disables the sensor. |
+| `address` | input | Functional bus | Address of the register to read from or write to. |
+| `data_in` | input | Functional bus | Pointer to the input data for write operations. |
+| `req_size` | input | Functional bus | Size of the data to be read or written. |
+| `flag_wr` | input | Functional bus | A flag to determine the operation type: `true` for read, `false` for write. |
+| `ready` | input | Functional bus | A flag indicating that the sensor is ready for a new operation. |
+| `data_out` | output | Functional bus | Pointer to the output data for read operations. |
+| `go` | output | Functional bus | A signal indicating the completion of an operation. |
+| `power_signal` | output | Power bus | The current power state of the sensor. |
 
 ### Input Signals
 The input signals are:
@@ -57,7 +57,6 @@ The input signals are:
 - **ready**: This signal is used to define if the sensor is ready to read or write. 
 
 ### Output Signals
-The output signals are:
 
 - **data_out**: This signal represents the **pointer** to the output data. This signal goes to the [functional bus](functional-bus.md)
 - **go**: This signal is used to signal that the sensor has completed the operation. It is set to `true` when the sensor has finished, to `false` otherwise. This signal goes to the [functional bus](functional-bus.md)
@@ -65,93 +64,75 @@ The output signals are:
 
 ## Power Instance
 
-The functional instance is a SystemC-AMS Module and is structured as follows: 
+The power instance is a SystemC-AMS module that models the power consumption of the sensor. It receives the power state from the functional instance and calculates the corresponding voltage and current consumption.
 
-![text](images/sensor_power.png)
+![Power Sensor](images/sensor_power.png)
 
 ### Signals Summary
-A summary of the signals is shown in the table below:
 
 | Signal | Direction | Connected to | Description |
 | --- | --- | --- | --- |
-| func_signal | input | Sensor Functional | Power state of the sensor |
-| voltage_state | output | Power bus & Load Converter | Voltage of the sensor |
-| current_state | output | Power bus | Current of the sensor |
+| `func_signal` | input | Sensor Functional | The power state of the sensor. |
+| `voltage_state` | output | Power bus & Load Converter | The voltage of the sensor. |
+| `current_state` | output | Power bus | The current drawn by the sensor. |
 
 ### Input Signals
 
-The input signals are:
-
-- **func_signal**: This signal is used to define the power state of the sensor. It is usually an integer, representing a value from an enum. This signal comes from the functional instance of the sensor.
+- **`func_signal`**: An integer representing the power state of the sensor, received from the functional instance.
 
 ### Output Signals
-The output signals are:
 
-- **voltage_state**: This signal is used to define the voltage of the sensor. This signal is connected to the power bus and the load converter
-- **current_state**: This signal is used to define the current of the sensor. This signal is connected to the power bus
+- **`voltage_state`**: The voltage of the sensor.
+- **`current_state`**: The current drawn by the sensor.
 
-## Definition in the JSON Configuration File
+## JSON Configuration
 
-The sensors are defined together with the rest of the system in a JSON configuration file. Below for example there is defined a microphone sensor called `mic_click`:
+Sensors are defined in the `peripherals.sensors` section of the JSON configuration file. Here is an example of a microphone sensor:
 
-```JSON
+```json
 "mic_click": {
-    "tracing":{
-        "messy_trace":{
-            "mic_click_I":"current"
-        }
-    },
     "vref": 3.3,
-    "register_memory" : 256,
-    "states":{
-        "read" : {
-            "current" : "0.12",
-            "delay" : "30"
+    "register_memory": 256,
+    "states": {
+        "read": {
+            "current": "0.12",
+            "delay": "30"
         },
         "write": {
-            "current" : "0.16",
-            "delay" : "30"
+            "current": "0.16",
+            "delay": "30"
         },
-        "idle":{
-            "current" : "0.002"
+        "idle": {
+            "current": "0.002"
         }
     }
 }
 ```
 
-Each sensor needs a certain amount of memory to interact with the system and this is simulated and setted thanks to the `register_memory` parameter. 
-
-Ideally each sensor could define a set of states, however currently the system supports only the reading state, the writing state and an idle state. 
-
-Each state is defined considering the needed `current`, in mA, and optionally a timing `delay` in ms (how much time the sensor stay in that state).
-
-Tracing can be set as described in [Tracing](tracing.md).
-
-Finally, the information about the reference voltage can be set through the `vref` parameter.
+- **`vref`**: The reference voltage of the sensor in Volts.
+- **`register_memory`**: The size of the sensor's memory in bytes.
+- **`states`**: Defines the different power states of the sensor. Each state has a `current` consumption in mA and an optional `delay` in ms.
 
 ## State Machine
 
-The state machine of the sensor can be represented as follows:
+The sensor's behavior is modeled as a state machine:
 
-``` mermaid
+```mermaid
 stateDiagram
-  state Off
-  state Write
-  state Read
-  state Idle
-
-  [*] --> Off
-  Off --> Read
-  Off --> Write
-  Read --> Idle
-  Write --> Idle
-  Idle --> Read
-  Idle --> Write
+    [*] --> Off
+    Off --> Read
+    Off --> Write
+    Read --> Idle
+    Write --> Idle
+    Idle --> Read
+    Idle --> Write
 ```
 
-## Sensor Memory & Multiple Sensors
+## Memory Mapping
 
-As we previously described, there is a field called `register_memory`. This takes into account the memory space of the sensor. This is managed by the following lines of code in the `codegen.py`:
+Sensors are mapped to a specific memory region. The `baseaddress` of each sensor is automatically calculated by the `codegen.py` script based on the order of the sensors in the JSON file and the size of their `register_memory`.
+
+The `codegen.py` script calculates the base address for each sensor as follows:
 
 ```python
 for idx,(sensor_name,sensor) in enumerate(settings["peripherals"]["sensors"].items()):

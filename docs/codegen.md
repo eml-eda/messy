@@ -1,64 +1,56 @@
-# Codegen
+# Code Generation
 
-This module will explain the codegen process with its characteristics.
+The `messy.py` script uses a JSON configuration file to generate the SystemC/SystemC-AMS models for the simulation. This document explains the structure of the JSON file and the code generation process.
 
-The codegen is a Python script that generates the code for the simulation. It is located in the `messy/codegen` folder. The codegen is composed of two files:
+## JSON Configuration File
 
-- `codegen.py`: this is the main file of the codegen. It contains the call to specific functions that will generate the code of the components of the simulator.
+The JSON file defines the entire system to be simulated. Here is an example of a simple configuration:
 
-# Codegen explanation
-
-The `codegen.py` expect a JSON file as input, which contains the configuration for the simulator. 
-
-An example of a JSON file is the following:
-
-```JSON
+```json
 {
-    "resolution":"SC_MS",
-    "tracing":{
-        ...
+    "resolution": "SC_MS",
+    "tracing": {},
+    "bus": {
+        "vref": 3.3
     },
-    "bus":{
-        "vref":3.3
+    "core": {
+        "vref": 1.8,
+        "iss": "gvsoc",
+        "config": {
+            "path": "./gvsoc_config.json",
+            "axi_path": "/chip/axi_proxy"
+        }
     },
-    "core":{
-        "vref":1.8,
-        "iss":"gvsoc",
-        "config":{
-            "path":"./gvsoc_config.json",
-            "axi_path":"/chip/axi_proxy"
+    "peripherals": {
+        "sensors": {
+            "mic_click": {}
         },
-        ...
-    },
-    "peripherals":{
-        "sensors" : {
-            "mic_click": {
-                ...
-            }
-        },
-        "harvesters":{
-            "battery" : {
-                ...
-            },
-            "photovoltaic" : {
-                ...
-            }
+        "harvesters": {
+            "battery": {},
+            "photovoltaic": {}
         }
     }
 }
 ```
 
-In this case for example, we are describing a single sensor. The meaning of different fields is the following:
+### Top-Level Properties
 
-- `resolution`: this is the simulation resolution using `sc_unit` values. For more details refer to [Resolution](resolution.md)
-- `tracing`: tracing is better described in [Tracing](tracing.md) 
-- `bus`: the bus object contains all the relative informations about it, which currently resides only in its reference voltage in Volts.
+- `resolution`: The simulation time resolution. See [Resolution](resolution.md) for more details.
+- `tracing`: Tracing configuration. See [Tracing](tracing.md) for more details.
+- `bus`: The power bus configuration. See [Power Bus](power-bus.md) for more details.
+- `core`: The RISC-V core configuration. See [Core](core.md) for more details.
+- `peripherals`: The peripherals connected to the core, such as sensors and harvesters.
 
-- `core`: definition of the simulated core (system), to define one we can use the following parameters
-    - `vref`: reference voltage in Volts
-    - `config`: configuration of the ISS, which considers path of files and address of the AXI currently 
+### Peripherals
 
-- `converters`: Messy also supports converters. Read more at [Converters](converters.md)
+The `peripherals` object contains two sub-objects:
 
-- `peripherals`: set of sensors (better described [Sensors](sensors.md)) and harvesters (better described in [Harvesters](harvesters.md))
+- `sensors`: A list of sensors to be included in the simulation. See [Sensors](sensors.md) for more details.
+- `harvesters`: A list of harvesters to be included in the simulation. See [Harvesters](harvesters.md) for more details.
+
+## Code Generation Process
+
+The `messy.py` script reads the JSON configuration file and generates the SystemC/SystemC-AMS models based on the templates located in the `messy/codegen/templates` directory. The generated code is placed in the `messy/codegen/src` and `messy/codegen/include` directories.
+
+The generated code is then compiled and linked with the user application to create the final simulation executable.
 
