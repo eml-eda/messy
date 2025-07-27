@@ -15,25 +15,6 @@ cd messy
 
 To build the project, you need to have Docker installed on your machine. You can find the installation instructions [here](https://docs.docker.com/engine/install/).
 
-In addition to that you need to populate the `deps/` directory with the SystemC and SystemC-AMS `.tar` files. You can find them [here](https://www.accellera.org/downloads/standards/systemc) and [here](https://www.coseda-tech.com/systemc-ams-proof-of-concept). The Dockerfile expects the following files:
-
-- `systemc-x.x.x.tar`
-- `systemc-ams-x.x.x.tar`
-
-!!! important
-    For compatibility reasons we suggest you to use the following version of SystemC and SystemC-AMS:
-
-    1. SystemC **2.3.3**
-    2. SystemC-AMS **2.3.4**
-
-    The `x.x.x` at the end of the file name of the SystemC and SystemC-AMS files should be replaced by the downloaded version. After that check the `Dockerfile` to make sure to put the correct version in the `COPY` command. You need to change the `x.x.x` in the following line:
-
-    ```Dockerfile
-    COPY deps/systemc-2.3.3.tar /systemc.tar
-    ...
-    COPY deps/systemc-ams-2.3.4.tar /systemc-ams.tar
-    ```
-
 ## Build the Docker image
 
 The first step is to build a Docker image. For example to build the `pulp-open` container the following command should be issued:
