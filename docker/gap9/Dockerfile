@@ -145,7 +145,9 @@ RUN chmod -R 777 /gap_sdk
 # Pass the current directory to the container
 WORKDIR /
 
-COPY deps/systemc-2.3.3.tar /systemc.tar 
+RUN git clone https://github.com/eml-eda/systemc-systemc-ams.git
+
+RUN cp systemc-systemc-ams/systemc-2.3.3.tar /systemc.tar 
 
 # Create a directory for systemc
 RUN mkdir /systemc
@@ -178,7 +180,7 @@ RUN chmod -R 777 /usr/local/systemc
 WORKDIR /
 
 # Copy the systemc-ams-2.3.4 folder to the container
-COPY deps/systemc-ams-2.3.4.tar /systemc-ams.tar
+RUN cp systemc-systemc-ams/systemc-ams-2.3.4.tar /systemc-ams.tar
 
 # Create a directory for systemc-ams
 RUN mkdir /systemc-ams
