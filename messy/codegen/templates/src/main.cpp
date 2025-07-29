@@ -141,15 +141,15 @@ int sc_main(int argc, char* argv[])
     % endfor
 
     // Binding Functional Master's signals
-    core.request_address(core_request_address);
-    core.request_data(core_request_data);
-    core.request_size(core_request_size);
-    core.request_ready(core_request_ready);
-    core.request_go(core_request_go);
-    core.request_value(core_request_value);
-    core.idx_sensor(idx_sensor);
-    core.functional_bus_flag(core_functional_bus_flag);
-    core.power_signal(core_state);
+    core.o_address(core_request_address);
+    core.o_data_ptr(core_request_data);
+    core.o_size(core_request_size);
+    core.o_activate_functional_bus(core_request_ready);
+    core.i_done_functional_bus(core_request_go);
+    core.i_data_ptr(core_request_value);
+    core.i_idx_sensor(idx_sensor);
+    core.o_is_read(core_functional_bus_flag);
+    core.o_power_state(core_state);
 
     // Binding Power Master's signals
     core_power.i_power_state(core_state);
