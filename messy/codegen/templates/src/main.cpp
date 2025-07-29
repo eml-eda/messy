@@ -130,9 +130,9 @@ int sc_main(int argc, char* argv[])
     ${sensor_name}.o_data_ptr(${sensor_name}_Data);
     ${sensor_name}.o_is_done(${sensor_name}_Go);
     ${sensor_name}.o_power_state(${sensor_name}_F_to_P);
-    ${sensor_name}_power.func_signal(${sensor_name}_F_to_P);
-    ${sensor_name}_power.voltage_state(voltage_sensors[${idx}]);
-    ${sensor_name}_power.current_state(${sensor_name}_I_S_to_C);
+    ${sensor_name}_power.i_power_state(${sensor_name}_F_to_P);
+    ${sensor_name}_power.o_voltage_a(voltage_sensors[${idx}]);
+    ${sensor_name}_power.o_current_a(${sensor_name}_I_S_to_C);
     ${sensor_name}_conv.current_in(${sensor_name}_I_S_to_C);
     ${sensor_name}_conv.voltage_in(voltage_sensors[${idx}]);
     ${sensor_name}_conv.current_out(current_sensors[${idx}]);
