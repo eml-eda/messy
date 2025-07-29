@@ -152,9 +152,9 @@ int sc_main(int argc, char* argv[])
     core.power_signal(core_state);
 
     // Binding Power Master's signals
-    core_power.func_signal(core_state);
-    core_power.voltage_state(voltage_core);
-    core_power.current_state(current_core);
+    core_power.i_power_state(core_state);
+    core_power.o_voltage_a(voltage_core);
+    core_power.o_current_a(current_core);
     core_conv.current_in(current_core);
     core_conv.voltage_in(voltage_core);
     core_conv.current_out(core_conv_current);
