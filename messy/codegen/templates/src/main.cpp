@@ -29,7 +29,7 @@ int sc_main(int argc, char* argv[])
     Core                          core("Master"); /**< Core module */
     Core_power                    core_power("Master_Power"); /**< Core power module */
     core_power.core=&core;
-    ${"core_converter" if "converter" in core else "Load_converter"} core_conv("Master Power Conv"); /**< Core converter module */
+    ${"core_converter" if "converter" in core else "Load_converter"} core_conv("Master_Power_Conv"); /**< Core converter module */
 
     sc_signal <double> core_state; /**< Signal for the core's functional state. */
 
