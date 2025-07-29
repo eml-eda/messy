@@ -176,21 +176,21 @@ int sc_main(int argc, char* argv[])
         functional_bus.flag_out_sensor[i](F_B_to_S[i]);
         functional_bus.size_out_sensor[i](size_to_sensors[i]);
         functional_bus.ready_sensor[i](ready_to_sensors[i]);
-        power_bus.voltage_sensors[i](voltage_sensors[i]);
-        power_bus.current_sensors[i](current_sensors[i]);
+        power_bus.i_voltage_sensors_a[i](voltage_sensors[i]);
+        power_bus.i_current_sensors_a[i](current_sensors[i]);
     }
 
     // Binding Battery and Source Harvesters
     % for idx,batt_name in enumerate([harv_name for harv_name,harv in peripherals["harvesters"].items() if harv["harvester_type"]=="battery"]):
-    power_bus.current_batteries[${idx}](current_${batt_name});
+    power_bus.i_current_batteries_a[${idx}](current_${batt_name});
     % endfor
     % for idx,source_name in enumerate([harv_name for harv_name,harv in peripherals["harvesters"].items() if harv["harvester_type"]=="source"]):
-    power_bus.current_sources[${idx}](current_${source_name});
+    power_bus.i_current_sources_a[${idx}](current_${source_name});
     % endfor
 
     // Binding Power Bus's Input Signals related to the Master (Core)
-    power_bus.core_voltage(voltage_core);
-    power_bus.core_current(core_conv_current);
+    power_bus.i_voltage_core_a(voltage_core);
+    power_bus.i_current_core_a(core_conv_current);
 
     % for trace_name,trace_data in tracing.items():
 
