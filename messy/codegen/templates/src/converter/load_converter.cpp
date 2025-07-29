@@ -1,5 +1,11 @@
 #include <converter/load_converter.hpp>
 
+/**
+ * @brief Sets the attributes of the Load_converter module.
+ *
+ * This function sets the rate and timestep for the input current and voltage ports.
+ * It ensures that the module is triggered at the specified simulation resolution.
+ */
 void Load_converter::set_attributes() {
 
     current_in.set_rate(1);
@@ -8,6 +14,12 @@ void Load_converter::set_attributes() {
     voltage_in.set_timestep(1, SIM_RESOLUTION);
 }
 
+/**
+ * @brief Initializes the Load_converter module.
+ *
+ * This function is called once at the beginning of the simulation to initialize the module.
+ * Currently, no specific initialization is required.
+ */
 void Load_converter::initialize() {}
 
 /**

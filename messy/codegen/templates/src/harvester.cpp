@@ -1,11 +1,21 @@
 #include <harvester_${harvester_name}.hpp>
 % if harvester_type!="battery":
+/**
+ * @brief Sets the attributes of the Harvester module.
+ * 
+ * This function sets the timestep for the output current (i) and voltage (v) signals.
+ */
 void Harvester_${harvester_name}::set_attributes()
 {
     i.set_timestep(1, SIM_RESOLUTION);
     v.set_timestep(1, SIM_RESOLUTION);
 }
 
+/**
+ * @brief Initializes the Harvester module.
+ * 
+ * This function opens the input files for iref and vref if they are defined.
+ */
 void Harvester_${harvester_name}::initialize()
 {   
     % if vref and type(vref)==dict:
@@ -29,6 +39,12 @@ void Harvester_${harvester_name}::initialize()
     % endif
 }
 
+/**
+ * @brief Processes the Harvester module's functionality.
+ * 
+ * This function reads the input values for iref and vref from their respective files
+ * and writes the corresponding current and voltage values to the output ports.
+ */
 void Harvester_${harvester_name}::processing()
 {
     // sensing of irradiance takes place every TRACE_PERIOD s.

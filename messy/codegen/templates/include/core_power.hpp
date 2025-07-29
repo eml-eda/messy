@@ -16,13 +16,13 @@
  */
 SCA_TDF_MODULE(Core_power)
 {
-    Core* core;
+    Core* core; /**< Pointer to the Core functional module. */
     //Data from Functional Instance
-    sca_tdf::sc_in  <double> func_signal;
+    sca_tdf::sc_in  <double> func_signal; /**< Input port for receiving functional signals from the Core. */
     //Data to Power Bus
-    sca_tdf::sca_out <double> voltage_state;
-    sca_tdf::sca_out <double> current_state;
-    //sca_tdf::sc_out <int> power_to_therm;
+    sca_tdf::sca_out <double> voltage_state; /**< Output port for sending the voltage state to the Power Bus. */
+    sca_tdf::sca_out <double> current_state; /**< Output port for sending the current state to the Power Bus. */
+    //sca_tdf::sca_out <int> power_to_therm;
 
     /**
      * @brief Constructor for the Core_power module.
@@ -35,8 +35,25 @@ SCA_TDF_MODULE(Core_power)
         current_state("Current_trace_to_Power_Bus")
     {}
 
+    /**
+     * @brief Sets the attributes of the Core_power module.
+     *
+     * This function sets the rate and timestep of the `func_signal` port.
+     * Check the SystemC-AMS documentation for more details on the `set_rate` and `set_timestep` functions.
+     */
     void set_attributes();
+    /**
+     * @brief Initializes the Core_power module.
+     *
+     * This function is called once at the beginning of the simulation to initialize the module.
+     */
     void initialize();
+    /**
+     * @brief Processes the Core_power module's functionality.
+     *
+     * This function is called at each timestep to process the functional signal and calculate
+     * the corresponding voltage and current states.
+     */
     void processing();
 
     Core_power(){}

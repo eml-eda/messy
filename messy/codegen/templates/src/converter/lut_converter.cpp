@@ -1,12 +1,22 @@
 #include <converter/${name}_converter.hpp>
 
 
+/**
+ * @brief Sets the attributes of the converter.
+ * 
+ * This function sets the timestep and delay for the `current_out` port.
+ */
 void ${name}_converter::set_attributes()
 {
     current_out.set_timestep(1, SIM_RESOLUTION);
     current_out.set_delay(1);
 }
 
+/**
+ * @brief Initializes the converter.
+ * 
+ * This function is called once at the beginning of the simulation to initialize the converter.
+ */
 void ${name}_converter::initialize() {}
 
 
@@ -34,7 +44,7 @@ void ${name}_converter::processing()
     // Get efficiency
     eta = lut_eta.get_val(${"v_tmp" if input_variable=="voltage" else "i_tmp"}) / 100; /**< Get the efficiency from the lookup table */
     
-    % if not out_dir:
+% if not out_dir:
     /** 
      * The efficiency of this converter is defined as:
      * eta = Pin / Pout
@@ -43,7 +53,7 @@ void ${name}_converter::processing()
      * current_out = eta * (i_tmp * VREF_BUS) / v_tmp
      */
     current_out.write(i_tmp * v_tmp / (VREF_BUS*eta));
-    % else:
+% else:
     /**
      * 
      * The efficiency of this converter is defined as:
@@ -54,5 +64,5 @@ void ${name}_converter::processing()
      * 
      */
     current_out.write((eta * (i_tmp * VREF_BUS)) / v_tmp);
-    % endif
+% endif
 }

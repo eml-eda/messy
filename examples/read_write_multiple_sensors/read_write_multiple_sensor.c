@@ -16,18 +16,18 @@ int main(void)
     uint32_t core_id = pi_core_id(), cluster_id = pi_cluster_id();
     printf("[%d %d] Hello World!\n", cluster_id, core_id);
 
-    int* mic_click_sensor = (volatile int *)AXI_BASE+0x0;
-    int* mic_click_sensor2 = (volatile int *)AXI_BASE+256;
+    uint8_t* mic_click_sensor = (uint8_t*)AXI_BASE + 0x0;
+    uint8_t* mic_click_sensor2 = (uint8_t*)AXI_BASE + 256;
 
     for(int i=0;i<NUM_ITERS;i++){
         printf("Iter %d\n", i);
-        printf("Microphone sensor %d\n", *mic_click_sensor);
+        printf("Microphone sensor 1: %d\n", *mic_click_sensor);
         *(mic_click_sensor2 + i) = i;
     }
     
     for(int i=0; i<NUM_ITERS; i++){
-        printf("Iter_puppo %d\n", i);
-        printf("Microphone sensor 2 %d\n", *(mic_click_sensor2 + i));
+        printf("Iter %d\n", i);
+        printf("Microphone sensor 2: %d\n", *(mic_click_sensor2 + i));
     }
 
     return errors;

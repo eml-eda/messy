@@ -8,40 +8,44 @@ def run_messy(
     config_filename: Path = None, application: Path = None, skip: List[str] = []
 ):
     """
-    Run the messy toolchain with the given configuration file and application
+    Run the messy toolchain with the given configuration file and application.
+
+    This function orchestrates the build and simulation process by calling
+    various Makefile targets. It can skip certain steps based on the `skip` list.
 
     Args:
-        config_filename: Path to the JSON input simulation settings
-        application: Path to the application to simulate
-        skip: List of steps to skip in the build process
+        config_filename: Path to the JSON input simulation settings or IP-XACT XML file.
+        application: Path to the embedded application to simulate.
+        skip: A list of steps to skip in the build process.
+              Possible values: "clean", "codegen", "codegen_ipxact", "application", "docs".
 
     Returns:
         None
     """
     if "clean" not in skip:
-        subprocess.run(["make","clean"])
+        subprocess.run(["make", "clean"])
     if "codegen" not in skip and config_filename.suffix == ".json":
-        subprocess.run(["make","codegen",f"file={Path(config_filename).absolute()}"])
+        subprocess.run(["make", "codegen", f"file={Path(config_filename).absolute()}"])
         subprocess.run(["make", "format"])
     if "codegen_ipxact" not in skip and config_filename.suffix == ".xml":
-        subprocess.run(["make","codegen_ipxact",f"file={Path(config_filename).absolute()}"])
+        subprocess.run(["make", "codegen_ipxact", f"file={Path(config_filename).absolute()}"])
     if "application" not in skip:
         subprocess.run(["make", "application", f"app={Path(application).absolute()}"])
     subprocess.run(["make", "run"])
 
 
 if __name__ == "__main__":
-    # Create an argument parser with a description
-    parser = argparse.ArgumentParser(description="Generate src code")
+    parser = argparse.ArgumentParser(
+        description="Messy: A toolchain for simulation and analysis of embedded systems."
+    )
 
-    # Add an argument for the input file path
     parser.add_argument(
         "-f",
         "--filename",
         type=str,
         default="codegen/pulp-open.json",
         metavar="PATH",
-        help="Path to JSON input simulation settings",
+        help="Path to JSON input simulation settings or IP-XACT XML file.",
     )
 
     parser.add_argument(
@@ -50,25 +54,25 @@ if __name__ == "__main__":
         type=str,
         default="/messy/examples/helloworld",
         metavar="PATH",
-        help="Path to the application to simulate",
+        help="Path to the embedded application to simulate.",
     )
 
     parser.add_argument(
         "--skip_clean",
         action="store_true",
-        help="Skip the cleaning of the current build",
+        help="Skip the cleaning of the current build artifacts.",
     )
 
     parser.add_argument(
         "--skip_codegen",
         action="store_true",
-        help="Skip the codegen part of the current build",
+        help="Skip the code generation and formatting steps.",
     )
 
     parser.add_argument(
         "--skip_application",
         action="store_true",
-        help="Skip the application regeneration part of the current build",
+        help="Skip the embedded application building step.",
     )
 
     # Parse the command line arguments

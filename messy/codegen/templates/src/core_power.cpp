@@ -12,6 +12,12 @@ void Core_power::set_attributes() {
     func_signal.set_timestep(1, SIM_RESOLUTION); //< Set how often the module is triggered (sampling period). Check SystemC-AMS documentation for more details on the set_timestep function.
 }
 
+/**
+ * @brief Initializes the Core_power module.
+ *
+ * This function is called once at the beginning of the simulation to initialize the module.
+ * Currently, no specific initialization is required.
+ */
 void Core_power::initialize() {}
 
 /**

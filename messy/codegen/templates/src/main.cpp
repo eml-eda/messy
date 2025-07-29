@@ -31,68 +31,68 @@ int sc_main(int argc, char* argv[])
     core_power.core=&core;
     ${"core_converter" if "converter" in core else "Load_converter"} core_conv("Master Power Conv"); /**< Core converter module */
 
-    sc_signal <double> core_state; 
+    sc_signal <double> core_state; /**< Signal for the core's functional state. */
 
-    // Master (Core) Power Signal
-    sca_tdf::sca_signal <double> voltage_core;
-    sca_tdf::sca_signal <double> current_core;
-    sca_tdf::sca_signal <double> core_conv_current;
+    // Master (Core) Power Signals
+    sca_tdf::sca_signal <double> voltage_core; /**< Voltage signal for the core. */
+    sca_tdf::sca_signal <double> current_core; /**< Current signal for the core. */
+    sca_tdf::sca_signal <double> core_conv_current; /**< Converted current signal for the core. */
     
     /********************************************
-     * Functional Bus
+     * Functional Bus Signals
      ********************************************/
 
-    sc_signal <bool> enable_temp; /**< Enable signal for the functional bus */
+    sc_signal <bool> enable_temp; /**< Enable signal for the functional bus. */
 
     // Data from Master (Core) to Functional Bus
-    sc_signal <unsigned int>  core_request_address; 
-    sc_signal <uint8_t*>  core_request_data;
-    sc_signal <unsigned int>  core_request_size;
-    sc_signal <bool> core_request_ready;
-    sc_signal <bool> core_functional_bus_flag;
+    sc_signal <unsigned int>  core_request_address; /**< Address of the request from the core. */
+    sc_signal <uint8_t*>  core_request_data; /**< Data of the request from the core. */
+    sc_signal <unsigned int>  core_request_size; /**< Size of the request from the core. */
+    sc_signal <bool> core_request_ready; /**< Flag indicating if the core's request is ready. */
+    sc_signal <bool> core_functional_bus_flag; /**< Flag for the functional bus from the core. */
     
     // Data from Functional Bus to Master
-    sc_signal <uint8_t*>  core_request_value;
-    sc_signal <bool> core_request_go;
-    sc_signal <int> idx_sensor;
+    sc_signal <uint8_t*>  core_request_value; /**< Value of the request from the functional bus to the core. */
+    sc_signal <bool> core_request_go; /**< Flag indicating if the functional bus is ready to process the core's request. */
+    sc_signal <int> idx_sensor; /**< Index of the selected sensor for the core's request. */
     
     // Data from Functional Bus to Slave (Sensors)
-    sc_signal <unsigned int>  address_to_sensors[NUM_SENSORS];
-    sc_signal <unsigned int>  size_to_sensors[NUM_SENSORS];
-    sc_signal <uint8_t*>  data_to_sensors[NUM_SENSORS];
-    sc_signal <bool> F_B_to_S[NUM_SENSORS];
-    sc_signal <bool> ready_to_sensors[NUM_SENSORS];
+    sc_signal <unsigned int>  address_to_sensors[NUM_SENSORS]; /**< Array of addresses to sensors. */
+    sc_signal <unsigned int>  size_to_sensors[NUM_SENSORS]; /**< Array of sizes to sensors. */
+    sc_signal <uint8_t*>  data_to_sensors[NUM_SENSORS]; /**< Array of data to sensors. */
+    sc_signal <bool> F_B_to_S[NUM_SENSORS]; /**< Array of functional bus to sensor flags. */
+    sc_signal <bool> ready_to_sensors[NUM_SENSORS]; /**< Array of ready flags to sensors. */
 
     /********************************************
-     * Power Bus
+     * Power Bus Signals
      ********************************************/
 
     // Signals from Slave (Sensors) to Power Bus
-    sca_tdf::sca_signal <double> voltage_sensors[NUM_SENSORS];
-    sca_tdf::sca_signal <double> current_sensors[NUM_SENSORS];
+    sca_tdf::sca_signal <double> voltage_sensors[NUM_SENSORS]; /**< Array of voltage signals from sensors to the power bus. */
+    sca_tdf::sca_signal <double> current_sensors[NUM_SENSORS]; /**< Array of current signals from sensors to the power bus. */
 #if NUM_SOURCES>0
-    sca_tdf::sca_signal <double> current_sources[NUM_SOURCES];
+    sca_tdf::sca_signal <double> current_sources[NUM_SOURCES]; /**< Array of current signals from sources to the power bus. */
 #endif
 #if NUM_BATTERIES>0
-    sca_tdf::sca_signal <double> current_batteries[NUM_BATTERIES];
+    sca_tdf::sca_signal <double> current_batteries[NUM_BATTERIES]; /**< Array of current signals from batteries to the power bus. */
 #endif
 
     // Output Traces from Power Bus
-    sca_tdf::sca_signal <double> overall_voltage;
+    sca_tdf::sca_signal <double> overall_voltage; /**< Overall voltage signal from the power bus. */
 
     % for harvester_name,harvester in peripherals["harvesters"].items():
     /********************************************
-     * ${harvester_name}
+     * ${harvester_name} Module
      ********************************************/
-    Harvester_${harvester_name} ${harvester_name}("${harvester_name}");
-    ${f"{harvester_name}_converter" if "converter" in harvester else "Load_converter"} ${harvester_name}_conv("${harvester_name}_conv");
+    Harvester_${harvester_name} ${harvester_name}("${harvester_name}"); /**< Harvester module instance. */
+    ${f"{harvester_name}_converter" if "converter" in harvester else "Load_converter"} ${harvester_name}_conv("${harvester_name}_conv"); /**< Harvester converter module instance. */
     % if harvester["harvester_type"]=="battery":
-    sca_tdf::sca_signal <double> SoC_${harvester_name};
+    sca_tdf::sca_signal <double> SoC_${harvester_name}; /**< State of Charge signal for the ${harvester_name} battery. */
     ${harvester_name}.soc(SoC_${harvester_name});
     % endif
-    sca_tdf::sca_signal <double> voltage_${harvester_name};
-    sca_tdf::sca_signal <double> current_${harvester_name};
-    sca_tdf::sca_signal <double> current_${harvester_name}_bus;
+    sca_tdf::sca_signal <double> voltage_${harvester_name}; /**< Voltage signal for the ${harvester_name}. */
+    sca_tdf::sca_signal <double> current_${harvester_name}; /**< Current signal for the ${harvester_name}. */
+    sca_tdf::sca_signal <double> current_${harvester_name}_bus; /**< Bus current signal for the ${harvester_name}. */
     ${harvester_name}.v(voltage_${harvester_name});
     ${harvester_name}.i(current_${harvester_name}_bus);
 
@@ -104,21 +104,21 @@ int sc_main(int argc, char* argv[])
 
     % for idx,(sensor_name,sensor) in enumerate(peripherals["sensors"].items()):
     /********************************************
-     * ${sensor_name}
+     * ${sensor_name} Module
      ********************************************/
-    Sensor_${sensor_name}_functional ${sensor_name}("${sensor_name}");
+    Sensor_${sensor_name}_functional ${sensor_name}("${sensor_name}"); /**< Functional sensor module instance. */
     ${sensor_name}.core=&core;
-    Sensor_${sensor_name}_power ${sensor_name}_power("${sensor_name}_power");
+    Sensor_${sensor_name}_power ${sensor_name}_power("${sensor_name}_power"); /**< Power sensor module instance. */
     // sensors don't support a real converter currently
-    Load_converter ${sensor_name}_conv("${sensor_name}_converter");
+    Load_converter ${sensor_name}_conv("${sensor_name}_converter"); /**< Sensor converter module instance. */
     ${sensor_name}_conv.set_efficency(1.0);
 
-    sc_signal <uint8_t*> ${sensor_name}_Data;
-    sc_signal <bool> ${sensor_name}_Go;  
-    sc_signal <int> ${sensor_name}_F_to_P;
-    sca_tdf::sca_signal <double> ${sensor_name}_V_State;
-    sca_tdf::sca_signal <double> ${sensor_name}_I_State;
-    sca_tdf::sca_signal <double> ${sensor_name}_I_S_to_C;
+    sc_signal <uint8_t*> ${sensor_name}_Data; /**< Data signal for ${sensor_name}. */
+    sc_signal <bool> ${sensor_name}_Go;  /**< Go signal for ${sensor_name}. */
+    sc_signal <int> ${sensor_name}_F_to_P; /**< Functional to Power signal for ${sensor_name}. */
+    sca_tdf::sca_signal <double> ${sensor_name}_V_State; /**< Voltage state signal for ${sensor_name}. */
+    sca_tdf::sca_signal <double> ${sensor_name}_I_State; /**< Current state signal for ${sensor_name}. */
+    sca_tdf::sca_signal <double> ${sensor_name}_I_S_to_C; /**< Current signal from ${sensor_name} to converter. */
 
     // Binding ${sensor_name} signals to the power instance, functional bus and converter
     ${sensor_name}.enable(enable_temp);

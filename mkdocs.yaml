@@ -49,35 +49,37 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 
 nav:
-  - Home: index.md
-  - "What is MESSY": what-is-messy.md
-  - "Getting started": getting-started.md
+  - Overview: index.md
+  - "Getting Started":
+    - "What is MESSY": what-is-messy.md
+    - "Installation and Setup": getting-started.md
+    - "Usage": how-to-build-docs.md
   - "Examples":
     - "Hello World": examples/hello-world.md
     - "Periodic Sensor": examples/periodic-sensor.md
-  - "Flow":
+    - "Read Sensor": examples/read-sensor.md
+    - "Read Write Multiple Sensors": examples/read-write-multiple-sensors.md
+    - "Read Write Sensor": examples/read-write-sensor.md
+  - "Core Concepts":
     - "Flow": flow.md
     - "Codegen": codegen.md
-  - "Timing and Communication":
-    - "GVSoC - SystemC Timing": timing.md
+    - "Timing and Communication": timing.md
     - "SystemC Modules Timing": communication-example.md
-  - "IPXACT":
     - "IPXACT": ipxact.md
-    - "IPXACT-Parsing": ipxact-parsing.md
-  - "Building Blocks":
-    - "Core": core.md
-    - "Functional Bus": functional-bus.md
-    - "Power Bus": power-bus.md
-    - "Sensors": sensors.md
-    - "Adapter": adapter.md
-    - "Harvesters": harvesters.md
-    - "Converters": converters.md
-    - "LUT": lut.md
-  - Others:
+    - "IPXACT Parsing": ipxact-parsing.md
+    - "Building Blocks":
+      - "Core": core.md
+      - "Functional Bus": functional-bus.md
+      - "Power Bus": power-bus.md
+      - "Sensors": sensors.md
+      - "Adapter": adapter.md
+      - "Harvesters": harvesters.md
+      - "Converters": converters.md
+      - "LUT": lut.md
+  - "Utilities and Advanced Topics":
     - "Docker": docker.md
     - "Resolution": resolution.md
     - "Debugging": debugging.md
     - "Tracing": tracing.md
-    - "How to build the documentation": how-to-build-docs.md
 
 

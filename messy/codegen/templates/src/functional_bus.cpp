@@ -85,7 +85,7 @@ void Functional_bus::processing_data(){
 }    
 
 /**
- * @brief Function for handling responses.
+ * @brief Handles responses from sensors.
  * 
  * This function is responsible for handling the responses from the sensors
  * and sending them back to the master. It reads the data from the selected

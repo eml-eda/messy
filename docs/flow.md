@@ -1,53 +1,44 @@
-This file is intended for explaining the flow of MESSY and what each step does. The flow is divided into the following steps:
+# MESSY Flow
+
+This document explains the workflow of MESSY, from system definition to simulation.
 
 ```mermaid
 graph TD
     A[JSON Configuration File] --> B[GVSoC Application]
     B --> MESSY
     subgraph MESSY
-        D[Generation of the SystemC/AMS model] --> E[Compilation]
-        E --> F[Execution of the simulation]
+        D[SystemC/AMS Model Generation] --> E[Compilation]
+        E --> F[Simulation]
     end
 ```
 
-## Definition of the JSON configuration file
+## 1. System Definition (JSON)
 
-This step is crucial because it defines the whole system. The JSON configuration file allows the user to define the components, such as the [core](core.md), the [sensors](sensors.md), the [harvesters](harvesters.md), the [functional bus](functional-bus.md), the [power bus](power-bus.md) etc. 
-All these blocks have a predifined structure in terms of input and output signals. However, the user can define for example the power consumption and the delay of each state of a [sensor](sensors.md).
+The first step is to define the system using a JSON configuration file. This file describes the components of the system, such as the [core](core.md), [sensors](sensors.md), [harvesters](harvesters.md), [functional bus](functional-bus.md), and [power bus](power-bus.md). While the components have a predefined structure, the JSON file allows you to customize their parameters, such as power consumption and delays.
 
-## Writing the application that will run on GVSoC
+For more details on the JSON configuration, see the [Codegen](codegen.md) documentation.
 
-This is another very important step because it defines the entrypoint of our simulation. Specifically it defines the code that will be executed by our system. The application is written in C. You can find some examples in the `examples` folder of the MESSY repository.
+## 2. Application Development
 
-## Running the MESSY tool
+Next, you need to write the application that will run on the simulated RISC-V core. This application is written in C and defines the behavior of the system. You can find examples in the [examples](https://github.com/eml-eda/messy/tree/main/examples) folder of the MESSY repository.
 
-The next step is to run the MESSY tool. The entrypoint is the `messy.py` script. This script expects two arguments:
+## 3. Running the MESSY Tool
 
-- `-f`: the file name of the chosen JSON configuration file
-- `-a`: the path of the folder of the application
+The `messy.py` script is the main entry point for running the simulation. It takes two arguments:
 
-This script will do the following:
+- `-f`: The path to the JSON configuration file.
+- `-a`: The path to the application directory.
 
-1. [Generate the SystemC/SystemC-AMS model](#generation-of-the-systemcams-models)
-2. [Compile the SystemC/SystemC-AMS model and the application](#compilation)
-3. [Execute the simulation](#execution-of-the-simulation)
+The script automates the following steps:
 
-### Generation of the SystemC/AMS models
+### a. SystemC/AMS Model Generation
 
-The first step of the MESSY tool is to generate the SystemC and SystemC-AMS. The components defined in the JSON should match the available components defined in the `messy/codegen/templates` folder. The latter contains all the templates of the components that are supported by MESSY.
+MESSY parses the JSON configuration file and generates the corresponding SystemC/SystemC-AMS models. The generated code is placed in the `messy/codegen/src` and `messy/codegen/include` directories.
 
-As already mentioned, most of these templates have a predefined structure in terms of input and output signals. However, through the JSON configuration file, the user can define custom characteristics of the components, such as the power consumption and the delay of each state of a sensor.
+### b. Compilation
 
-The JSON is then parsed by the python script and the templates are filled with the necessary information and saved in the `messy/codegen/src` and `messy/codegen/include` folders respectively.
+The script compiles both the user application and the generated SystemC/SystemC-AMS models. It uses `make` to build the application and the simulation environment.
 
-For more details on these steps, please refer to the [codegen](codegen.md) documentation.
+### c. Simulation
 
-### Compilation
-
-The following step of the `messy.py` script is to compile both the GVSoC application and the SystemC/SystemC-AMS models. 
-
-The GVSoC application is compiled using the Makefile command `make application`. Everything happens automatically, since the `messy.py` script launches a subprocess that executes the command. Following the compilation of the GVSoC application, the SystemC/SystemC-AMS models are compiled using the Makefile command `make run`. This command compiles the models and runs the simulation. Everything, as before, happens automatically, since the `messy.py` script launches a subprocess that executes the command.
-
-### Execution of the simulation
-
-The execution, as already explained, is done by the Makefile command `make run`. This command compiles the SystemC/SystemC-AMS models and runs the simulation.
+Finally, the script runs the simulation. The simulation is executed, and the results are saved to the output files specified in the configuration.

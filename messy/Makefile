@@ -132,6 +132,9 @@ application:
 	sed -i 's:"flash.bin":"/messy/messy/gvsoc_deps/flash.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json;\
 	sed -i 's:"hyperflash.bin":"/messy/messy/gvsoc_deps/hyperflash.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json
 
+docs:
+	mkdocs build
+
 help:
 	@echo "Available targets:"
 	@echo "  all       		: Build the executable"
@@ -140,4 +143,5 @@ help:
 	@echo "  ultraclean		: Perform a clean and remove additional files, such as .log, .csv and GvSoC configuration files"
 	@echo "  run       		: Build the executable and run it without regenerating the code"
 	@echo "  application 		: Build and run the specified application. Usage example: make application app=/messy/examples/helloworld"
+	@echo "  docs      		: Build the project documentation"
 	@echo "  help      		: Display this help message"

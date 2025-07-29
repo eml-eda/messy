@@ -47,7 +47,7 @@ double LUT::get_val(double query) {
     double dy;
 
     // Find i, such that key[i] <= query < key[i+1]
-    for (i = 0; i < size - 1; i++) // TODO: Use Binary Search here instead
+    for (i = 0; i < size - 1; i++)
     {
         if (key[i + 1] > query) {
             break;

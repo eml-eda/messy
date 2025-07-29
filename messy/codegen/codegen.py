@@ -83,16 +83,21 @@ def get_signals(settings: dict) -> dict:
 
 def main(input_file, template_dir, output_dir):
     """
-    Main function for code generation
+    Main function for code generation.
+
+    This function reads the input settings from a JSON file, prepares the necessary
+    directories, and generates SystemC/SystemC-AMS code based on the provided templates.
+    It handles the configuration of core, sensors, and harvesters, including tracing
+    and power conversion settings.
 
     Parameters
     ----------
     input_file : Path
-        Path to JSON input simulation settings
+        Path to JSON input simulation settings.
     template_dir : Path
-        Path to templates directory
+        Path to templates directory.
     output_dir : Path
-        Path where code will be generated
+        Path where code will be generated.
     """
 
     # Load input settings file
