@@ -113,6 +113,27 @@ Sensors are defined in the `peripherals.sensors` section of the JSON configurati
 - **`register_memory`**: The size of the sensor's memory in bytes.
 - **`states`**: Defines the different power states of the sensor. Each state has a `current` consumption in mA and an optional `delay` in ms.
 
+## Custom Sensors
+
+Currently, default sensors should only be used as placeholders in simple projects, since they do not implement any specific logic. For specialized behavior, you can implement custom sensors by setting `"type": "custom"`:
+
+```json
+"gesture": {
+    "type": "custom",
+    "custom_implementation": {
+        "path_header": "./gesture_sensor/gesture_sensor.hpp",
+        "path_source": "./gesture_sensor/gesture_sensor.cpp"
+    },
+    "vref": 3.3,
+    "register_memory": 1024,
+    "states": { /* same as default sensors */ }
+}
+```
+
+**Requirements**: Custom sensors must maintain the exact same interface as default sensors (same ports, class name pattern, constructor). Only the `sensor_logic()` method implementation can be customized.
+
+**Files**: Place header and source files in the `templates/custom/` directory.
+
 ## State Machine
 
 The sensor's behavior is modeled as a state machine:

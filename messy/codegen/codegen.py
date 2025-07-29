@@ -152,21 +152,50 @@ def main(input_file, template_dir, output_dir):
                     settings["tracing"][t_name]["traces"].append(
                         {"type": "sensor", "name": sensor_name, "params": t_params}
                     )
-        template_generators.append(
-            Template_generator(
-                template_dir / "include" / "sensor_functional.hpp",
-                base_header_dir / f"sensor_{sensor_name}_functional.hpp",
-                {"sensor_name": sensor_name, **sensor},
+        
+        # Check if sensor has custom implementation
+        if sensor.get("type") == "custom" and "custom_implementation" in sensor:
+            # For custom sensors, copy the specified header and source files
+            custom_impl = sensor["custom_implementation"]
+            
+            # Copy custom header file
+            if "path_header" in custom_impl:
+                template_generators.append(
+                    Template_generator(
+                        template_dir / "custom" / custom_impl["path_header"],
+                        base_header_dir / f"sensor_{sensor_name}_functional.hpp",
+                        {"sensor_name": sensor_name, **sensor},
+                    )
+                )
+            
+            # Copy custom source file
+            if "path_source" in custom_impl:
+                template_generators.append(
+                    Template_generator(
+                        template_dir / "custom" / custom_impl["path_source"],
+                        base_src_dir / f"sensor_{sensor_name}_functional.cpp",
+                        {"sensor_name": sensor_name, **sensor},
+                    )
+                )
+        else:
+            # Use default sensor templates
+            template_generators.append(
+                Template_generator(
+                    template_dir / "include" / "sensor_functional.hpp",
+                    base_header_dir / f"sensor_{sensor_name}_functional.hpp",
+                    {"sensor_name": sensor_name, **sensor},
+                )
             )
-        )
-        template_generators.append(
-            Template_generator(
-                template_dir / "src" / "sensor_functional.cpp",
-                base_src_dir / f"sensor_{sensor_name}_functional.cpp",
-                {"sensor_name": sensor_name, **sensor},
+            template_generators.append(
+                Template_generator(
+                    template_dir / "src" / "sensor_functional.cpp",
+                    base_src_dir / f"sensor_{sensor_name}_functional.cpp",
+                    {"sensor_name": sensor_name, **sensor},
+                )
             )
-        )
 
+        # Power templates are always generated using the default template
+        # (power modeling doesn't change with custom implementations)
         template_generators.append(
             Template_generator(
                 template_dir / "include" / "sensor_power.hpp",
