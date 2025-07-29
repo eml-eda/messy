@@ -121,15 +121,15 @@ int sc_main(int argc, char* argv[])
     sca_tdf::sca_signal <double> ${sensor_name}_I_S_to_C; /**< Current signal from ${sensor_name} to converter. */
 
     // Binding ${sensor_name} signals to the power instance, functional bus and converter
-    ${sensor_name}.enable(enable_temp);
-    ${sensor_name}.address(address_to_sensors[${idx}]);
-    ${sensor_name}.req_size(size_to_sensors[${idx}]);
-    ${sensor_name}.data_in(data_to_sensors[${idx}]);
-    ${sensor_name}.flag_wr(F_B_to_S[${idx}]);
+    ${sensor_name}.i_is_enabled(enable_temp);
+    ${sensor_name}.i_address(address_to_sensors[${idx}]);
+    ${sensor_name}.i_size(size_to_sensors[${idx}]);
+    ${sensor_name}.i_data_ptr(data_to_sensors[${idx}]);
+    ${sensor_name}.i_is_read(F_B_to_S[${idx}]);
     ${sensor_name}.ready(ready_to_sensors[${idx}]);
-    ${sensor_name}.data_out(${sensor_name}_Data);
-    ${sensor_name}.go(${sensor_name}_Go);
-    ${sensor_name}.power_signal(${sensor_name}_F_to_P);
+    ${sensor_name}.o_data_ptr(${sensor_name}_Data);
+    ${sensor_name}.o_is_done(${sensor_name}_Go);
+    ${sensor_name}.o_power_state(${sensor_name}_F_to_P);
     ${sensor_name}_power.func_signal(${sensor_name}_F_to_P);
     ${sensor_name}_power.voltage_state(voltage_sensors[${idx}]);
     ${sensor_name}_power.current_state(${sensor_name}_I_S_to_C);
