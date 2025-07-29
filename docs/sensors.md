@@ -129,6 +129,27 @@ Tracing can be set as described in [Tracing](tracing.md).
 
 Finally, the information about the reference voltage can be set through the `vref` parameter.
 
+## Custom Sensors
+
+Currently, default sensors should only be used as placeholders in simple projects, since they do not implement any specific logic. For specialized behavior, you can implement custom sensors by setting `"type": "custom"`:
+
+```json
+"gesture": {
+    "type": "custom",
+    "custom_implementation": {
+        "path_header": "./gesture_sensor/gesture_sensor.hpp",
+        "path_source": "./gesture_sensor/gesture_sensor.cpp"
+    },
+    "vref": 3.3,
+    "register_memory": 1024,
+    "states": { /* same as default sensors */ }
+}
+```
+
+**Requirements**: Custom sensors must maintain the exact same interface as default sensors (same ports, class name pattern, constructor). Only the `sensor_logic()` method implementation can be customized.
+
+**Files**: Place header and source files in the `templates/custom/` directory.
+
 ## State Machine
 
 The state machine of the sensor can be represented as follows:
