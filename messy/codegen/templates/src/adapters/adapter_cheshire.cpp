@@ -255,16 +255,15 @@ void AdapterCheshire::custom_reply(MessyRequest *req)
 }
 
 /**
- * @brief Reads the cycle counter register from Cheshire.
+ * @brief Reads the machine timer register from Cheshire through GDB.
  *
- * This function reads the cycle counter register from Cheshire through GDB.
- * It sends a command to read the cycle counter and parses the response.
+ * This function reads the machine timer register from Cheshire through GDB.
+ * It sends a command to read the machine timer and parses the response.
  *
- * @return The value of the cycle counter.
+ * @return The value of the machine timer.
  */
-uint64_t AdapterCheshire::read_cycle_counter()
+uint64_t AdapterCheshire::read_mtime()
 {
-    // FIXME: the ^done is used also elsewhere + that reg is used for time not cycles
     std::string line;
     int ret;
 
@@ -274,17 +273,15 @@ uint64_t AdapterCheshire::read_cycle_counter()
 
     // Flush the GDB output buffer
     this->flush_gdb_output();
-    this->send_gdb_command("-data-read-memory " CHS_CC_REG " u 8 1 1");
+    this->send_gdb_command("-data-read-memory 0x" CHS_MTIME_REG " u 8 1 1");
 
-    line = this->wait_for_gdb_line("^done,address=");
+    line = this->wait_for_gdb_line("^done,addr=\"0x00000000" CHS_MTIME_REG);
 
     if (std::regex_search(line, match, memory_regex)) {
         return std::stoull(match[1], nullptr, 10);
     } else {
-        throw std::runtime_error("Failed to parse cycle counter response: " + line);
+        throw std::runtime_error("Failed to parse machine timer response: " + line);
     }
-
-    return -1;
 }
 
 void AdapterCheshire::flush_gdb_output()

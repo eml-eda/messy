@@ -23,10 +23,11 @@
 #define GDB_PORT "3333"
 #define GDB_DEF_LONG_TIMEOUT_MS 2000
 #define GDB_DEF_SHORT_TIMEOUT_MS 100
-#define CHESSY_TEST_BIN "/tests/fake_sensor.spm.elf"
+#define CHESSY_TEST_BIN "/tests/fake_sensor_multiple_reads.spm.elf" // TODO: make this configurable
 
-#define CORE_FREQ 50000000      // 50 MHz
-#define CHS_CC_REG "0x0204bff8" // Cycle counter register
+// Machine timer register, contains the current time in microseconds. 
+// Avoid the 0x prefix!
+#define CHS_MTIME_REG "0204bff8"
 
 #define DEBUG
 // #define DEBUG_GDB
@@ -49,7 +50,7 @@ class AdapterCheshire
     void send_gdb_command(const std::string cmd);
     MessyRequest *get_messy_request_from_gdb(const std::string &response);
     std::string wait_for_gdb_line(const std::string &keyword = "*stopped,reason=\"signal-received\"");
-    uint64_t read_cycle_counter();
+    uint64_t read_mtime();
     void flush_gdb_output();
 
     bool finished;
