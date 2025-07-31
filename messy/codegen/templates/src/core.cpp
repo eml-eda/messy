@@ -266,12 +266,14 @@ void Core::request_delay(double start_time,int time_to_skip,sc_core::sc_time_uni
  */
 void Core::continue_messy(bool handle_req_queue)
 {
+    printf("\n--------------------- SIM ITERATION @ %llu ms\n", sc_timestamp / 1'000'000'000);
+    printf("Running computation until a request is found...\n");
     // Run the ISS adapter to execute the current simulation step
-    this->iss_adapter->exec();
+    this->next_timestamp = this->iss_adapter->exec() + sc_timestamp;
+    printf("Delay of the computation: %llu ms\n", (this->next_timestamp - sc_timestamp) / 1'000'000'000);
 
     // Accumulate the total power consumed up to the current timestamp
-    // TODO: power consumption is not implemented in synchronous mode
-    //this->tot_power += this->iss_adapter->get_power_at(sc_timestamp);
+    this->tot_power += this->iss_adapter->get_power_at(sc_timestamp);
 
     // Increment the simulation iteration count
     simulation_iters++;
@@ -279,15 +281,17 @@ void Core::continue_messy(bool handle_req_queue)
     // Handle the request queue if the flag is set
     if(handle_req_queue)    
         this->handle_req_queue();
+    
+    // Run the next simulation cycle
+    printf("Reaching next sim timestamp: %llu ms\n", this->next_timestamp / 1'000'000'000);
+    this->run_next_sc();
 }
 
 
-/**
- * @brief Placeholder for time delay functionality in synchronous mode.
- *
- * In synchronous mode, this function returns immediately without performing any action.
- */
 void Core::request_delay(double start_time,int time_to_skip,sc_core::sc_time_unit resolution)
 {
+    // Calculate the target timestamp by adding the delay to the start time
+    this->next_timestamp += (time_to_skip * get_resolution_val(resolution));
+    printf("Delay of the request: %d ms\n", time_to_skip);
 }
 % endif

@@ -190,28 +190,38 @@ void AdapterCheshire::close()
     return;
 }
 
-void AdapterCheshire::exec()
+uint64_t AdapterCheshire::exec()
 {
     std::string request_unparsed;
     MessyRequest *request;
 
-    // Extract the timestamp
-    // int64_t timestamp = 0;
-    // timestamp = this->read_cycle_counter();
+    // Read start time from the machine timer
+    uint64_t start_timestamp_us = this->read_mtime();
 
+    // Resume execution of the program
     this->send_gdb_command("-exec-continue");
 
     // Wait for a breakpoint (or an error)
     request_unparsed = this->wait_for_gdb_line("*stopped,reason=\"signal-received\"");
 
-    // The parser found a vaid sensor call in the GDB response
+    // Read the machine timer again to get the timestamp of the request
+    // TODO: This currently includes the overhead of the GDB communication.
+    //  Although the overhead **should** be negligible, this could create skewed results in long simulations.
+    uint64_t end_timestamp_us = this->read_mtime();
+
+    // Calculate the delay of the computation in picoseconds
+    uint64_t delay_ps = (end_timestamp_us - start_timestamp_us) * 1'000'000;
+
+    // Parse the GDB response to get the MessyRequest
     request = this->get_messy_request_from_gdb(request_unparsed);
-    request->addr -= 0x3000000; // FIXME: Adjust the address to match Cheshire's sensor address space
     add_request(request);
 
 #ifdef DEBUG
-    printf("Parsed request: addr=0x%llx, data=%u, read_req=%d, size=%u\n", request->addr, *request->data,
-           request->read_req, request->size);
+    if (request->read_req) {
+        printf("Parsed READ request: <-(0x%llx), %u Bytes\n", request->addr, request->size);
+    } else {
+        printf("Parsed WRITE request: %u ->(0x%llx), %u Bytes\n", *request->data, request->addr, request->size);
+    }
 #endif
 
     // Jump over the ebreak instruction
@@ -219,6 +229,9 @@ void AdapterCheshire::exec()
 
     // Flush GDB output
     this->flush_gdb_output();
+
+    // Return the computation delay in picoseconds
+    return delay_ps;
 }
 
 /**
@@ -248,7 +261,7 @@ void AdapterCheshire::custom_reply(MessyRequest *req)
     // If it was a read request, we need to send the value back to GDB
     if (req->read_req) {
 #ifdef DEBUG
-        printf("Sending read request response to GDB: addr=0x%llx, data=%u\n", req->addr, *req->data);
+        printf("Responding to READ request: %u <-(0x%llx), %u Bytes\n", *req->data, req->addr, req->size);
 #endif
         this->send_gdb_command("set sensor_data=" + std::to_string(*req->data));
     }

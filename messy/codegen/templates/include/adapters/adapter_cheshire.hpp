@@ -37,7 +37,7 @@ class AdapterCheshire
   public:
     void close();
     void startup();
-    void exec();
+    uint64_t exec();
     double get_power_at(int64_t timestamp);
     AdapterCheshire();
     ~AdapterCheshire()
