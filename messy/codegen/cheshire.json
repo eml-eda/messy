@@ -40,15 +40,20 @@
     },
     "peripherals":{
         "sensors" : {
-            "mic_click": {
+            "gesture": {
+                "type": "custom",
+                "custom_implementation": {
+                    "path_header": "./gesture_sensor/gesture_sensor.hpp",
+                    "path_source": "./gesture_sensor/gesture_sensor.cpp"
+                },
                 "power": true,
                 "tracing":{
                     "messy_trace":{
-                        "mic_click_I":"current"
+                        "gesture_I":"current"
                     }
                 },
                 "vref": 3.3,
-                "register_memory" : 1048576,
+                "register_memory" : 1024,
                 "states":{
                     "read" : {
                         "current" : "0.12",
