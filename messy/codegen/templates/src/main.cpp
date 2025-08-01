@@ -136,8 +136,8 @@ int sc_main(int argc, char* argv[])
     ${sensor_name}_conv.current_in(${sensor_name}_I_S_to_C);
     ${sensor_name}_conv.voltage_in(voltage_sensors[${idx}]);
     ${sensor_name}_conv.current_out(current_sensors[${idx}]);
-    functional_bus.data_input_sensor[${idx}](${sensor_name}_Data);
-    functional_bus.go_sensors[${idx}](${sensor_name}_Go);
+    functional_bus.i_data_sensor_ptr[${idx}](${sensor_name}_Data);
+    functional_bus.i_is_done_sensors[${idx}](${sensor_name}_Go);
     % endfor
 
     // Binding Functional Master's signals
@@ -160,22 +160,22 @@ int sc_main(int argc, char* argv[])
     core_conv.current_out(core_conv_current);
 
     // Binding Functional Bus Master's Input 
-    functional_bus.request_address(core_request_address);
-    functional_bus.request_data(core_request_data);
-    functional_bus.request_ready(core_request_ready);
-    functional_bus.request_size(core_request_size);
-    functional_bus.idx_sensor(idx_sensor);
-    functional_bus.flag_from_core(core_functional_bus_flag);
+    functional_bus.i_address(core_request_address);
+    functional_bus.i_data_ptr(core_request_data);
+    functional_bus.i_is_active(core_request_ready);
+    functional_bus.i_size(core_request_size);
+    functional_bus.o_idx_sensor(idx_sensor);
+    functional_bus.i_is_read(core_functional_bus_flag);
 
     // Binding Functional Bus's Output Address
-    functional_bus.request_value(core_request_value);
-    functional_bus.request_go(core_request_go);
+    functional_bus.o_data_ptr(core_request_value);
+    functional_bus.o_is_done(core_request_go);
     for (size_t i = 0; i < NUM_SENSORS; i++) {
-        functional_bus.address_out_sensor[i](address_to_sensors[i]);
-        functional_bus.data_out_sensor[i](data_to_sensors[i]);
-        functional_bus.flag_out_sensor[i](F_B_to_S[i]);
-        functional_bus.size_out_sensor[i](size_to_sensors[i]);
-        functional_bus.ready_sensor[i](ready_to_sensors[i]);
+        functional_bus.o_address[i](address_to_sensors[i]);
+        functional_bus.o_data_sensors_ptr[i](data_to_sensors[i]);
+        functional_bus.o_is_read[i](F_B_to_S[i]);
+        functional_bus.o_size[i](size_to_sensors[i]);
+        functional_bus.o_activate_sensors[i](ready_to_sensors[i]);
         power_bus.i_voltage_sensors_a[i](voltage_sensors[i]);
         power_bus.i_current_sensors_a[i](current_sensors[i]);
     }
