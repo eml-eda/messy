@@ -121,76 +121,76 @@ int sc_main(int argc, char* argv[])
     sca_tdf::sca_signal <double> ${sensor_name}_I_S_to_C; /**< Current signal from ${sensor_name} to converter. */
 
     // Binding ${sensor_name} signals to the power instance, functional bus and converter
-    ${sensor_name}.enable(enable_temp);
-    ${sensor_name}.address(address_to_sensors[${idx}]);
-    ${sensor_name}.req_size(size_to_sensors[${idx}]);
-    ${sensor_name}.data_in(data_to_sensors[${idx}]);
-    ${sensor_name}.flag_wr(F_B_to_S[${idx}]);
+    ${sensor_name}.i_is_enabled(enable_temp);
+    ${sensor_name}.i_address(address_to_sensors[${idx}]);
+    ${sensor_name}.i_size(size_to_sensors[${idx}]);
+    ${sensor_name}.i_data_ptr(data_to_sensors[${idx}]);
+    ${sensor_name}.i_is_read(F_B_to_S[${idx}]);
     ${sensor_name}.ready(ready_to_sensors[${idx}]);
-    ${sensor_name}.data_out(${sensor_name}_Data);
-    ${sensor_name}.go(${sensor_name}_Go);
-    ${sensor_name}.power_signal(${sensor_name}_F_to_P);
-    ${sensor_name}_power.func_signal(${sensor_name}_F_to_P);
-    ${sensor_name}_power.voltage_state(voltage_sensors[${idx}]);
-    ${sensor_name}_power.current_state(${sensor_name}_I_S_to_C);
+    ${sensor_name}.o_data_ptr(${sensor_name}_Data);
+    ${sensor_name}.o_is_done(${sensor_name}_Go);
+    ${sensor_name}.o_power_state(${sensor_name}_F_to_P);
+    ${sensor_name}_power.i_power_state(${sensor_name}_F_to_P);
+    ${sensor_name}_power.o_voltage_a(voltage_sensors[${idx}]);
+    ${sensor_name}_power.o_current_a(${sensor_name}_I_S_to_C);
     ${sensor_name}_conv.current_in(${sensor_name}_I_S_to_C);
     ${sensor_name}_conv.voltage_in(voltage_sensors[${idx}]);
     ${sensor_name}_conv.current_out(current_sensors[${idx}]);
-    functional_bus.data_input_sensor[${idx}](${sensor_name}_Data);
-    functional_bus.go_sensors[${idx}](${sensor_name}_Go);
+    functional_bus.i_data_sensor_ptr[${idx}](${sensor_name}_Data);
+    functional_bus.i_is_done_sensors[${idx}](${sensor_name}_Go);
     % endfor
 
     // Binding Functional Master's signals
-    core.request_address(core_request_address);
-    core.request_data(core_request_data);
-    core.request_size(core_request_size);
-    core.request_ready(core_request_ready);
-    core.request_go(core_request_go);
-    core.request_value(core_request_value);
-    core.idx_sensor(idx_sensor);
-    core.functional_bus_flag(core_functional_bus_flag);
-    core.power_signal(core_state);
+    core.o_address(core_request_address);
+    core.o_data_ptr(core_request_data);
+    core.o_size(core_request_size);
+    core.o_activate_functional_bus(core_request_ready);
+    core.i_done_functional_bus(core_request_go);
+    core.i_data_ptr(core_request_value);
+    core.i_idx_sensor(idx_sensor);
+    core.o_is_read(core_functional_bus_flag);
+    core.o_power_state(core_state);
 
     // Binding Power Master's signals
-    core_power.func_signal(core_state);
-    core_power.voltage_state(voltage_core);
-    core_power.current_state(current_core);
+    core_power.i_power_state(core_state);
+    core_power.o_voltage_a(voltage_core);
+    core_power.o_current_a(current_core);
     core_conv.current_in(current_core);
     core_conv.voltage_in(voltage_core);
     core_conv.current_out(core_conv_current);
 
     // Binding Functional Bus Master's Input 
-    functional_bus.request_address(core_request_address);
-    functional_bus.request_data(core_request_data);
-    functional_bus.request_ready(core_request_ready);
-    functional_bus.request_size(core_request_size);
-    functional_bus.idx_sensor(idx_sensor);
-    functional_bus.flag_from_core(core_functional_bus_flag);
+    functional_bus.i_address(core_request_address);
+    functional_bus.i_data_ptr(core_request_data);
+    functional_bus.i_is_active(core_request_ready);
+    functional_bus.i_size(core_request_size);
+    functional_bus.o_idx_sensor(idx_sensor);
+    functional_bus.i_is_read(core_functional_bus_flag);
 
     // Binding Functional Bus's Output Address
-    functional_bus.request_value(core_request_value);
-    functional_bus.request_go(core_request_go);
+    functional_bus.o_data_ptr(core_request_value);
+    functional_bus.o_is_done(core_request_go);
     for (size_t i = 0; i < NUM_SENSORS; i++) {
-        functional_bus.address_out_sensor[i](address_to_sensors[i]);
-        functional_bus.data_out_sensor[i](data_to_sensors[i]);
-        functional_bus.flag_out_sensor[i](F_B_to_S[i]);
-        functional_bus.size_out_sensor[i](size_to_sensors[i]);
-        functional_bus.ready_sensor[i](ready_to_sensors[i]);
-        power_bus.voltage_sensors[i](voltage_sensors[i]);
-        power_bus.current_sensors[i](current_sensors[i]);
+        functional_bus.o_address[i](address_to_sensors[i]);
+        functional_bus.o_data_sensors_ptr[i](data_to_sensors[i]);
+        functional_bus.o_is_read[i](F_B_to_S[i]);
+        functional_bus.o_size[i](size_to_sensors[i]);
+        functional_bus.o_activate_sensors[i](ready_to_sensors[i]);
+        power_bus.i_voltage_sensors_a[i](voltage_sensors[i]);
+        power_bus.i_current_sensors_a[i](current_sensors[i]);
     }
 
     // Binding Battery and Source Harvesters
     % for idx,batt_name in enumerate([harv_name for harv_name,harv in peripherals["harvesters"].items() if harv["harvester_type"]=="battery"]):
-    power_bus.current_batteries[${idx}](current_${batt_name});
+    power_bus.i_current_batteries_a[${idx}](current_${batt_name});
     % endfor
     % for idx,source_name in enumerate([harv_name for harv_name,harv in peripherals["harvesters"].items() if harv["harvester_type"]=="source"]):
-    power_bus.current_sources[${idx}](current_${source_name});
+    power_bus.i_current_sources_a[${idx}](current_${source_name});
     % endfor
 
     // Binding Power Bus's Input Signals related to the Master (Core)
-    power_bus.core_voltage(voltage_core);
-    power_bus.core_current(core_conv_current);
+    power_bus.i_voltage_core_a(voltage_core);
+    power_bus.i_current_core_a(core_conv_current);
 
     % for trace_name,trace_data in tracing.items():
 

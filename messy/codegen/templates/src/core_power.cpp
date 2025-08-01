@@ -8,8 +8,8 @@
  * This function sets the rate and timestep of the `func_signal` port. Check the SystemC-AMS documentation for more details on the `set_rate` and `set_timestep` functions.
  */
 void Core_power::set_attributes() {
-    func_signal.set_rate(1); ///< Set the number of samples that have to be read on the port per execution. Check SystemC-AMS documentation for more details on the set_rate function.
-    func_signal.set_timestep(1, SIM_RESOLUTION); //< Set how often the module is triggered (sampling period). Check SystemC-AMS documentation for more details on the set_timestep function.
+    i_power_state.set_rate(1); ///< Set the number of samples that have to be read on the port per execution. Check SystemC-AMS documentation for more details on the set_rate function.
+    i_power_state.set_timestep(1, SIM_RESOLUTION); //< Set how often the module is triggered (sampling period). Check SystemC-AMS documentation for more details on the set_timestep function.
 }
 
 /**
@@ -33,14 +33,14 @@ void Core_power::initialize() {}
 void Core_power::processing() {
     // If no simulation iterations have been performed, set voltage and current to 0.
     if (!core->simulation_iters) {
-        voltage_state.write(0.0);
-        current_state.write(0.0);
+        o_voltage_a.write(0.0);
+        o_current_a.write(0.0);
         return;
     }
 
     // Calculate and write the current state based on total power and number of iterations.
-    voltage_state.write(V_CORE);
-    current_state.write(((core->tot_power / core->simulation_iters) * 1000) / V_CORE);
+    o_voltage_a.write(V_CORE);
+    o_current_a.write(((core->tot_power / core->simulation_iters) * 1000) / V_CORE);
 
     // Reset the core's simulation iteration count and total power.
     core->simulation_iters = 0;

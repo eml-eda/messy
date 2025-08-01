@@ -20,11 +20,11 @@ void Functional_bus::processing_data(){
     
     while (true){
         // Check if the request is ready
-        if (request_ready.read() == true) {
+        if (i_is_active.read() == true) {
             // Read the request details from the input ports
-            add_s = request_address.read();
-            flag_s = flag_from_core.read();
-            size_s = request_size.read();
+            add_s = i_address.read();
+            flag_s = i_is_read.read();
+            size_s = i_size.read();
 
             // Iterate over the sensors to find the matching address range
             % for idx,(sensor_name,sensor) in enumerate(peripherals["sensors"].items()):
@@ -38,47 +38,47 @@ void Functional_bus::processing_data(){
                 // Check if the request exceeds the sensor's memory range
                 if(add_s+size_s > (${sensor_name}_BASE_ADDRESS + ${sensor["register_memory"]})){
                     fprintf(stderr,"\n[MESSY]\tRead/Write at %d of %d bytes exceeds ${sensor_name} memory\n",add_s,size_s);
-                    selected_sensor=-1;
-                    request_value.write(0x0);
-                    request_go.write(true);
+                    _selected_sensor=-1;
+                    o_data_ptr.write(0x0);
+                    o_is_done.write(true);
                 }
                 else{
                     // Calculate the register address within the sensor
                     reg_s = add_s - ${sensor_name}_BASE_ADDRESS;
-                    data_s = request_data.read();
+                    data_s = i_data_ptr.read();
                     // Set the output signals to the sensor
-                    size_out_sensor[${idx}].write(size_s);
-                    address_out_sensor[${idx}].write(reg_s);
-                    data_out_sensor[${idx}].write(data_s);
-                    flag_out_sensor[${idx}].write(flag_s);
-                    selected_sensor = ${idx};
-                    ready_sensor[selected_sensor].write(true);
+                    o_size[${idx}].write(size_s);
+                    o_address[${idx}].write(reg_s);
+                    o_data_sensors_ptr[${idx}].write(data_s);
+                    o_is_read[${idx}].write(flag_s);
+                    _selected_sensor = ${idx};
+                    o_activate_sensors[_selected_sensor].write(true);
                 }
             }
             % endfor
             else{
                 // Log an error if the address does not match any sensor
                 fprintf(stderr,"\n[MESSY]\tAddress %d not found by functional bus\n", add_s);
-                selected_sensor=-1;
-                request_value.write(0x0);
-                request_go.write(true);
+                _selected_sensor=-1;
+                o_data_ptr.write(0x0);
+                o_is_done.write(true);
             }
             // Write the index of the selected sensor to the output port
-            idx_sensor.write(selected_sensor);
+            o_idx_sensor.write(_selected_sensor);
         }
         
         // Wait for the next event
         wait();
 
-        if(selected_sensor>=0){
+        if(_selected_sensor>=0){
             // Check if a valid sensor was selected
             response();
             // Wait until the sensor and request are no longer ready
-            while (go_sensors[selected_sensor].read() != false && request_ready.read() != false) {
+            while (i_is_done_sensors[_selected_sensor].read() != false && i_is_active.read() != false) {
                 wait();
             }
             // Indicate that the request processing is complete
-            request_go.write(false);
+            o_is_done.write(false);
         }
  
     }
@@ -89,17 +89,17 @@ void Functional_bus::processing_data(){
  * 
  * This function is responsible for handling the responses from the sensors
  * and sending them back to the master. It reads the data from the selected
- * sensor and writes it to the request_value output port. It also updates the
- * ready_sensor and request_go flags accordingly.
+ * sensor and writes it to the o_data_ptr output port. It also updates the
+ * o_activate_sensors and o_is_done flags accordingly.
  */
 void Functional_bus::response(){
     // Check if the selected sensor is ready
-    if (go_sensors[selected_sensor].read() == true) {
-        // Write the sensor data to the request_value output port
-        request_value.write(data_input_sensor[selected_sensor].read());
+    if (i_is_done_sensors[_selected_sensor].read() == true) {
+        // Write the sensor data to the o_data_ptr output port
+        o_data_ptr.write(i_data_sensor_ptr[_selected_sensor].read());
         // Indicate that the response is ready
-        request_go.write(true);
+        o_is_done.write(true);
         // Reset the ready flag for the selected sensor
-        ready_sensor[selected_sensor].write(false);
+        o_activate_sensors[_selected_sensor].write(false);
     }
 }

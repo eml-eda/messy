@@ -10,20 +10,20 @@
 class Core : public sc_module {
   public:
     // Input Ports
-    sc_core::sc_in<bool> request_go; /**< Flag indicating if the request can proceed */
-    sc_core::sc_in<uint8_t *> request_value; /**< Value of the request */
-    sc_core::sc_in<int> idx_sensor; /**< Index of the sensor */
+    sc_core::sc_in<bool> i_done_functional_bus; /**< Flag indicating if the request can proceed */
+    sc_core::sc_in<uint8_t *> i_data_ptr; /**< Value of the request */
+    sc_core::sc_in<int> i_idx_sensor; /**< Index of the sensor */
 
     // Output Ports
-    sc_core::sc_out<unsigned int> request_address; /**< Address of the request */
-    sc_core::sc_out<uint8_t *> request_data; /**< Data of the request */
-    sc_core::sc_out<unsigned int> request_size; /**< Size of the request */
-    sc_core::sc_out<bool> functional_bus_flag; /**< Flag for the functional bus */
-    sc_core::sc_out<bool> request_ready; /**< Flag indicating if the request is ready */
+    sc_core::sc_out<unsigned int> o_address; /**< Address of the request */
+    sc_core::sc_out<uint8_t *> o_data_ptr; /**< Data of the request */
+    sc_core::sc_out<unsigned int> o_size; /**< Size of the request */
+    sc_core::sc_out<bool> o_is_read; /**< Flag for the functional bus */
+    sc_core::sc_out<bool> o_activate_functional_bus; /**< Flag indicating if the request is ready */
 
 
     // Power Port
-    sc_core::sc_out<double> power_signal; /**< Power signal output */
+    sc_core::sc_out<double> o_power_state; /**< Power signal output */
 
     // Variables
     int simulation_iters = 0;  /**< Number of simulation iterations. It gets incremented every time the continue_messy method is executed */
@@ -151,17 +151,10 @@ class Core : public sc_module {
      * 
      * Initializes the input and output ports with their respective names.
      */
-    SC_CTOR(Core) : request_address("Address_From_Core_to_Func_Bus"),
-                    request_data("Data_From_Core_to_Func_Bus"),
-                    functional_bus_flag("Flag_From_Core_to_Func_Bus"),
-                    request_ready("Master_Ready_to_Func_Bus"),
-                    request_go("Master_GO_to_Func_Bus"),
-                    request_value("Data_form_Bus_to_Master"),
-                    power_signal("Func_to_Power_signal"),
-                    idx_sensor("selected_sensor_of_request") {
+    SC_CTOR(Core) {
         iss_adapter = (${adapter_class}*) new ${adapter_class}();
         SC_THREAD(run);
-        sensitive << request_go;
+        sensitive << i_done_functional_bus;
     }
 
     ~Core() {
