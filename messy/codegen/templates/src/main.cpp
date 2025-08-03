@@ -126,7 +126,7 @@ int sc_main(int argc, char* argv[])
     ${sensor_name}.i_size(size_to_sensors[${idx}]);
     ${sensor_name}.i_data_ptr(data_to_sensors[${idx}]);
     ${sensor_name}.i_is_read(F_B_to_S[${idx}]);
-    ${sensor_name}.ready(ready_to_sensors[${idx}]);
+    ${sensor_name}.i_is_active(ready_to_sensors[${idx}]);
     ${sensor_name}.o_data_ptr(${sensor_name}_Data);
     ${sensor_name}.o_is_done(${sensor_name}_Go);
     ${sensor_name}.o_power_state(${sensor_name}_F_to_P);

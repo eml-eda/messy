@@ -7,8 +7,8 @@
  * write operations. It also manages power signals based on the sensor's current state,
  * such as reading, writing, or idling. The hierarchy of the sensor logic is as follows:
  * - i_is_enabled: Checks if the sensor is i_is_enabledd. If true, proceeds to the next step, else idles (writes 0 to the power signal).
- * - ready: This is the following step if the i_is_enabled signal is true. If the sensor is also ready (ready signal is true), the sensor proceeds to the next step, else writes false to the o_is_done signal. 
- * - i_is_read: If the sensor is ready, it checks the i_is_read signal. If true, the sensor performs a read operation, else a write operation. 
+ * - i_is_active: This is the following step if the i_is_enabled signal is true. If the sensor is also i_is_active (i_is_active signal is true), the sensor proceeds to the next step, else writes false to the o_is_done signal. 
+ * - i_is_read: If the sensor is i_is_active, it checks the i_is_read signal. If true, the sensor performs a read operation, else a write operation. 
  * 
  * 
  * The read and write operations are modeled using the following concept. In the configuration file, the user can specify the delay and the power consumption for each operation. To mimic this behaviour, the sensor logic waits for the specified delay time before proceeding to the next operation. During the read/write operation, the power signal is set to the corresponding state (read/write) and then switched back to idle after the operation is complete. This allows the power model to accurately simulate the power consumption of the sensor.
@@ -21,7 +21,7 @@ void Sensor_${sensor_name}_functional::sensor_logic() {
     % endif 
     while (true) {
         if (i_is_enabled.read() == true) {
-            if (ready.read() == true) {
+            if (i_is_active.read() == true) {
                 if (i_is_read.read() == true) {
                     // Read operation
                     unsigned int add = i_address.read(); ///< Get the i_address from the input

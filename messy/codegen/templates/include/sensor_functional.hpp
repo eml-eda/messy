@@ -14,7 +14,7 @@
  *  - data_in: Input port for incoming data to be written to the sensor's memory.
  *  - req_size: Input port for the size of the request.
  *  - flag_wr: Input port for the write/read flag (true for read, false for write).
- *  - ready: Input port indicating if the sensor is ready to be used.
+ *  - i_is_active: Input port indicating if the sensor is i_is_active to be used.
  * - Output Ports:
  *  - data_out: Output port for the data read from the sensor's memory.
  *  - go: Output port for signaling the sensor to proceed with the operation.
@@ -29,7 +29,7 @@ SC_MODULE(Sensor_${sensor_name}_functional) {
     sc_core::sc_in<uint8_t *> i_data_ptr; ///< Input port for incoming data to be written to the sensor's memory.
     sc_core::sc_in<unsigned int> i_size; ///< Input port for the size of the request. It must be coehrent with the size of the data_in.
     sc_core::sc_in<bool> i_is_read; ///< Input port for the write/read flag (true for read, false for write).
-    sc_core::sc_in<bool> ready; ///< Input port indicating if the system is ready.
+    sc_core::sc_in<bool> i_is_active; ///< Input port indicating if the system is i_is_active.
 
     // Output Port
     sc_core::sc_out<uint8_t *> o_data_ptr; ///< Output port for the data read from the sensor's memory.
@@ -53,9 +53,9 @@ SC_MODULE(Sensor_${sensor_name}_functional) {
 
         _register_memory_ptr = new uint8_t[${register_memory}];  ///< Allocate memory for the sensor's register map.
 
-        // Declare the sensor logic thread and make it sensitive to the 'ready' signal.
+        // Declare the sensor logic thread and make it sensitive to the 'i_is_active' signal.
         SC_THREAD(sensor_logic);
-        sensitive << ready;
+        sensitive << i_is_active;
     }
 
     
