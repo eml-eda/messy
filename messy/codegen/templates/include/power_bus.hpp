@@ -15,8 +15,10 @@ SCA_TDF_MODULE(Power_bus) {
     // Input Ports
     sca_tdf::sca_in<double> i_current_core_a; ///< Input port for the current consumed by the CPU core.
     sca_tdf::sca_in<double> i_voltage_core_a; ///< Input port for the voltage supplied to the CPU core.
-    sca_tdf::sca_in<double> i_voltage_sensors_a[NUM_SENSORS]; ///< Array of input ports for the voltages supplied to the sensors.
-    sca_tdf::sca_in<double> i_current_sensors_a[NUM_SENSORS]; ///< Array of input ports for the currents consumed by the sensors.
+% for sensor_name, sensor in peripherals['sensors'].items():
+    sca_tdf::sca_in<double> i_current_${sensor_name}_a; ///< Input port for the current consumed by the ${sensor_name} sensor.
+    sca_tdf::sca_in<double> i_voltage_${sensor_name}_a; ///< Input port for the voltage supplied to the ${sensor_name} sensor.
+% endfor
 
 #if NUM_SOURCES > 0
     sca_tdf::sca_in<double> i_current_sources_a[NUM_SOURCES]; //< Array of input ports for the currents supplied by external power sources (i.e. photovoltailc panels).

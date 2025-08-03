@@ -34,11 +34,10 @@ void Power_bus::processing() {
     double tmp_i;
     _total_current = 0;
 
-    for (int i = 0; i < NUM_SENSORS; i++) {
-        tmp_i = i_current_sensors_a[i].read();
-        _total_current += tmp_i;
-    }
-
+% for sensor_name, sensor in peripherals['sensors'].items():
+    tmp_i = i_current_${sensor_name}_a.read();
+    _total_current += tmp_i;
+% endfor
     tmp_i = i_current_core_a.read();
 
     _total_current += tmp_i;

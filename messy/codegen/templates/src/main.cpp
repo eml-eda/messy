@@ -57,19 +57,16 @@ int sc_main(int argc, char* argv[])
     sc_signal <int> idx_sensor; /**< Index of the selected sensor for the core's request. */
     
     // Data from Functional Bus to Slave (Sensors)
-    sc_signal <unsigned int>  address_to_sensors[NUM_SENSORS]; /**< Array of addresses to sensors. */
-    sc_signal <unsigned int>  size_to_sensors[NUM_SENSORS]; /**< Array of sizes to sensors. */
-    sc_signal <uint8_t*>  data_to_sensors[NUM_SENSORS]; /**< Array of data to sensors. */
-    sc_signal <bool> F_B_to_S[NUM_SENSORS]; /**< Array of functional bus to sensor flags. */
-    sc_signal <bool> ready_to_sensors[NUM_SENSORS]; /**< Array of ready flags to sensors. */
+% for sensor_name, sensor in peripherals['sensors'].items():
+    sc_signal <unsigned int>  address_to_${sensor_name}; /**< Address of the request to the ${sensor_name} sensor. */
+    sc_signal <unsigned int>  size_to_${sensor_name}; /**< Size of the request to the ${sensor_name} sensor. */
+    sc_signal <uint8_t*>  data_to_${sensor_name}; /**< Data of the request to the ${sensor_name} sensor. */
+    sc_signal <bool> F_B_to_${sensor_name}; /**< Flag indicating if the request to the ${sensor_name} sensor is a read operation. */
+    sc_signal <bool> ready_to_${sensor_name}; /**< Flag indicating if the ${sensor_name} sensor is ready to process the request. */
+    sca_tdf::sca_signal <double> voltage_${sensor_name}; /**< Voltage signal for the ${sensor_name} sensor. */
+    sca_tdf::sca_signal <double> current_${sensor_name}; /**< Current signal for the ${sensor_name} sensor. */
+% endfor
 
-    /********************************************
-     * Power Bus Signals
-     ********************************************/
-
-    // Signals from Slave (Sensors) to Power Bus
-    sca_tdf::sca_signal <double> voltage_sensors[NUM_SENSORS]; /**< Array of voltage signals from sensors to the power bus. */
-    sca_tdf::sca_signal <double> current_sensors[NUM_SENSORS]; /**< Array of current signals from sensors to the power bus. */
 #if NUM_SOURCES>0
     sca_tdf::sca_signal <double> current_sources[NUM_SOURCES]; /**< Array of current signals from sources to the power bus. */
 #endif
@@ -122,20 +119,20 @@ int sc_main(int argc, char* argv[])
 
     // Binding ${sensor_name} signals to the power instance, functional bus and converter
     ${sensor_name}.i_is_enabled(enable_temp);
-    ${sensor_name}.i_address(address_to_sensors[${idx}]);
-    ${sensor_name}.i_size(size_to_sensors[${idx}]);
-    ${sensor_name}.i_data_ptr(data_to_sensors[${idx}]);
-    ${sensor_name}.i_is_read(F_B_to_S[${idx}]);
-    ${sensor_name}.i_is_active(ready_to_sensors[${idx}]);
+    ${sensor_name}.i_address(address_to_${sensor_name});
+    ${sensor_name}.i_size(size_to_${sensor_name});
+    ${sensor_name}.i_data_ptr(data_to_${sensor_name});
+    ${sensor_name}.i_is_read(F_B_to_${sensor_name});
+    ${sensor_name}.i_is_active(ready_to_${sensor_name});
     ${sensor_name}.o_data_ptr(${sensor_name}_Data);
     ${sensor_name}.o_is_done(${sensor_name}_Go);
     ${sensor_name}.o_power_state(${sensor_name}_F_to_P);
     ${sensor_name}_power.i_power_state(${sensor_name}_F_to_P);
-    ${sensor_name}_power.o_voltage_a(voltage_sensors[${idx}]);
+    ${sensor_name}_power.o_voltage_a(voltage_${sensor_name});
     ${sensor_name}_power.o_current_a(${sensor_name}_I_S_to_C);
     ${sensor_name}_conv.current_in(${sensor_name}_I_S_to_C);
-    ${sensor_name}_conv.voltage_in(voltage_sensors[${idx}]);
-    ${sensor_name}_conv.current_out(current_sensors[${idx}]);
+    ${sensor_name}_conv.voltage_in(voltage_${sensor_name});
+    ${sensor_name}_conv.current_out(current_${sensor_name});
     functional_bus.i_data_sensor_ptr[${idx}](${sensor_name}_Data);
     functional_bus.i_is_done_sensors[${idx}](${sensor_name}_Go);
     % endfor
@@ -170,15 +167,17 @@ int sc_main(int argc, char* argv[])
     // Binding Functional Bus's Output Address
     functional_bus.o_data_ptr(core_request_value);
     functional_bus.o_is_done(core_request_go);
-    for (size_t i = 0; i < NUM_SENSORS; i++) {
-        functional_bus.o_address[i](address_to_sensors[i]);
-        functional_bus.o_data_sensors_ptr[i](data_to_sensors[i]);
-        functional_bus.o_is_read[i](F_B_to_S[i]);
-        functional_bus.o_size[i](size_to_sensors[i]);
-        functional_bus.o_activate_sensors[i](ready_to_sensors[i]);
-        power_bus.i_voltage_sensors_a[i](voltage_sensors[i]);
-        power_bus.i_current_sensors_a[i](current_sensors[i]);
-    }
+
+% for idx, (sensor_name, sensor) in enumerate(peripherals["sensors"].items()):
+    functional_bus.o_address[${idx}](address_to_${sensor_name});
+    functional_bus.o_data_sensors_ptr[${idx}](data_to_${sensor_name});
+    functional_bus.o_is_read[${idx}](F_B_to_${sensor_name});
+    functional_bus.o_size[${idx}](size_to_${sensor_name});
+    functional_bus.o_activate_sensors[${idx}](ready_to_${sensor_name});
+    // Binding Power Bus's Input Signals related to the ${sensor_name} sensor
+    power_bus.i_voltage_${sensor_name}_a(voltage_${sensor_name});
+    power_bus.i_current_${sensor_name}_a(current_${sensor_name});
+% endfor
 
     // Binding Battery and Source Harvesters
     % for idx,batt_name in enumerate([harv_name for harv_name,harv in peripherals["harvesters"].items() if harv["harvester_type"]=="battery"]):
