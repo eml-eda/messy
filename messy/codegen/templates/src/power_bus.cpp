@@ -23,8 +23,8 @@ void Power_bus::initialize() {}
  * - If there are any batteries, the total current is divided by the number of batteries,
  *   and the value is written to each battery, representing the current drawn from each battery.
  *
- * @note The number of sensors, sources, and batteries is determined by the constants
- * `NUM_SENSORS`, `NUM_SOURCES`, and `NUM_BATTERIES` respectively.
+ * @note The number of sources, and batteries is determined by the constants
+ * `NUM_SOURCES` and `NUM_BATTERIES` respectively.
  *
  * @warning If `NUM_SOURCES` or `NUM_BATTERIES` is 0, the respective section of code
  * will not be executed.

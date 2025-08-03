@@ -25,13 +25,13 @@ SC_MODULE(Functional_bus) {
     sc_core::sc_out<uint8_t *> o_data_ptr; /**< Data of the response to the master */
     sc_core::sc_out<bool> o_is_done; /**< Flag indicating if the bus is ready to process the request */
     sc_core::sc_out<int> o_idx_sensor; /**< Index of the selected sensor */
-    sc_core::sc_out<unsigned int> o_address[NUM_SENSORS]; /**< Address output to sensors */
-    sc_core::sc_out<uint8_t *> o_data_sensors_ptr[NUM_SENSORS]; /**< Data output to sensors */
-    sc_core::sc_out<unsigned int> o_size[NUM_SENSORS]; /**< Size of the data output to sensors */
-    sc_core::sc_out<bool> o_is_read[NUM_SENSORS]; /**< Flags indicating the type of data output to sensors */
 
 % for sensor_name, sensor in peripherals['sensors'].items():
     sc_core::sc_out<bool> o_activate_${sensor_name}; /**< Flag to activate the sensor */
+    sc_core::sc_out<unsigned int> o_address_${sensor_name}; /**< Address output to the ${sensor_name} sensor */
+    sc_core::sc_out<unsigned int> o_size_${sensor_name}; /**< Size output to the ${sensor_name} sensor */
+    sc_core::sc_out<bool> o_is_read_${sensor_name}; /**< Flag indicating if the request to the ${sensor_name} sensor is a read request */
+    sc_core::sc_out<uint8_t *> o_data_${sensor_name}_ptr; /**< Data output to the ${sensor_name} sensor */
 % endfor
 
 

@@ -169,10 +169,10 @@ int sc_main(int argc, char* argv[])
     functional_bus.o_is_done(core_request_go);
 
 % for idx, (sensor_name, sensor) in enumerate(peripherals["sensors"].items()):
-    functional_bus.o_address[${idx}](address_to_${sensor_name});
-    functional_bus.o_data_sensors_ptr[${idx}](data_to_${sensor_name});
-    functional_bus.o_is_read[${idx}](F_B_to_${sensor_name});
-    functional_bus.o_size[${idx}](size_to_${sensor_name});
+    functional_bus.o_address_${sensor_name}(address_to_${sensor_name});
+    functional_bus.o_data_${sensor_name}_ptr(data_to_${sensor_name});
+    functional_bus.o_is_read_${sensor_name}(F_B_to_${sensor_name});
+    functional_bus.o_size_${sensor_name}(size_to_${sensor_name});
     functional_bus.o_activate_${sensor_name}(ready_to_${sensor_name});
     // Binding Power Bus's Input Signals related to the ${sensor_name} sensor
     power_bus.i_voltage_${sensor_name}_a(voltage_${sensor_name});

@@ -47,10 +47,10 @@ void Functional_bus::processing_data(){
                     reg_s = add_s - ${sensor_name}_BASE_ADDRESS;
                     data_s = i_data_ptr.read();
                     // Set the output signals to the sensor
-                    o_size[${idx}].write(size_s);
-                    o_address[${idx}].write(reg_s);
-                    o_data_sensors_ptr[${idx}].write(data_s);
-                    o_is_read[${idx}].write(flag_s);
+                    o_size_${sensor_name}.write(size_s);
+                    o_address_${sensor_name}.write(reg_s);
+                    o_data_${sensor_name}_ptr.write(data_s);
+                    o_is_read_${sensor_name}.write(flag_s);
                     _selected_sensor = ${idx};
                     o_activate_${sensor_name}.write(true);
                 }
