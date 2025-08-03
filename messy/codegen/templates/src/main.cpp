@@ -133,8 +133,8 @@ int sc_main(int argc, char* argv[])
     ${sensor_name}_conv.current_in(${sensor_name}_I_S_to_C);
     ${sensor_name}_conv.voltage_in(voltage_${sensor_name});
     ${sensor_name}_conv.current_out(current_${sensor_name});
-    functional_bus.i_data_sensor_ptr[${idx}](${sensor_name}_Data);
-    functional_bus.i_is_done_sensors[${idx}](${sensor_name}_Go);
+    functional_bus.i_data_${sensor_name}_ptr(${sensor_name}_Data);
+    functional_bus.i_is_done_${sensor_name}(${sensor_name}_Go);
     % endfor
 
     // Binding Functional Master's signals
@@ -173,7 +173,7 @@ int sc_main(int argc, char* argv[])
     functional_bus.o_data_sensors_ptr[${idx}](data_to_${sensor_name});
     functional_bus.o_is_read[${idx}](F_B_to_${sensor_name});
     functional_bus.o_size[${idx}](size_to_${sensor_name});
-    functional_bus.o_activate_sensors[${idx}](ready_to_${sensor_name});
+    functional_bus.o_activate_${sensor_name}(ready_to_${sensor_name});
     // Binding Power Bus's Input Signals related to the ${sensor_name} sensor
     power_bus.i_voltage_${sensor_name}_a(voltage_${sensor_name});
     power_bus.i_current_${sensor_name}_a(current_${sensor_name});

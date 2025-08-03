@@ -52,7 +52,7 @@ void Functional_bus::processing_data(){
                     o_data_sensors_ptr[${idx}].write(data_s);
                     o_is_read[${idx}].write(flag_s);
                     _selected_sensor = ${idx};
-                    o_activate_sensors[_selected_sensor].write(true);
+                    o_activate_${sensor_name}.write(true);
                 }
             }
             % endfor
@@ -73,10 +73,14 @@ void Functional_bus::processing_data(){
         if(_selected_sensor>=0){
             // Check if a valid sensor was selected
             response();
-            // Wait until the sensor and request are no longer ready
-            while (i_is_done_sensors[_selected_sensor].read() != false && i_is_active.read() != false) {
-                wait();
+            % for idx, (sensor_name, sensor) in enumerate(peripherals['sensors'].items()):
+            if (_selected_sensor == ${idx}) {
+                // Check if the selected sensor is done
+                while (i_is_done_${sensor_name}.read() == true && i_is_active.read() == true) {
+                    wait();
+                }
             }
+            % endfor
             // Indicate that the request processing is complete
             o_is_done.write(false);
         }
@@ -93,13 +97,14 @@ void Functional_bus::processing_data(){
  * o_activate_sensors and o_is_done flags accordingly.
  */
 void Functional_bus::response(){
-    // Check if the selected sensor is ready
-    if (i_is_done_sensors[_selected_sensor].read() == true) {
+% for sensor_name, sensor in peripherals['sensors'].items():
+    if (i_is_done_${sensor_name}.read() == true) {
         // Write the sensor data to the o_data_ptr output port
-        o_data_ptr.write(i_data_sensor_ptr[_selected_sensor].read());
+        o_data_ptr.write(i_data_${sensor_name}_ptr.read());
         // Indicate that the response is ready
         o_is_done.write(true);
         // Reset the ready flag for the selected sensor
-        o_activate_sensors[_selected_sensor].write(false);
+        o_activate_${sensor_name}.write(false);
     }
+% endfor
 }
