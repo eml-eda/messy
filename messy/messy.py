@@ -5,7 +5,7 @@ from typing import List
 
 
 def run_messy(
-    config_filename: Path = None, application: Path = None, skip: List[str] = []
+    config_filename: Path = None, application: Path = None, skip: List[str] = [], graph: bool = False
 ):
     """
     Run the messy toolchain with the given configuration file and application.
@@ -18,6 +18,7 @@ def run_messy(
         application: Path to the embedded application to simulate.
         skip: A list of steps to skip in the build process.
               Possible values: "clean", "codegen", "codegen_ipxact", "application", "docs".
+        graph: Generate a Simulink diagram of the design.
 
     Returns:
         None
@@ -31,7 +32,8 @@ def run_messy(
         subprocess.run(["make", "codegen_ipxact", f"file={Path(config_filename).absolute()}"])
     if "application" not in skip:
         subprocess.run(["make", "application", f"app={Path(application).absolute()}"])
-    subprocess.run(["make", "run"])
+    if graph:
+        subprocess.run(["python3", "messy/codegen/codegen.py", "-f", str(config_filename), "--graph", "matlab/messy_diagram.m"])
 
 
 if __name__ == "__main__":
@@ -74,6 +76,12 @@ if __name__ == "__main__":
         action="store_true",
         help="Skip the embedded application building step.",
     )
+    
+    parser.add_argument(
+        "--graph",
+        action="store_true",
+        help="Generate a Simulink diagram of the design.",
+    )
 
     # Parse the command line arguments
     args = parser.parse_args()
@@ -95,4 +103,4 @@ if __name__ == "__main__":
         skips.append("codegen_ipxact")
     if args.skip_clean:
         skips.append("clean")
-    run_messy(config_filename=config_filename, application=application, skip=skips)
+    run_messy(config_filename=config_filename, application=application, skip=skips, graph=args.graph)
