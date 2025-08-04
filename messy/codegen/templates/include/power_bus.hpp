@@ -13,16 +13,18 @@ SCA_TDF_MODULE(Power_bus) {
     // Time resolution is set to 1 ms, meaning the module is triggered every 1 ms
 
     // Input Ports
-    sca_tdf::sca_in<double> core_current; ///< Input port for the current consumed by the CPU core.
-    sca_tdf::sca_in<double> core_voltage; ///< Input port for the voltage supplied to the CPU core.
-    sca_tdf::sca_in<double> voltage_sensors[NUM_SENSORS]; ///< Array of input ports for the voltages supplied to the sensors.
-    sca_tdf::sca_in<double> current_sensors[NUM_SENSORS]; ///< Array of input ports for the currents consumed by the sensors.
+    sca_tdf::sca_in<double> i_current_core_a; ///< Input port for the current consumed by the CPU core.
+    sca_tdf::sca_in<double> i_voltage_core_a; ///< Input port for the voltage supplied to the CPU core.
+% for sensor_name, sensor in peripherals['sensors'].items():
+    sca_tdf::sca_in<double> i_current_${sensor_name}_a; ///< Input port for the current consumed by the ${sensor_name} sensor.
+    sca_tdf::sca_in<double> i_voltage_${sensor_name}_a; ///< Input port for the voltage supplied to the ${sensor_name} sensor.
+% endfor
 
 #if NUM_SOURCES > 0
-    sca_tdf::sca_in<double> current_sources[NUM_SOURCES]; //< Array of input ports for the currents supplied by external power sources (i.e. photovoltailc panels).
+    sca_tdf::sca_in<double> i_current_sources_a[NUM_SOURCES]; //< Array of input ports for the currents supplied by external power sources (i.e. photovoltailc panels).
 #endif
 #if NUM_BATTERIES > 0
-    sca_tdf::sca_out<double> current_batteries[NUM_BATTERIES]; //< Array of output ports for the currents drawn from batteries.
+    sca_tdf::sca_out<double> i_current_batteries_a[NUM_BATTERIES]; //< Array of output ports for the currents drawn from batteries.
 #endif
 
     /**
@@ -30,8 +32,7 @@ SCA_TDF_MODULE(Power_bus) {
      * 
      * Initializes the input and output signal names for tracing and connecting to other modules.
      */
-    SCA_CTOR(Power_bus) : core_current("Current_of_CPU"),
-                          core_voltage("Voltage_of_CPU") {}
+    SCA_CTOR(Power_bus) {}
 
     /**
      * @brief Sets the attributes of the Power_bus module.
@@ -55,7 +56,7 @@ SCA_TDF_MODULE(Power_bus) {
     void processing();
 
   private:
-    double total_current = 0;
+    double _total_current = 0;
 
     // Default constructor is private to prevent its use, ensuring that
     // the module must be initialized using the public constructor above.

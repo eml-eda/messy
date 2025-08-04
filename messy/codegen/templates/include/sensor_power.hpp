@@ -13,20 +13,16 @@
 SCA_TDF_MODULE(Sensor_${sensor_name}_power)
 {
 
-    sca_tdf::sc_in  <int> func_signal; //< Input port for receiving data from the functional instance.
-    sca_tdf::sca_out <double> voltage_state; //< Output port for sending voltage state to the power bus.
-    sca_tdf::sca_out <double> current_state; //< Output port for sending current state to the power bus.
+    sca_tdf::sc_in  <int> i_power_state; //< Input port for receiving data from the functional instance.
+    sca_tdf::sca_out <double> o_voltage_a; //< Output port for sending voltage state to the power bus.
+    sca_tdf::sca_out <double> o_current_a; //< Output port for sending current state to the power bus.
 
     /**
      * @brief Constructor for the Sensor_${sensor_name}_power module.
      * 
      * Initializes the port names for power state signals.
      */
-    SCA_CTOR(Sensor_${sensor_name}_power):
-        func_signal("State_of_Power_From_Functional"),
-        voltage_state("Voltage_trace_to_Power_Bus"),
-        current_state("Current_trace_to_Power_Bus")
-    {}
+    SCA_CTOR(Sensor_${sensor_name}_power) {}
 
     void set_attributes();
     void initialize();

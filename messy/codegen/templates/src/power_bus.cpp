@@ -23,8 +23,8 @@ void Power_bus::initialize() {}
  * - If there are any batteries, the total current is divided by the number of batteries,
  *   and the value is written to each battery, representing the current drawn from each battery.
  *
- * @note The number of sensors, sources, and batteries is determined by the constants
- * `NUM_SENSORS`, `NUM_SOURCES`, and `NUM_BATTERIES` respectively.
+ * @note The number of sources, and batteries is determined by the constants
+ * `NUM_SOURCES` and `NUM_BATTERIES` respectively.
  *
  * @warning If `NUM_SOURCES` or `NUM_BATTERIES` is 0, the respective section of code
  * will not be executed.
@@ -32,26 +32,25 @@ void Power_bus::initialize() {}
  */
 void Power_bus::processing() {
     double tmp_i;
-    total_current = 0;
+    _total_current = 0;
 
-    for (int i = 0; i < NUM_SENSORS; i++) {
-        tmp_i = current_sensors[i].read();
-        total_current += tmp_i;
-    }
+% for sensor_name, sensor in peripherals['sensors'].items():
+    tmp_i = i_current_${sensor_name}_a.read();
+    _total_current += tmp_i;
+% endfor
+    tmp_i = i_current_core_a.read();
 
-    tmp_i = core_current.read();
-
-    total_current += tmp_i;
+    _total_current += tmp_i;
 
 #if NUM_SOURCES > 0
     for (int i = 0; i < NUM_SOURCES; i++) {
-        tmp_i = current_sources[i].read();
-        total_current -= tmp_i;
+        tmp_i = i_current_sources_a[i].read();
+        _total_current -= tmp_i;
     }
 #endif
 
 #if NUM_BATTERIES > 0
     for (int i = 0; i < NUM_BATTERIES; i++)
-        current_batteries[i].write(total_current / NUM_BATTERIES);
+        i_current_batteries_a[i].write(_total_current / NUM_BATTERIES);
 #endif
 }

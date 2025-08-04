@@ -169,42 +169,42 @@ void Core::handle_req(MessyRequest *req)
     if (req->read_req)
     {
         // For the read request the functional bus flag is set to true
-        functional_bus_flag.write(true);
+        o_is_read.write(true);
 
         // Set the request ready signal
-        request_ready.write(true);
+        o_activate_functional_bus.write(true);
         
         // Write the address and size to the corresponding signals
-        request_address.write(req->addr);
-        request_size.write(req->size);
+        o_address.write(req->addr);
+        o_size.write(req->size);
         wait();
 
         // Check for segmentation fault
-        if(idx_sensor.read() < 0) 
+        if(i_idx_sensor.read() < 0) 
             this->close();
 
-        request_ready.write(false);
+        o_activate_functional_bus.write(false);
         wait();
 
         // Write the read data into the iss memory
-        uint8_t* sensor_memory = (uint8_t*)request_value.read();
+        uint8_t* sensor_memory = (uint8_t*)i_data_ptr.read();
         for(unsigned int i = 0; i < req->size; i++)    
             ((uint8_t*)req->data)[i] = sensor_memory[i];
     }
     else
     {
-        request_data.write(((uint8_t*)req->data));
+        o_data_ptr.write(((uint8_t*)req->data));
         
         // For the write request the functional bus flag is set to false
-        functional_bus_flag.write(false);
-        request_ready.write(true);
+        o_is_read.write(false);
+        o_activate_functional_bus.write(true);
 
-        request_address.write(req->addr);
-        request_size.write(req->size);
+        o_address.write(req->addr);
+        o_size.write(req->size);
         wait();
-        if(idx_sensor.read() < 0) 
+        if(i_idx_sensor.read() < 0) 
             this->close();
-        request_ready.write(false);
+        o_activate_functional_bus.write(false);
         wait();
         
     }
