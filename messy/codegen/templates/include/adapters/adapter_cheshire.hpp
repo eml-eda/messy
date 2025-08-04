@@ -5,12 +5,11 @@
 #include <cstdlib>
 #include <cstring>
 #include <signal.h>
-
 #include <config.hpp>
 #include <string.h>
 #include <messy_request.hpp>
 
-// GDB
+// GDB-related includes
 #include <fcntl.h>
 #include <fstream>
 #include <unistd.h>
@@ -32,38 +31,52 @@
 #define DEBUG
 // #define DEBUG_GDB
 
-class AdapterCheshire
+class GdbServer
 {
   public:
+    GdbServer();
+    ~GdbServer();
+    
+    void setup();
     void close();
-    void startup();
-    uint64_t exec();
-    double get_power_at(int64_t timestamp);
-    AdapterCheshire();
-    ~AdapterCheshire()
-    {
-        close();
-    }
-    void custom_reply(MessyRequest *req);
-
-    void setup_gdb();
-    void send_gdb_command(const std::string cmd);
-    MessyRequest *get_messy_request_from_gdb(const std::string &response);
-    std::string wait_for_gdb_line(const std::string &keyword = "*stopped,reason=\"signal-received\"");
+    void send_command(const std::string &cmd);
+    std::string wait_for_line(const std::string &keyword);
+    void flush_output();
     uint64_t read_mtime();
-    void flush_gdb_output();
-
-    bool finished;
-
+    
+    bool is_closed() const { return closed; }
+    pid_t get_pid() const { return gdb_pid; }
+    
   private:
-    // TODO: have a GdbServer class that handles all GDB interactions
-    int closed;
+    bool closed;
     pid_t gdb_pid;
     FILE *gdb_in, *gdb_out;
     int gdb_out_fd[2];
     int gdb_in_fd[2];
     char gdb_out_buf[GDB_BUFFER];
+};
 
+class AdapterCheshire
+{
+  public:
+    AdapterCheshire();
+    ~AdapterCheshire()
+    {
+        close();
+    }
+        void close();
+    void startup();
+    uint64_t exec();
+    double get_power_at(int64_t timestamp);
+    void custom_reply(MessyRequest *req);
+    
+    MessyRequest *get_messy_request_from_gdb(const std::string &response);
+
+    bool finished;
+
+  private:
+    int closed;
+    GdbServer gdb_server;
     uint8_t *req_data_buf; // Buffer to store request data
 };
 

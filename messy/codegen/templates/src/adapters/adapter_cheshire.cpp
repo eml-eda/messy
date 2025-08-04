@@ -1,9 +1,22 @@
 #include <adapters/adapter_cheshire.hpp>
 
-AdapterCheshire::AdapterCheshire()
+/* -------------------------------------------------------------------------- */
+/*                              GdbServer methods                             */
+/* -------------------------------------------------------------------------- */
+
+// GdbServer implementation
+GdbServer::GdbServer()
 {
-    closed   = 0;
-    finished = false;
+    closed = true;
+    gdb_pid = -1;
+    gdb_in = nullptr;
+    gdb_out = nullptr;
+    memset(gdb_out_buf, 0, sizeof(gdb_out_buf));
+}
+
+GdbServer::~GdbServer()
+{
+    close();
 }
 
 /**
@@ -13,7 +26,7 @@ AdapterCheshire::AdapterCheshire()
  * It forks a new process and runs GDB, redirecting GDB I/O to pipes.
  * GDB will be used to start, continue and stop bare metal programs running on Cheshire.
  */
-void AdapterCheshire::setup_gdb()
+void GdbServer::setup()
 {
     // Create pipes for GDB input and output redirection
     if (pipe(this->gdb_in_fd) == -1 || pipe(this->gdb_out_fd) == -1) {
@@ -58,18 +71,41 @@ void AdapterCheshire::setup_gdb()
         fflush(this->gdb_out);
 
         // Set up GDB connection
-        this->send_gdb_command("-gdb-set pagination off");
-        this->send_gdb_command("-gdb-set confirm off");
-        this->send_gdb_command("-gdb-set verbose off");
-        this->send_gdb_command("-target-select extended-remote localhost:" GDB_PORT);
-        this->send_gdb_command("-file-exec-and-symbols " CHESSY_TEST_BIN);
-        this->send_gdb_command("-target-download");
-        this->wait_for_gdb_line("^done,address="); // Wait for GDB to finish downloading the program
-        this->flush_gdb_output();
+        this->send_command("-gdb-set pagination off");
+        this->send_command("-gdb-set confirm off");
+        this->send_command("-gdb-set verbose off");
+        this->send_command("-target-select extended-remote localhost:" GDB_PORT);
+        this->send_command("-file-exec-and-symbols " CHESSY_TEST_BIN);
+        this->send_command("-target-download");
+        this->wait_for_line("^done,address="); // Wait for GDB to finish downloading the program
+        this->flush_output();
+
+        closed = false;
     }
 }
 
-std::string AdapterCheshire::wait_for_gdb_line(const std::string &keyword)
+void GdbServer::close()
+{
+    if (!closed) {
+        // Exit GDB processes
+        this->send_command("-gdb-exit");
+
+        // Close pipes
+        if (gdb_in) {
+            fflush(gdb_in);
+            fclose(gdb_in);
+            gdb_in = nullptr;
+        }
+        if (gdb_out) {
+            fclose(gdb_out);
+            gdb_out = nullptr;
+        }
+
+        closed = true;
+    }
+}
+
+std::string GdbServer::wait_for_line(const std::string &keyword)
 {
     std::string line;
 
@@ -92,7 +128,7 @@ std::string AdapterCheshire::wait_for_gdb_line(const std::string &keyword)
     }
 }
 
-void AdapterCheshire::send_gdb_command(const std::string cmd)
+void GdbServer::send_command(const std::string &cmd)
 {
     // Send command to GDB
     fprintf(this->gdb_in, "%s\n", cmd.c_str());
@@ -100,6 +136,69 @@ void AdapterCheshire::send_gdb_command(const std::string cmd)
     printf("GDB command sent: %s\n", cmd.c_str());
 #endif
     fflush(this->gdb_in);
+}
+
+/**
+ * @brief Reads the machine timer register from Cheshire through GDB.
+ *
+ * This function reads the machine timer register from Cheshire through GDB.
+ * It sends a command to read the machine timer and parses the response.
+ *
+ * @return The value of the machine timer.
+ */
+uint64_t GdbServer::read_mtime()
+{
+    std::string line;
+    int ret;
+
+    // Regex to match the memory read response
+    std::regex memory_regex("data=\\[\"([^\"]+)\"\\]");
+    std::smatch match;
+
+    // Flush the GDB output buffer
+    this->flush_output();
+    this->send_command("-data-read-memory 0x" CHS_MTIME_REG " u 8 1 1");
+
+    line = this->wait_for_line("^done,addr=\"0x00000000" CHS_MTIME_REG);
+
+    if (std::regex_search(line, match, memory_regex)) {
+        return std::stoull(match[1], nullptr, 10);
+    } else {
+        throw std::runtime_error("Failed to parse machine timer response: " + line);
+    }
+}
+
+void GdbServer::flush_output()
+{
+    // Flush the GDB output stream
+    fflush(this->gdb_out);
+    // Clear the output buffer
+    memset(this->gdb_out_buf, 0, sizeof(this->gdb_out_buf));
+}
+
+/* -------------------------------------------------------------------------- */
+/*                           AdapterCheshire methods                          */
+/* -------------------------------------------------------------------------- */
+
+// AdapterCheshire implementation
+AdapterCheshire::AdapterCheshire()
+{
+    closed   = 0;
+    finished = false;
+}
+
+/**
+ * @brief Gets the power at a given timestamp.
+ *
+ * This function gets the power at a given timestamp.
+ *
+ * @param timestamp The timestamp at which to get the power.
+ * @return The power at the given timestamp.
+ */
+double AdapterCheshire::get_power_at(int64_t timestamp)
+{
+    // Not implemented yet
+    return 0;
 }
 
 MessyRequest *AdapterCheshire::get_messy_request_from_gdb(const std::string &response)
@@ -163,20 +262,15 @@ MessyRequest *AdapterCheshire::get_messy_request_from_gdb(const std::string &res
 void AdapterCheshire::startup(void)
 {
     // Start Cheshire
-    this->setup_gdb();
-    printf("GDB started. PID: %d\n", this->gdb_pid);
+    this->gdb_server.setup();
+    printf("GDB started. PID: %d\n", this->gdb_server.get_pid());
 }
 
 void AdapterCheshire::close()
 {
     if (!closed) {
-        // Exit GDB processes
-        this->send_gdb_command("-gdb-exit");
-
-        // Close pipes
-        fflush(gdb_in);
-        fclose(gdb_in);
-        fclose(gdb_out);
+        // Close GDB server
+        this->gdb_server.close();
 
         // Free request data buffer
         if (req_data_buf) {
@@ -196,18 +290,18 @@ uint64_t AdapterCheshire::exec()
     MessyRequest *request;
 
     // Read start time from the machine timer
-    uint64_t start_timestamp_us = this->read_mtime();
+    uint64_t start_timestamp_us = this->gdb_server.read_mtime();
 
     // Resume execution of the program
-    this->send_gdb_command("-exec-continue");
+    this->gdb_server.send_command("-exec-continue");
 
     // Wait for a breakpoint (or an error)
-    request_unparsed = this->wait_for_gdb_line("*stopped,reason=\"signal-received\"");
+    request_unparsed = this->gdb_server.wait_for_line("*stopped,reason=\"signal-received\"");
 
     // Read the machine timer again to get the timestamp of the request
     // TODO: This currently includes the overhead of the GDB communication.
     //  Although the overhead **should** be negligible, this could create skewed results in long simulations.
-    uint64_t end_timestamp_us = this->read_mtime();
+    uint64_t end_timestamp_us = this->gdb_server.read_mtime();
 
     // Calculate the delay of the computation in picoseconds
     uint64_t delay_ps = (end_timestamp_us - start_timestamp_us) * 1'000'000;
@@ -225,27 +319,13 @@ uint64_t AdapterCheshire::exec()
 #endif
 
     // Jump over the ebreak instruction
-    this->send_gdb_command("set $pc=$pc+2");
+    this->gdb_server.send_command("set $pc=$pc+2");
 
     // Flush GDB output
-    this->flush_gdb_output();
+    this->gdb_server.flush_output();
 
     // Return the computation delay in picoseconds
     return delay_ps;
-}
-
-/**
- * @brief Gets the power at a given timestamp.
- *
- * This function gets the power at a given timestamp.
- *
- * @param timestamp The timestamp at which to get the power.
- * @return The power at the given timestamp.
- */
-double AdapterCheshire::get_power_at(int64_t timestamp)
-{
-    // Not implemented yet
-    return 0;
 }
 
 /**
@@ -263,44 +343,6 @@ void AdapterCheshire::custom_reply(MessyRequest *req)
 #ifdef DEBUG
         printf("Responding to READ request: %u <-(0x%llx), %u Bytes\n", *req->data, req->addr, req->size);
 #endif
-        this->send_gdb_command("set sensor_data=" + std::to_string(*req->data));
+        this->gdb_server.send_command("set sensor_data=" + std::to_string(*req->data));
     }
-}
-
-/**
- * @brief Reads the machine timer register from Cheshire through GDB.
- *
- * This function reads the machine timer register from Cheshire through GDB.
- * It sends a command to read the machine timer and parses the response.
- *
- * @return The value of the machine timer.
- */
-uint64_t AdapterCheshire::read_mtime()
-{
-    std::string line;
-    int ret;
-
-    // Regex to match the memory read response
-    std::regex memory_regex("data=\\[\"([^\"]+)\"\\]");
-    std::smatch match;
-
-    // Flush the GDB output buffer
-    this->flush_gdb_output();
-    this->send_gdb_command("-data-read-memory 0x" CHS_MTIME_REG " u 8 1 1");
-
-    line = this->wait_for_gdb_line("^done,addr=\"0x00000000" CHS_MTIME_REG);
-
-    if (std::regex_search(line, match, memory_regex)) {
-        return std::stoull(match[1], nullptr, 10);
-    } else {
-        throw std::runtime_error("Failed to parse machine timer response: " + line);
-    }
-}
-
-void AdapterCheshire::flush_gdb_output()
-{
-    // Flush the GDB output stream
-    fflush(this->gdb_out);
-    // Clear the output buffer
-    memset(this->gdb_out_buf, 0, sizeof(this->gdb_out_buf));
 }
