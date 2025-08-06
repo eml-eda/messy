@@ -22,6 +22,10 @@ If you enjoy and use Messy on your works, please acknowledge our paper: https://
 }
 ```
 
+
+> [!WARNING]  
+> If you are looking for the code for *MEbots: Integrating a RISC-V Virtual Platform with a Robotic Simulator for Energy-Aware Design*, it is currently being refactored. We will make it available as soon as possible.
+
 # Documentation
 
 To get started, please refer to the [Documentation](https://eml-eda.github.io/messy/)
