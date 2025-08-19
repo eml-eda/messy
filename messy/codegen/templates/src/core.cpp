@@ -173,7 +173,7 @@ void Core::handle_req(MessyRequest *req)
         wait();
         
     }
-    iss_adapter->custom_reply(req);   
+    iss_adapter->custom_reply(req, next_timestamp / 1'000'000); // Convert from ps to us
 }
 
 void Core::grant_req(MessyRequest *req)
@@ -269,7 +269,7 @@ void Core::continue_messy(bool handle_req_queue)
     printf("\n--------------------- SIM ITERATION @ %llu ms\n", sc_timestamp / 1'000'000'000);
     printf("Running computation until a request is found...\n");
     // Run the ISS adapter to execute the current simulation step
-    this->next_timestamp = this->iss_adapter->exec() + sc_timestamp;
+    this->next_timestamp = this->iss_adapter->exec();
     printf("Delay of the computation: %llu ms\n", (this->next_timestamp - sc_timestamp) / 1'000'000'000);
 
     // Accumulate the total power consumed up to the current timestamp

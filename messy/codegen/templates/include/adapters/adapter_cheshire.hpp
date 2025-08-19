@@ -43,6 +43,9 @@ class GdbServer
     std::string wait_for_line(const std::string &keyword);
     void flush_output();
     uint64_t read_mtime();
+    void set_mtime(const std::string &value);
+    uint64_t read_var(const std::string &var_name, int base = 10);
+    void write_var(const std::string &var_name, uint64_t value);
     
     bool is_closed() const { return closed; }
     pid_t get_pid() const { return gdb_pid; }
@@ -68,7 +71,7 @@ class AdapterCheshire
     void startup();
     uint64_t exec();
     double get_power_at(int64_t timestamp);
-    void custom_reply(MessyRequest *req);
+    void custom_reply(MessyRequest *req, uint64_t timestamp_us);
     
     MessyRequest *get_messy_request_from_gdb(const std::string &response);
 

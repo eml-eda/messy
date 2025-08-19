@@ -148,6 +148,7 @@ void GdbServer::send_command(const std::string &cmd)
  */
 uint64_t GdbServer::read_mtime()
 {
+    // TODO: make this generic for any register
     std::string line;
     int ret;
 
@@ -165,6 +166,46 @@ uint64_t GdbServer::read_mtime()
         return std::stoull(match[1], nullptr, 10);
     } else {
         throw std::runtime_error("Failed to parse machine timer response: " + line);
+    }
+}
+
+void GdbServer::set_mtime(const std::string &value) 
+{
+    // Set the machine timer register in Cheshire through GDB
+    // FIXME: it needs a hex and will set bytes in reverse order
+    this->send_command("-data-write-memory-bytes 0x" CHS_MTIME_REG + value);
+    std::string response = this->wait_for_line("^done");
+    
+    if (response.find("^error") != std::string::npos) {
+        throw std::runtime_error("Failed to set machine timer: " + response);
+    }
+}
+
+uint64_t GdbServer::read_var(const std::string &var_name, int base)
+{
+    // Read the value of a variable from GDB
+    std::string line;
+    std::regex value_regex("value=\"([^\"]+)\"");
+    std::smatch match;
+
+    this->send_command("-data-evaluate-expression \"" + var_name + "\"");
+    line = this->wait_for_line("^done,value=");
+
+    if (std::regex_search(line, match, value_regex)) {
+        return std::stoull(match[1], nullptr, base);
+    } else {
+        throw std::runtime_error("Failed to parse variable response: " + line);
+    }
+}
+
+void GdbServer::write_var(const std::string &var_name, uint64_t value)
+{
+    // Set the value of a variable in GDB
+    this->send_command("set " + var_name + "=" + std::to_string(value));
+
+    std::string response = this->wait_for_line("^done");
+    if (response.find("^error") != std::string::npos) {
+        throw std::runtime_error("Failed to write variable: " + response);
     }
 }
 
@@ -289,9 +330,6 @@ uint64_t AdapterCheshire::exec()
     std::string request_unparsed;
     MessyRequest *request;
 
-    // Read start time from the machine timer
-    uint64_t start_timestamp_us = this->gdb_server.read_mtime();
-
     // Resume execution of the program
     this->gdb_server.send_command("-exec-continue");
 
@@ -301,10 +339,7 @@ uint64_t AdapterCheshire::exec()
     // Read the machine timer again to get the timestamp of the request
     // TODO: This currently includes the overhead of the GDB communication.
     //  Although the overhead **should** be negligible, this could create skewed results in long simulations.
-    uint64_t end_timestamp_us = this->gdb_server.read_mtime();
-
-    // Calculate the delay of the computation in picoseconds
-    uint64_t delay_ps = (end_timestamp_us - start_timestamp_us) * 1'000'000;
+    uint64_t req_timestamp_ps = this->gdb_server.read_var("req_timestamp", 10) * 1'000'000; // Convert from us to ps
 
     // Parse the GDB response to get the MessyRequest
     request = this->get_messy_request_from_gdb(request_unparsed);
@@ -312,9 +347,9 @@ uint64_t AdapterCheshire::exec()
 
 #ifdef DEBUG
     if (request->read_req) {
-        printf("Parsed READ request: <-(0x%llx), %u Bytes\n", request->addr, request->size);
+        printf("Parsed READ request: ? <-(0x%llx), %u Bytes @ %llu ms\n", request->addr, request->size, req_timestamp_ps / 1'000'000'000);
     } else {
-        printf("Parsed WRITE request: %u ->(0x%llx), %u Bytes\n", *request->data, request->addr, request->size);
+        printf("Parsed WRITE request: %u ->(0x%llx), %u Bytes @ %llu ms\n", *request->data, request->addr, request->size, req_timestamp_ps / 1'000'000'000);
     }
 #endif
 
@@ -324,8 +359,8 @@ uint64_t AdapterCheshire::exec()
     // Flush GDB output
     this->gdb_server.flush_output();
 
-    // Return the computation delay in picoseconds
-    return delay_ps;
+    // Return the timestamp of the request
+    return req_timestamp_ps;
 }
 
 /**
@@ -336,13 +371,19 @@ uint64_t AdapterCheshire::exec()
  *
  * @param req The MessyRequest to handle.
  */
-void AdapterCheshire::custom_reply(MessyRequest *req)
+void AdapterCheshire::custom_reply(MessyRequest *req, uint64_t timestamp_us)
 {
     // If it was a read request, we need to send the value back to GDB
     if (req->read_req) {
 #ifdef DEBUG
         printf("Responding to READ request: %u <-(0x%llx), %u Bytes\n", *req->data, req->addr, req->size);
 #endif
-        this->gdb_server.send_command("set sensor_data=" + std::to_string(*req->data));
+        this->gdb_server.write_var("sensor_data", *req->data);
     }
+
+    // Send back the new timestamp to GDB
+#ifdef DEBUG
+    printf("Sending timestamp back to GDB: %llu ms\n", timestamp_us / 1'000);
+#endif
+    this->gdb_server.write_var("req_timestamp", timestamp_us);
 }
