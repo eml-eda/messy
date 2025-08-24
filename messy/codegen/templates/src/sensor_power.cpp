@@ -2,8 +2,8 @@
 
 void Sensor_${sensor_name}_power::set_attributes()
 {
-    func_signal.set_rate(1);
-    func_signal.set_timestep(1, SIM_RESOLUTION);
+    i_power_state.set_rate(1);
+    i_power_state.set_timestep(1, SIM_RESOLUTION);
 }
 
 void Sensor_${sensor_name}_power::initialize() {}
@@ -25,15 +25,15 @@ void Sensor_${sensor_name}_power::initialize() {}
 void Sensor_${sensor_name}_power::processing()
 {
     % for state_name,state in states.items():
-    if(func_signal.read() == ${sensor_name}_${state_name} ){
-        voltage_state.write(${sensor_name}_VREF);
-        current_state.write(${state["current"]});
+    if(i_power_state.read() == ${sensor_name}_${state_name} ){
+        o_voltage_a.write(${sensor_name}_VREF);
+        o_current_a.write(${state["current"]});
         return;
     }
     % endfor
-    if(func_signal.read() == 0){
-        voltage_state.write(0.0);
-        current_state.write(0.0);
+    if(i_power_state.read() == 0){
+        o_voltage_a.write(0.0);
+        o_current_a.write(0.0);
         return;
     }
 }

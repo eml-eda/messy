@@ -18,10 +18,10 @@ SCA_TDF_MODULE(Core_power)
 {
     Core* core; /**< Pointer to the Core functional module. */
     //Data from Functional Instance
-    sca_tdf::sc_in  <double> func_signal; /**< Input port for receiving functional signals from the Core. */
+    sca_tdf::sc_in  <double> i_power_state; /**< Input port for receiving functional signals from the Core. */
     //Data to Power Bus
-    sca_tdf::sca_out <double> voltage_state; /**< Output port for sending the voltage state to the Power Bus. */
-    sca_tdf::sca_out <double> current_state; /**< Output port for sending the current state to the Power Bus. */
+    sca_tdf::sca_out <double> o_voltage_a; /**< Output port for sending the voltage state to the Power Bus. */
+    sca_tdf::sca_out <double> o_current_a; /**< Output port for sending the current state to the Power Bus. */
     //sca_tdf::sca_out <int> power_to_therm;
 
     /**
@@ -29,11 +29,7 @@ SCA_TDF_MODULE(Core_power)
      * 
      * Initializes the input and output signal names for tracing and connecting to other modules.
      */
-    SCA_CTOR(Core_power):
-        func_signal("State_of_Power_From_Functional"),
-        voltage_state("Voltage_trace_to_Power_Bus"),
-        current_state("Current_trace_to_Power_Bus")
-    {}
+    SCA_CTOR(Core_power) {}
 
     /**
      * @brief Sets the attributes of the Core_power module.
