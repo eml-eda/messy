@@ -18,11 +18,11 @@
 #include <vector>
 #include <regex>
 
-#define GDB_BUFFER 1024
+#define GDB_BUFFER 2048
 #define GDB_PORT "3333"
 #define GDB_DEF_LONG_TIMEOUT_MS 2000
 #define GDB_DEF_SHORT_TIMEOUT_MS 100
-#define CHESSY_TEST_BIN "/tests/fake_sensor_multiple_reads.spm.elf" // TODO: make this configurable
+#define CHESSY_TEST_BIN "/messy/messy/bin/chessy_app" ///< Application binaries copied when running make application
 
 // Machine timer register, contains the current time in microseconds. 
 // Avoid the 0x prefix!

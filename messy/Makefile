@@ -132,6 +132,13 @@ application:
 	sed -i 's:"flash.bin":"/messy/messy/gvsoc_deps/flash.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json;\
 	sed -i 's:"hyperflash.bin":"/messy/messy/gvsoc_deps/hyperflash.bin":g' /messy/messy/gvsoc_deps/gvsoc_config.json
 
+application-cheshire:
+	@echo "Copying application binaries from $(app)"
+	cd /messy/messy/;\
+	mkdir -p bin;\
+	cd bin;\
+	cp $(app) chessy_app;
+
 docs:
 	mkdocs build
 
