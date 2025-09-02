@@ -1,20 +1,41 @@
+#ifndef GESTURE_SENSOR_HPP
+#define GESTURE_SENSOR_HPP
 #include <config.hpp>
 #include <core.hpp>
 #include <systemc.h>
 
+
+//
+// Register map
+//
 #define CONTROL_REG_BASE 0x00 ///< Base address for the control register (start/stop bit)
 #define MODULE_REG_BASE 0x04  ///< Base address for the MODULE amount register
 #define STATUS_REG_BASE 0x08  ///< Base address for the status register (new data present bit)
 #define DATA_REG_BASE 0x0C    ///< Base address for the data register
-
 // Control register bits
 #define CONTROL_START_BIT 0x01 ///< Bit to start the sensor
-
 // Status register bits
 #define STATUS_NEW_DATA_BIT 0x01 ///< Bit indicating new data is present
 
-// #define DEBUG_SENSOR_GESTURE
+//
+// Sensor's parameters
+//
+#define DATASET_PATH "./input_files/gesture/gesture_dataset.csv" ///< Path to the dataset file
+#define DATASET_RESOLUTION sc_core::SC_MS                        ///< Resolution of the dataset (SystemC time format)
+#define DATASET_TIME_INTERVAL 100                                ///< Time interval between two dataset readings (* DATASET_RESOLUTION)
 
+// Debug
+#define DEBUG_SENSOR_GESTURE
+
+#ifdef DEBUG_SENSOR_GESTURE
+#define DEBUG_PRINT(...) printf(__VA_ARGS__)
+#else
+#define DEBUG_PRINT(...)
+#endif
+
+//
+// Functions
+//
 /**
  * @brief Functional module for the ${sensor_name} sensor.
  *
@@ -79,6 +100,9 @@ SC_MODULE(Sensor_${sensor_name}_functional)
         register_memory[STATUS_REG_BASE]  = 0x00; // No new data initially
         register_memory[DATA_REG_BASE]    = 0x00; // Initial data value
 
+        // Open dataset file
+        open_dataset();
+
         // Declare the sensor logic thread and make it sensitive to the 'ready' signal.
         SC_THREAD(sensor_logic);
         sensitive << ready;
@@ -122,8 +146,17 @@ SC_MODULE(Sensor_${sensor_name}_functional)
     int register_memory_size = ${register_memory}; ///< Size of the sensor's register memory.
     bool sensor_running      = false;  ///< Flag to indicate if the sensor is running.
 
+    FILE *dataset_file = nullptr;           ///< File pointer for streaming CSV.
+    long dataset_line_pos = 0;              ///< File position of first data line (after header).
+    long dataset_current_line = 0;          ///< Current line number being processed.
+    char dataset_line_buf[256];             ///< Buffer for reading lines.
+    void open_dataset();                    ///< Helper to open CSV and skip header.
+    uint8_t read_next_value();              ///< Helper to read next VALUE from CSV, cycling.
+
     // Other methods
     void read_sensor(unsigned int address);
     void write_sensor(unsigned int address, uint8_t *data, unsigned int size);
     void data_update_thread(); ///< Thread for periodic data updates
 };
+
+#endif // GESTURE_SENSOR_HPP

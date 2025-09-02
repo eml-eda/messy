@@ -32,9 +32,7 @@ void Sensor_${sensor_name}_functional::sensor_logic()
             if (ready.read() == true) {
                 if (flag_wr.read() == true) {
                     // Read operation
-#ifdef DEBUG_SENSOR_GESTURE
-                    printf("[${sensor_name}] performing read operation at address 0x%x\n", address.read());
-#endif
+                    DEBUG_PRINT("[${sensor_name}] performing read operation at address 0x%x\n", address.read());
                     read_sensor(address.read());
 
                     // Reading power consumption state
@@ -48,9 +46,7 @@ void Sensor_${sensor_name}_functional::sensor_logic()
                     power_signal.write(${sensor_name}_idle);
                 } else {
                     // Write operation
-#ifdef DEBUG_SENSOR_GESTURE
-                    printf("[${sensor_name}] performing write operation at address 0x%x\n", address.read());
-#endif
+                    DEBUG_PRINT("[${sensor_name}] performing write operation at address 0x%x\n", address.read());
                     write_sensor(address.read(), data_in.read(), req_size.read());
 
                     // Writing power consumption state
@@ -64,9 +60,7 @@ void Sensor_${sensor_name}_functional::sensor_logic()
                     power_signal.write(${sensor_name}_idle);
                 }
                 go.write(true); ///< Indicate that the operation is complete.
-#ifdef DEBUG_SENSOR_GESTURE
-                printf("[${sensor_name}] operation completed\n");
-#endif
+                DEBUG_PRINT("[${sensor_name}] operation completed\n");
             } else {
                 go.write(false);
             }
@@ -83,35 +77,25 @@ void Sensor_${sensor_name}_functional::read_sensor(unsigned int address)
     // Handle specific register reads
     switch (address) {
     case CONTROL_REG_BASE:
-#ifdef DEBUG_SENSOR_GESTURE
-        printf("[${sensor_name}] reading CONTROL register: 0x%x\n", register_memory[CONTROL_REG_BASE]);
-#endif
+        DEBUG_PRINT("[${sensor_name}] reading CONTROL register: 0x%x\n", register_memory[CONTROL_REG_BASE]);
         data_out.write(register_memory + CONTROL_REG_BASE);
         break;
     case MODULE_REG_BASE:
-#ifdef DEBUG_SENSOR_GESTURE
-        printf("[${sensor_name}] reading MODULE register: 0x%x\n", register_memory[MODULE_REG_BASE]);
-#endif
+        DEBUG_PRINT("[${sensor_name}] reading MODULE register: 0x%x\n", register_memory[MODULE_REG_BASE]);
         data_out.write(register_memory + MODULE_REG_BASE);
         break;
     case STATUS_REG_BASE:
-#ifdef DEBUG_SENSOR_GESTURE
-        printf("[${sensor_name}] reading STATUS register: 0x%x\n", register_memory[STATUS_REG_BASE]);
-#endif
+        DEBUG_PRINT("[${sensor_name}] reading STATUS register: 0x%x\n", register_memory[STATUS_REG_BASE]);
         data_out.write(register_memory + STATUS_REG_BASE);
         break;
     case DATA_REG_BASE:
-#ifdef DEBUG_SENSOR_GESTURE
-        printf("[${sensor_name}] reading DATA register: 0x%x\n", register_memory[DATA_REG_BASE]);
-#endif
+        DEBUG_PRINT("[${sensor_name}] reading DATA register: 0x%x\n", register_memory[DATA_REG_BASE]);
         data_out.write(register_memory + DATA_REG_BASE);
         // Clear the new data status bit after reading
         register_memory[STATUS_REG_BASE] &= ~STATUS_NEW_DATA_BIT;
         break;
     default:
-#ifdef DEBUG_SENSOR_GESTURE
-        printf("[${sensor_name}] reading generic register at address 0x%x: 0x%x\n", address, register_memory[address]);
-#endif
+        DEBUG_PRINT("[${sensor_name}] reading generic register at address 0x%x: 0x%x\n", address, register_memory[address]);
         // For other addresses, send the pointer to the data in the register memory
         data_out.write(register_memory + address);
         break;
@@ -120,64 +104,44 @@ void Sensor_${sensor_name}_functional::read_sensor(unsigned int address)
 
 void Sensor_${sensor_name}_functional::write_sensor(unsigned int address, uint8_t *data, unsigned int size)
 {
-#ifdef DEBUG_SENSOR_GESTURE
-    printf("[${sensor_name}] write_sensor called for address 0x%x, size %u, data[0] = 0x%x\n", address, size, data[0]);
-#endif
+    DEBUG_PRINT("[${sensor_name}] write_sensor called for address 0x%x, size %u, data[0] = 0x%x\n", address, size, data[0]);
     // Handle specific register writes
     switch (address) {
     case CONTROL_REG_BASE:
         register_memory[CONTROL_REG_BASE] = data[0];
-#ifdef DEBUG_SENSOR_GESTURE
-        printf("[${sensor_name}] writing CONTROL register: 0x%x\n", data[0]);
-#endif
+        DEBUG_PRINT("[${sensor_name}] writing CONTROL register: 0x%x\n", data[0]);
         // Check if sensor should start or stop
         if (data[0] & CONTROL_START_BIT) {
             sensor_running = true;
-#ifdef DEBUG_SENSOR_GESTURE
-            printf("[${sensor_name}] sensor started\n");
-#endif
+            DEBUG_PRINT("[${sensor_name}] sensor started\n");
         } else {
             sensor_running = false;
-#ifdef DEBUG_SENSOR_GESTURE
-            printf("[${sensor_name}] sensor stopped\n");
-#endif
+            DEBUG_PRINT("[${sensor_name}] sensor stopped\n");
         }
         break;
     case MODULE_REG_BASE:
         register_memory[MODULE_REG_BASE] = data[0];
-#ifdef DEBUG_SENSOR_GESTURE
-        printf("[${sensor_name}] writing MODULE register: 0x%x\n", data[0]);
-#endif
+        DEBUG_PRINT("[${sensor_name}] writing MODULE register: 0x%x\n", data[0]);
         // Ensure module_value is at least 1 to avoid division by zero
         if (register_memory[MODULE_REG_BASE] == 0) {
             register_memory[MODULE_REG_BASE] = 1;
-#ifdef DEBUG_SENSOR_GESTURE
-            printf("[${sensor_name}] MODULE register corrected to 1 to avoid division by zero\n");
-#endif
+            DEBUG_PRINT("[${sensor_name}] MODULE register corrected to 1 to avoid division by zero\n");
         }
         break;
     case STATUS_REG_BASE:
-#ifdef DEBUG_SENSOR_GESTURE
-        printf("[${sensor_name}] attempted write to read-only STATUS register ignored\n");
-#endif
+        DEBUG_PRINT("[${sensor_name}] attempted write to read-only STATUS register ignored\n");
         // Status register is read-only, ignore writes
         break;
     case DATA_REG_BASE:
-#ifdef DEBUG_SENSOR_GESTURE
-        printf("[${sensor_name}] attempted write to read-only DATA register ignored\n");
-#endif
+        DEBUG_PRINT("[${sensor_name}] attempted write to read-only DATA register ignored\n");
         // Data register is read-only (updated by sensor), ignore writes
         break;
     default:
-#ifdef DEBUG_SENSOR_GESTURE
-        printf("[${sensor_name}] writing generic register at address 0x%x\n", address);
-#endif
+        DEBUG_PRINT("[${sensor_name}] writing generic register at address 0x%x\n", address);
         // For other addresses, write normally
         for (unsigned int i = 0; i < size; i++) {
             register_memory[i + address] = data[i];
-#ifdef DEBUG_SENSOR_GESTURE
-            printf("[${sensor_name}] wrote 0x%x to address 0x%x\n", data[i], i + address);
-#endif
+            DEBUG_PRINT("[${sensor_name}] wrote 0x%x to address 0x%x\n", data[i], i + address);
         }
         break;
     }
@@ -187,27 +151,51 @@ void Sensor_${sensor_name}_functional::write_sensor(unsigned int address, uint8_
 void Sensor_${sensor_name}_functional::data_update_thread()
 {
     while (true) {
-        wait(1, sc_core::SC_SEC); // Wait for the next time unit (1 second)
-
-
         // Update the data register if sensor is running
         if (sensor_running) {
-#ifdef DEBUG_SENSOR_GESTURE
-            printf("[${sensor_name}] updating data register\n");
-            printf("[${sensor_name}] current MODULE value: %u\n", register_memory[MODULE_REG_BASE]);
-#endif
-            uint8_t new_value = rand() % register_memory[MODULE_REG_BASE];
-            register_memory[DATA_REG_BASE] = new_value; ///< Update the data register with a random value
+            // Read the next line from the dataset
+            uint8_t new_value = read_next_value();
+            register_memory[DATA_REG_BASE] = new_value;
             // Set the new data present bit in status register
             register_memory[STATUS_REG_BASE] |= STATUS_NEW_DATA_BIT;
-#ifdef DEBUG_SENSOR_GESTURE
-            printf("[${sensor_name}] data updated: new value = 0x%x, STATUS = 0x%x\n", 
-                   new_value, register_memory[STATUS_REG_BASE]);
-#endif
+            DEBUG_PRINT("[${sensor_name}] data updated: new value = %d, STATUS = 0x%x, timestamp = %d\n", 
+                new_value, register_memory[STATUS_REG_BASE], dataset_current_line);
         } else {
-#ifdef DEBUG_SENSOR_GESTURE
-            printf("[${sensor_name}] sensor not running, skipping data update\n");
-#endif
+            DEBUG_PRINT("[${sensor_name}] sensor not running, skipping data update\n");
         }
+
+        wait(DATASET_TIME_INTERVAL, DATASET_RESOLUTION);
     }
+}
+
+void Sensor_${sensor_name}_functional::open_dataset() {
+    if (dataset_file) fclose(dataset_file);
+    dataset_file = fopen(DATASET_PATH, "r");
+    if (!dataset_file) {
+        DEBUG_PRINT("[${sensor_name}] ERROR: Could not open dataset file: %s\n", DATASET_PATH);
+        dataset_line_pos = 0;
+        return;
+    }
+    // Skip header
+    if (fgets(dataset_line_buf, sizeof(dataset_line_buf), dataset_file)) {
+        dataset_line_pos = ftell(dataset_file);
+    } else {
+        dataset_line_pos = 0;
+    }
+}
+
+uint8_t Sensor_${sensor_name}_functional::read_next_value() {
+    if (!dataset_file) return 0;
+    if (!fgets(dataset_line_buf, sizeof(dataset_line_buf), dataset_file)) {
+        // EOF reached, cycle to first data line
+        dataset_current_line = 0;
+        fseek(dataset_file, dataset_line_pos, SEEK_SET);
+        if (!fgets(dataset_line_buf, sizeof(dataset_line_buf), dataset_file)) return 0;
+    }
+    char *comma = strchr(dataset_line_buf, ',');
+    if (comma) {
+        dataset_current_line++;
+        return (uint8_t)atoi(comma + 1);
+    }
+    return 0;
 }

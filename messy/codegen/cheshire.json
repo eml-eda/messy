@@ -46,7 +46,7 @@
                     "path_header": "./gesture_sensor/gesture_sensor.hpp",
                     "path_source": "./gesture_sensor/gesture_sensor.cpp"
                 },
-                "power": true,
+                "power": false,
                 "tracing":{
                     "messy_trace":{
                         "gesture_I":"current"
