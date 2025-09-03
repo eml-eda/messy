@@ -67,7 +67,6 @@
                         "current" : "0.002"
                     },
                     "bluetooth": {
-                        "enabled" : true,
                         "connection_interval" : "100.0",
                         "connection_event" : "5.0",
                         "jitter" : "1.0",
