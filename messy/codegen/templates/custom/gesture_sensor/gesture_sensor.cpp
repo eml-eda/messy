@@ -30,6 +30,7 @@ void Sensor_${sensor_name}_functional::sensor_logic()
     while (true) {
         if (enable.read() == true) {
             if (ready.read() == true) {
+                double start_time = sc_time_stamp().to_double(); ///< Get the current simulation time
                 if (flag_wr.read() == true) {
                     // Read operation
                     DEBUG_PRINT("[${sensor_name}] performing read operation at address 0x%x\n", address.read());
@@ -53,12 +54,19 @@ void Sensor_${sensor_name}_functional::sensor_logic()
                     power_signal.write(${sensor_name}_write);
                     
                     // Request delay for the write operation
-                    double start_time = sc_time_stamp().to_double(); ///< Get the current simulation time
                     core->request_delay(start_time, ${states["write"]["delay"]}, SIM_RESOLUTION); 
 
                     // Switch to idle power consumption state
                     power_signal.write(${sensor_name}_idle);
                 }
+
+                if (${states["bluetooth"]["enabled"]} == true) {
+                    // Compute Bluetooth delay
+                    int transmission_delay = compute_bt_delay(req_size.read());
+                    DEBUG_PRINT("[${sensor_name}] computed Bluetooth transmission delay: %d\n", transmission_delay);
+                    core->request_delay(start_time, transmission_delay, SIM_RESOLUTION);
+                }
+
                 go.write(true); ///< Indicate that the operation is complete.
                 DEBUG_PRINT("[${sensor_name}] operation completed\n");
             } else {
@@ -198,4 +206,39 @@ uint8_t Sensor_${sensor_name}_functional::read_next_value() {
         return (uint8_t)atoi(comma + 1);
     }
     return 0;
+}
+
+// Computes the Bluetooth transmission delay given the request size in bytes
+int Sensor_${sensor_name}_functional::compute_bt_delay(unsigned int req_bytes) {
+    // Bluetooth parameters from configuration
+    double bt_conn_int = ${states["bluetooth"]["connection_interval"]};
+    double bt_event = ${states["bluetooth"]["connection_event"]};
+    double bt_jitter = ${states["bluetooth"]["jitter"]};
+    double bt_drop = ${states["bluetooth"]["fragment_drop_chance"]};
+    double bt_frag_size = ${states["bluetooth"]["fragment_size_bytes"]};
+
+    // Number of fragments is ceil(req_bytes / bt_frag_size)
+    unsigned int n_frags = (req_bytes + (unsigned int)bt_frag_size - 1) / (unsigned int)bt_frag_size; // ceil
+
+    // Jitter is a random value in [-bt_jitter, +bt_jitter]
+    double jitter_val = ((double)rand() / (double)RAND_MAX) * 2.0 * bt_jitter - bt_jitter;
+
+    // Number of retries based on bt_drop probability of each fragment
+    unsigned int total_retries = 0;
+    for (unsigned int i = 0; i < n_frags; ++i) {
+        double r = ((double)rand() / (double)RAND_MAX); // random in [0,1]
+        unsigned int retries = 0;
+        double p = bt_drop;
+        // Each retry multiplies the drop probability (p) by itself
+        while (r < p && p > 1e-9) {
+            ++retries;
+            p *= bt_drop;
+        }
+        total_retries += retries;
+    }
+
+    // Total bluetooth delay
+    int transmission_delay = (int)((bt_conn_int * (total_retries + 1)) + bt_event + jitter_val);
+    DEBUG_PRINT("[${sensor_name}] [compute_bt_delay] frags=%u, retries=%u, jitter=%.2f, delay=%d\n", n_frags, total_retries, jitter_val, transmission_delay);
+    return transmission_delay;
 }

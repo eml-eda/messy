@@ -157,6 +157,7 @@ SC_MODULE(Sensor_${sensor_name}_functional)
     void read_sensor(unsigned int address);
     void write_sensor(unsigned int address, uint8_t *data, unsigned int size);
     void data_update_thread(); ///< Thread for periodic data updates
+    int compute_bt_delay(unsigned int req_bytes);
 };
 
 #endif // GESTURE_SENSOR_HPP
