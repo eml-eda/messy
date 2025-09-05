@@ -13,11 +13,6 @@
  * - flag_wr: If the sensor is ready, it checks the flag_wr signal. If true, the sensor performs a read operation, else
  * a write operation.
  *
- * The sensor implements standard sensor behavior with:
- * - Control register: to start/stop the sensor
- * - Status register: to indicate if new data is available
- * - Data register: to hold the latest sensor data
- *
  * The read and write operations are modeled using the following concept. In the configuration file, the user can
  * specify the delay and the power consumption for each operation. To mimic this behaviour, the sensor logic waits for
  * the specified delay time before proceeding to the next operation. During the read/write operation, the power signal
@@ -109,16 +104,13 @@ void Sensor_${sensor_name}_functional::read_sensor(unsigned int address)
 
 void Sensor_${sensor_name}_functional::write_sensor(unsigned int address, uint8_t *data, unsigned int size)
 {
-    DEBUG_PRINT("[${sensor_name}] write_sensor called for address 0x%x, size %u\n", address, size);
+    DEBUG_PRINT("[${sensor_name}] write_sensor called for address 0x%x, size %u, data[0] = 0x%x\n", address, size, data[0]);
     // Handle specific register writes
     switch (address) {
     case CONTROL_REG_BASE:
-        // Copy all bytes to CONTROL register (up to CONTROL_REG_SIZE)
-        for (unsigned int i = 0; i < size && i < CONTROL_REG_SIZE; i++) {
-            register_memory[CONTROL_REG_BASE + i] = data[i];
-            DEBUG_PRINT("[${sensor_name}] writing CONTROL register byte %u: 0x%x\n", i, data[i]);
-        }
-        // Check if sensor should start or stop (use first byte)
+        register_memory[CONTROL_REG_BASE] = data[0];
+        DEBUG_PRINT("[${sensor_name}] writing CONTROL register: 0x%x\n", data[0]);
+        // Check if sensor should start or stop
         if (data[0] & CONTROL_START_BIT) {
             sensor_running = true;
             DEBUG_PRINT("[${sensor_name}] sensor started\n");
@@ -128,12 +120,9 @@ void Sensor_${sensor_name}_functional::write_sensor(unsigned int address, uint8_
         }
         break;
     case MODULE_REG_BASE:
-        // Copy all bytes to MODULE register (up to MODULE_REG_SIZE)
-        for (unsigned int i = 0; i < size && i < MODULE_REG_SIZE; i++) {
-            register_memory[MODULE_REG_BASE + i] = data[i];
-            DEBUG_PRINT("[${sensor_name}] writing MODULE register byte %u: 0x%x\n", i, data[i]);
-        }
-        // Ensure module_value is at least 1 to avoid division by zero (use first byte)
+        register_memory[MODULE_REG_BASE] = data[0];
+        DEBUG_PRINT("[${sensor_name}] writing MODULE register: 0x%x\n", data[0]);
+        // Ensure module_value is at least 1 to avoid division by zero
         if (register_memory[MODULE_REG_BASE] == 0) {
             register_memory[MODULE_REG_BASE] = 1;
             DEBUG_PRINT("[${sensor_name}] MODULE register corrected to 1 to avoid division by zero\n");
@@ -149,7 +138,7 @@ void Sensor_${sensor_name}_functional::write_sensor(unsigned int address, uint8_
         break;
     default:
         DEBUG_PRINT("[${sensor_name}] writing generic register at address 0x%x\n", address);
-        // For other addresses, write all bytes
+        // For other addresses, write normally
         for (unsigned int i = 0; i < size; i++) {
             register_memory[i + address] = data[i];
             DEBUG_PRINT("[${sensor_name}] wrote 0x%x to address 0x%x\n", data[i], i + address);
@@ -172,7 +161,7 @@ void Sensor_${sensor_name}_functional::data_update_thread()
             DEBUG_PRINT("[${sensor_name}] data updated: new value = %d, STATUS = 0x%x, timestamp = %d\n", 
                 new_value, register_memory[STATUS_REG_BASE], dataset_current_line);
         } else {
-            //DEBUG_PRINT("[${sensor_name}] sensor not running, skipping data update\n");
+            DEBUG_PRINT("[${sensor_name}] sensor not running, skipping data update\n");
         }
 
         wait(DATASET_TIME_INTERVAL, DATASET_RESOLUTION);
@@ -209,4 +198,36 @@ uint8_t Sensor_${sensor_name}_functional::read_next_value() {
         return (uint8_t)atoi(comma + 1);
     }
     return 0;
+}
+
+#define UNIFORM_OPEN01() ((double)rand() / (double)RAND_MAX) // random in [0,1]
+
+// Computes the Bluetooth transmission delay given the request size in bytes
+int Sensor_${sensor_name}_functional::compute_bt_delay(unsigned int req_bytes) {
+    // TODO: sanitize parameters
+    // Bluetooth parameters from configuration
+    double bt_conn_int = ${states["bluetooth"]["connection_interval"]};
+    double bt_event = ${states["bluetooth"]["connection_event"]};
+    double bt_jitter = ${states["bluetooth"]["jitter"]};
+    double bt_drop = ${states["bluetooth"]["fragment_drop_chance"]};
+    double bt_frag_size = ${states["bluetooth"]["fragment_size_bytes"]};
+
+    // Number of fragments is ceil(req_bytes / bt_frag_size)
+    unsigned int n_frags = (req_bytes + (unsigned int)bt_frag_size - 1) / (unsigned int)bt_frag_size; // ceil
+
+    // Jitter is a random value in [-bt_jitter, +bt_jitter]
+    double jitter_val = UNIFORM_OPEN01() * 2.0 * bt_jitter - bt_jitter;
+
+    // Number of trials based on bt_drop probability of each fragment
+    unsigned int trials = 0;
+    for (unsigned int i = 0; i < n_frags; ++i) {
+        ++trials; // Add the initial trial
+        double p = 1 - bt_drop;
+        while (UNIFORM_OPEN01() > p) ++trials; // Geometric distribution
+    }
+
+    // Total bluetooth delay
+    int transmission_delay = (int)((bt_conn_int * trials) + bt_event + jitter_val);
+    DEBUG_PRINT("[${sensor_name}] [compute_bt_delay] frags=%u, trials=%u, jitter=%.2f, delay=%d\n", n_frags, trials, jitter_val, transmission_delay);
+    return transmission_delay;
 }

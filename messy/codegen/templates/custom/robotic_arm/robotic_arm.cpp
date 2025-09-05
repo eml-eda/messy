@@ -79,14 +79,16 @@ void Sensor_${sensor_name}_functional::read_sensor(unsigned int address)
 
 void Sensor_${sensor_name}_functional::write_sensor(unsigned int address, uint8_t *data, unsigned int size)
 {
-    DEBUG_PRINT("[${sensor_name}] write_sensor called for address 0x%x, size %u, data[0] = 0x%x\n", address, size, data[0]);
+    DEBUG_PRINT("[${sensor_name}] write_sensor called for address 0x%x, size %u\n", address, size);
     // Handle specific register writes
-    // FIXME: why only data[0]?
     switch (address) {
     case CONTROL_REG_BASE:
-        register_memory[CONTROL_REG_BASE] = data[0];
-        DEBUG_PRINT("[${sensor_name}] writing CONTROL register: 0x%x\n", data[0]);
-        // Check if sensor should start or stop
+        // Copy all bytes to CONTROL register (up to CONTROL_REG_SIZE)
+        for (unsigned int i = 0; i < size && i < CONTROL_REG_SIZE; i++) {
+            register_memory[CONTROL_REG_BASE + i] = data[i];
+            DEBUG_PRINT("[${sensor_name}] writing CONTROL register byte %u: 0x%x\n", i, data[i]);
+        }
+        // Check if sensor should start or stop (use first byte)
         if (data[0] & CONTROL_START_BIT) {
             sensor_running = true;
             DEBUG_PRINT("[${sensor_name}] sensor started\n");
@@ -100,13 +102,16 @@ void Sensor_${sensor_name}_functional::write_sensor(unsigned int address, uint8_
         // Status register is read-only, ignore writes
         break;
     case MOVEMENT_REG_BASE:
-        DEBUG_PRINT("[${sensor_name}] writing MOVEMENT register: 0x%x\n", data[0]);
-        register_memory[MOVEMENT_REG_BASE] = data[0];
+        // Copy all bytes to MOVEMENT register (up to MOVEMENT_REG_SIZE)
+        for (unsigned int i = 0; i < size && i < MOVEMENT_REG_SIZE; i++) {
+            register_memory[MOVEMENT_REG_BASE + i] = data[i];
+            DEBUG_PRINT("[${sensor_name}] writing MOVEMENT register byte %u: 0x%x\n", i, data[i]);
+        }
         perform_movement(data[0]);
         break;
     default:
         DEBUG_PRINT("[${sensor_name}] writing generic register at address 0x%x\n", address);
-        // For other addresses, write normally
+        // For other addresses, write all bytes
         for (unsigned int i = 0; i < size; i++) {
             register_memory[i + address] = data[i];
             DEBUG_PRINT("[${sensor_name}] wrote 0x%x to address 0x%x\n", data[i], i + address);

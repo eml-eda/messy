@@ -57,22 +57,14 @@
                 "states":{
                     "read" : {
                         "current" : "0.12",
-                        "delay" : "30"
+                        "delay" : "0"
                     },
                     "write": {
                         "current" : "0.16",
-                        "delay" : "30"
+                        "delay" : "0"
                     },
                     "idle":{
                         "current" : "0.002"
-                    },
-                    "bluetooth": {
-                        "connection_interval" : "100.0",
-                        "connection_event" : "5.0",
-                        "jitter" : "1.0",
-                        "fragment_drop_chance" : "0.1",
-                        "fragment_size_bytes" : "256.0",
-                        "current" : "0.1"
                     }
                 }
             },
@@ -93,11 +85,11 @@
                 "states":{
                     "read" : {
                         "current" : "0.08",
-                        "delay" : "5"
+                        "delay" : "0"
                     },
                     "write": {
                         "current" : "0.1",
-                        "delay" : "5"
+                        "delay" : "0"
                     },
                     "idle":{
                         "current" : "0.002"

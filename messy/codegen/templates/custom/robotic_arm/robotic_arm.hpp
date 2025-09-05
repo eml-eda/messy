@@ -8,8 +8,12 @@
 // Register map
 //
 #define CONTROL_REG_BASE 0x00 ///< Base address for the control register (start/stop bit)
+#define CONTROL_REG_SIZE 4    ///< Size of the control register in bytes
 #define STATUS_REG_BASE 0x04  ///< Base address for the status register (new data present bit)
+#define STATUS_REG_SIZE 4     ///< Size of the status register in bytes
 #define MOVEMENT_REG_BASE 0x08    ///< Base address for the input movement register
+#define MOVEMENT_REG_SIZE 4     ///< Size of the movement register in bytes
+
 // Control register bits
 #define CONTROL_START_BIT 0x01 ///< Bit to start the sensor
 // Status register bits
@@ -19,9 +23,9 @@
 #define DEBUG_SENSOR_GESTURE
 
 #ifdef DEBUG_SENSOR_GESTURE
-#define DEBUG_PRINT(...) printf(__VA_ARGS__)
+    #define DEBUG_PRINT(...) printf(__VA_ARGS__)
 #else
-#define DEBUG_PRINT(...)
+    #define DEBUG_PRINT(...)
 #endif
 
 //
