@@ -53,7 +53,7 @@
                     }
                 },
                 "vref": 3.3,
-                "register_memory" : 1024,
+                "register_memory" : 4096,
                 "states":{
                     "read" : {
                         "current" : "0.12",
@@ -73,6 +73,42 @@
                         "fragment_drop_chance" : "0.1",
                         "fragment_size_bytes" : "256.0",
                         "current" : "0.1"
+                    }
+                }
+            },
+            "robotic_arm": {
+                "type": "custom",
+                "custom_implementation": {
+                    "path_header": "./robotic_arm/robotic_arm.hpp",
+                    "path_source": "./robotic_arm/robotic_arm.cpp"
+                },
+                "power": false,
+                "tracing":{
+                    "messy_trace":{
+                        "robotic_arm_I":"current"
+                    }
+                },
+                "vref": 3.3,
+                "register_memory" : 256,
+                "states":{
+                    "read" : {
+                        "current" : "0.08",
+                        "delay" : "5"
+                    },
+                    "write": {
+                        "current" : "0.1",
+                        "delay" : "5"
+                    },
+                    "idle":{
+                        "current" : "0.002"
+                    },
+                    "bluetooth": {
+                        "connection_interval" : "100.0",
+                        "connection_event" : "5.0",
+                        "jitter" : "1.0",
+                        "fragment_drop_chance" : "0.1",
+                        "fragment_size_bytes" : "256.0",
+                        "current" : "0.01"
                     }
                 }
             }
