@@ -19,7 +19,7 @@
 #include <regex>
 
 #define GDB_BUFFER 2048
-#define GDB_PORT "3333"
+#define GDB_PORT "3334"
 #define GDB_DEF_LONG_TIMEOUT_MS 2000
 #define GDB_DEF_SHORT_TIMEOUT_MS 100
 #define CHESSY_TEST_BIN "/messy/messy/bin/chessy_app" ///< Application binaries copied when running make application

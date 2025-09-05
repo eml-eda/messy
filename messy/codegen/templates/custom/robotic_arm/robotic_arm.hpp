@@ -1,5 +1,5 @@
-#ifndef GESTURE_SENSOR_HPP
-#define GESTURE_SENSOR_HPP
+#ifndef ${sensor_name}_HPP
+#define ${sensor_name}_HPP
 #include <config.hpp>
 #include <core.hpp>
 #include <systemc.h>
@@ -97,10 +97,6 @@ SC_MODULE(Sensor_${sensor_name}_functional)
         // Declare the sensor logic thread and make it sensitive to the 'ready' signal.
         SC_THREAD(sensor_logic);
         sensitive << ready;
-
-        // Declare the data update thread for periodic updates
-        SC_THREAD(data_update_thread);
-        sensitive << ready;
     }
 
     /**
@@ -144,4 +140,4 @@ SC_MODULE(Sensor_${sensor_name}_functional)
     void perform_movement(unsigned int movement);
 };
 
-#endif // GESTURE_SENSOR_HPP
+#endif // ${sensor_name}_HPP

@@ -1,5 +1,5 @@
-#ifndef GESTURE_SENSOR_HPP
-#define GESTURE_SENSOR_HPP
+#ifndef ${sensor_name}_HPP
+#define ${sensor_name}_HPP
 #include <config.hpp>
 #include <core.hpp>
 #include <systemc.h>
@@ -164,4 +164,4 @@ SC_MODULE(Sensor_${sensor_name}_functional)
     int compute_bt_delay(unsigned int req_bytes);
 };
 
-#endif // GESTURE_SENSOR_HPP
+#endif // ${sensor_name}_HPP
