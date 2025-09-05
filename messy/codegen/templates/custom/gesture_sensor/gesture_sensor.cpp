@@ -58,12 +58,6 @@ void Sensor_${sensor_name}_functional::sensor_logic()
                     // Switch to idle power consumption state
                     power_signal.write(${sensor_name}_idle);
                 }
-
-                // Compute Bluetooth delay
-                int transmission_delay = compute_bt_delay(req_size.read());
-                DEBUG_PRINT("[${sensor_name}] computed Bluetooth transmission delay: %d\n", transmission_delay);
-                core->request_delay(start_time, transmission_delay, SIM_RESOLUTION);
-
                 go.write(true); ///< Indicate that the operation is complete.
                 DEBUG_PRINT("[${sensor_name}] operation completed\n");
             } else {
@@ -164,49 +158,47 @@ void Sensor_${sensor_name}_functional::data_update_thread()
     while (true) {
         // Update the data register if sensor is running
         if (sensor_running) {
-            // Read the next line from the dataset
-            uint8_t new_value = read_next_value();
-            register_memory[DATA_REG_BASE] = new_value;
-            // Set the new data present bit in status register
-            register_memory[STATUS_REG_BASE] |= STATUS_NEW_DATA_BIT;
-            DEBUG_PRINT("[${sensor_name}] data updated: new value = %d, STATUS = 0x%x, timestamp = %d\n", 
-                new_value, register_memory[STATUS_REG_BASE], dataset_current_line);
-        } else {
-            //DEBUG_PRINT("[${sensor_name}] sensor not running, skipping data update\n");
+            int bytes_read = read_next_sample();
+            if (bytes_read > 0) {
+                // Set the new data present bit in status register
+                register_memory[STATUS_REG_BASE] |= STATUS_NEW_DATA_BIT;
+                DEBUG_PRINT("[${sensor_name}] data updated: %d bytes, STATUS = 0x%x, sample = %ld\n", 
+                    bytes_read, register_memory[STATUS_REG_BASE], dataset_current_sample);
+            } else {
+                DEBUG_PRINT("[${sensor_name}] no more samples, STATUS = 0x%x, sample = %ld\n", 
+                    register_memory[STATUS_REG_BASE], dataset_current_sample);
+            }
         }
-
         wait(DATASET_TIME_INTERVAL, DATASET_RESOLUTION);
     }
 }
 
 void Sensor_${sensor_name}_functional::open_dataset() {
     if (dataset_file) fclose(dataset_file);
-    dataset_file = fopen(DATASET_PATH, "r");
+    dataset_file = fopen(DATASET_PATH, "rb");
     if (!dataset_file) {
-        DEBUG_PRINT("[${sensor_name}] ERROR: Could not open dataset file: %s\n", DATASET_PATH);
-        dataset_line_pos = 0;
+        printf("[${sensor_name}] ERROR: Could not open dataset file: %s\n", DATASET_PATH);
+        sc_stop();
         return;
     }
-    // Skip header
-    if (fgets(dataset_line_buf, sizeof(dataset_line_buf), dataset_file)) {
-        dataset_line_pos = ftell(dataset_file);
-    } else {
-        dataset_line_pos = 0;
-    }
+    dataset_current_sample = 0;
+    fseek(dataset_file, 0, SEEK_SET);
 }
 
-uint8_t Sensor_${sensor_name}_functional::read_next_value() {
+// Read the next sample (DATASET_SAMPLE_SIZE bytes) from the binary dataset into the data register
+int Sensor_${sensor_name}_functional::read_next_sample() {
     if (!dataset_file) return 0;
-    if (!fgets(dataset_line_buf, sizeof(dataset_line_buf), dataset_file)) {
-        // EOF reached, cycle to first data line
-        dataset_current_line = 0;
-        fseek(dataset_file, dataset_line_pos, SEEK_SET);
-        if (!fgets(dataset_line_buf, sizeof(dataset_line_buf), dataset_file)) return 0;
+    // Reads DATASET_SAMPLE_SIZE bytes into DATA register at once
+    size_t bytes_read = fread(register_memory + DATA_REG_BASE, 1, DATASET_SAMPLE_SIZE, dataset_file);
+    if (bytes_read < DATASET_SAMPLE_SIZE) {
+        // EOF reached, cycle to first sample
+        fseek(dataset_file, 0, SEEK_SET);
+        bytes_read = fread(register_memory + DATA_REG_BASE, 1, DATASET_SAMPLE_SIZE, dataset_file);
+        dataset_current_sample = 0;
     }
-    char *comma = strchr(dataset_line_buf, ',');
-    if (comma) {
-        dataset_current_line++;
-        return (uint8_t)atoi(comma + 1);
+    if (bytes_read == DATASET_SAMPLE_SIZE) {
+        dataset_current_sample++;
+        return DATASET_SAMPLE_SIZE;
     }
     return 0;
 }

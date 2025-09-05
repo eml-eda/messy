@@ -24,9 +24,10 @@
 //
 // Sensor's parameters
 //
-#define DATASET_PATH "./input_files/gesture/gesture_dataset.csv" ///< Path to the dataset file
+#define DATASET_PATH "./input_files/gesture/gesture_dataset.bin" ///< Path to the dataset file
 #define DATASET_RESOLUTION sc_core::SC_MS                        ///< Resolution of the dataset (SystemC time format)
 #define DATASET_TIME_INTERVAL 100                                ///< Time interval between two dataset readings (* DATASET_RESOLUTION)
+#define DATASET_SAMPLE_SIZE 2400                                 ///< Size of each dataset sample in bytes (300 int64_t values)
 
 // Debug
 #define DEBUG_SENSOR_GESTURE
@@ -151,11 +152,9 @@ SC_MODULE(Sensor_${sensor_name}_functional)
     bool sensor_running      = false;  ///< Flag to indicate if the sensor is running.
 
     FILE *dataset_file = nullptr;           ///< File pointer for streaming CSV.
-    long dataset_line_pos = 0;              ///< File position of first data line (after header).
-    long dataset_current_line = 0;          ///< Current line number being processed.
-    char dataset_line_buf[256];             ///< Buffer for reading lines.
-    void open_dataset();                    ///< Helper to open CSV and skip header.
-    uint8_t read_next_value();              ///< Helper to read next VALUE from CSV, cycling.
+    long dataset_current_sample = 0;        ///< Current sample number being processed.
+    void open_dataset();                    ///< Helper to open binary file and reset sample.
+    int read_next_sample();                 ///< Helper to read next sample (2400 bytes) from binary file, cycling.
 
     // Other methods
     void read_sensor(unsigned int address);

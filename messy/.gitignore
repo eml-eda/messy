@@ -2,6 +2,7 @@ Makefile.exp
 power_trace*
 *vcd*
 *bin
+!gesture_dataset.bin
 power_report*
 *log
 trace*
