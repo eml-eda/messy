@@ -14,7 +14,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Copy application binaries
-make application-cheshire app=$APP
+make application app=$APP
 if [ $? -ne 0 ]; then
     echo "Copying application binaries failed"
     exit 1
