@@ -1,4 +1,5 @@
 #include <adapters/adapter_cheshire.hpp>
+#include <stdint.h>
 
 /* -------------------------------------------------------------------------- */
 /*                              GdbServer methods                             */
@@ -11,6 +12,7 @@ GdbServer::GdbServer()
     gdb_pid = -1;
     gdb_in = nullptr;
     gdb_out = nullptr;
+    dump_file = nullptr;
     memset(gdb_out_buf, 0, sizeof(gdb_out_buf));
 }
 
@@ -28,6 +30,13 @@ GdbServer::~GdbServer()
  */
 void GdbServer::setup()
 {
+    // Open dump file for memory dumps
+    this->dump_file = fopen(CHESSY_TMP_FILE, "w+b");
+    if (!this->dump_file) {
+        perror("Failed to open dump file");
+        exit(1);
+    }
+
     // Create pipes for GDB input and output redirection
     if (pipe(this->gdb_in_fd) == -1 || pipe(this->gdb_out_fd) == -1) {
         perror("Pipe creation failed");
@@ -68,6 +77,10 @@ void GdbServer::setup()
         // Store the pipe file descriptors for parent to use
         this->gdb_in  = fdopen(this->gdb_in_fd[1], "w");
         this->gdb_out = fdopen(this->gdb_out_fd[0], "r");
+        if (!this->gdb_in || !this->gdb_out) {
+            perror("fdopen failed");
+            exit(1);
+        }
         fflush(this->gdb_out);
 
         // Set up GDB connection
@@ -111,9 +124,7 @@ std::string GdbServer::wait_for_line(const std::string &keyword)
 
     while (true) {
         if (fgets(this->gdb_out_buf, sizeof(this->gdb_out_buf), this->gdb_out)) {
-#ifdef DEBUG_GDB
-            printf("[GDB]: %s", this->gdb_out_buf);
-#endif
+            DEBUG_PRINT_GDB("[GDB]: %s", this->gdb_out_buf);
             line = std::string(this->gdb_out_buf);
             if (line.rfind(keyword, 0) == 0) {
                 // Found the line starting with the keyword
@@ -132,9 +143,7 @@ void GdbServer::send_command(const std::string &cmd)
 {
     // Send command to GDB
     fprintf(this->gdb_in, "%s\n", cmd.c_str());
-#ifdef DEBUG_GDB
-    printf("GDB command sent: %s\n", cmd.c_str());
-#endif
+        DEBUG_PRINT_GDB("GDB command sent: %s\n", cmd.c_str());
     fflush(this->gdb_in);
 }
 
@@ -209,6 +218,51 @@ void GdbServer::write_var(const std::string &var_name, uint64_t value)
     }
 }
 
+void GdbServer::dump_memory(uint64_t address, uint8_t* data_ptr, size_t size_bytes)
+{
+    // Dump memory from the target address into the provided buffer
+    std::string line;
+    std::regex memory_regex("data=\\[\"([^\"]+)\"\\]");
+    std::smatch match;
+    size_t nread;
+
+    // Dump to the temporary file
+    this->flush_output();
+    this->send_command("dump memory " CHESSY_TMP_FILE " " + std::to_string(address) + " " + std::to_string(address + size_bytes));
+    line = this->wait_for_line("^done");
+    DEBUG_PRINT_GDB("Dumped memory from %p to %p (%zu bytes)\n", address, address + size_bytes, size_bytes);
+    
+    // Read from the temporary file into the buffer
+    this->dump_file = freopen(CHESSY_TMP_FILE, "rb", this->dump_file); ///< Refresh the file so we see new data written by GDB
+    fseek(this->dump_file, 0, SEEK_SET);
+    nread = fread(data_ptr, 1, size_bytes, this->dump_file);
+    DEBUG_PRINT_GDB("Read %zu bytes from dump file into buffer\n", nread);
+
+    DEBUG_PRINT_GDB("Data: ");
+    for (size_t i = 0; i < nread; i++) {
+        DEBUG_PRINT_GDB("%02x ", data_ptr[i]);
+    }
+    DEBUG_PRINT_GDB("\n");
+}
+
+void GdbServer::restore_memory(uint64_t address, uint8_t* data_ptr, size_t size_bytes)
+{
+    // Write memory to the target address from the provided data buffer
+    std::string line;
+
+    // Write to the temporary file
+    freopen(CHESSY_TMP_FILE, "w+b", this->dump_file); // clears file each time
+    fwrite(data_ptr, 1, size_bytes, this->dump_file);
+    fflush(this->dump_file);
+    DEBUG_PRINT_GDB("Wrote %zu bytes to dump file\n", size_bytes);
+
+    // Load from the temporary file to the target memory
+    this->flush_output();
+    this->send_command("restore " CHESSY_TMP_FILE " binary " + std::to_string(address));
+    line = this->wait_for_line("^done");
+    DEBUG_PRINT_GDB("Restored memory to %p (%zu bytes)\n", address, size_bytes);
+}
+
 void GdbServer::flush_output()
 {
     // Flush the GDB output stream
@@ -244,67 +298,78 @@ double AdapterCheshire::get_power_at(int64_t timestamp)
 
 MessyRequest *AdapterCheshire::get_messy_request_from_gdb(const std::string &response)
 {
-    // Regex patterns
-    std::regex func_regex("func=\"([^\"]+)\"");
-    std::regex address_regex("name=\"sensor_address\",value=\"([^\"]+)\"");
-    std::regex data_regex("name=\"sensor_data\",value=\"([^\"]+)\"");
-
+    uint64_t req_addr;
     std::smatch match;
-    uint64_t addr;
-    bool is_read;
-    unsigned int size = 8; // 64bit TODO: Adjust size based on the actual data type
+    uint64_t data_addr;
+    bool is_read = false;
+    unsigned int req_size;
 
-    // Prepare the request data buffer
-    this->req_data_buf = (uint8_t *)malloc(size);
-    if (!this->req_data_buf) {
-        throw std::runtime_error("Failed to allocate memory for request data buffer.");
-    }
-    memset(this->req_data_buf, 0, size); // Clear the buffer
-
-#ifdef DEBUG_GDB
-    printf("Parsing GDB response: %s\n", response.c_str());
-#endif
-    // Find function call name
-    if (std::regex_search(response, match, func_regex)) {
-        if (match[1] == "write_sensor") {
-            is_read = false; // This is a write operation
-        } else if (match[1] == "read_sensor") {
-            is_read = true; // This is a read operation
-        } else {
+    DEBUG_PRINT_GDB("Parsing GDB response: %s\n", response.c_str());
+    // Check that it is the expected function
+    if (std::regex_search(response, match, this->func_regex)) {
+        if (match[1] != "__chessy_access") {
             throw std::runtime_error("Unknown function name in \"*stopped\" line.");
         }
     } else {
         throw std::runtime_error("Function name not found in \"*stopped\" line.");
     }
 
+    // Check if it is a read or write operation
+    if (std::regex_search(response, match, this->rw_regex)) {
+        // Convert value from string (hex) to bool
+        is_read = (bool)std::stoull(match[1], nullptr, 16);
+    } else {
+        throw std::runtime_error("Read/Write flag not found in \"*stopped\" line.");
+    }
+
     // Find address and convert
-    if (std::regex_search(response, match, address_regex)) {
+    if (std::regex_search(response, match, this->addr_regex)) {
         // Convert address from string (hex) to uint64_t
-        addr = (uint64_t)std::stoull(match[1], nullptr, 16);
+        req_addr = std::stoull(match[1], nullptr, 16);
     } else {
         throw std::runtime_error("Address not found in \"*stopped\" line.");
     }
 
-    // Find data only if it is a write operation
-    if (!is_read) {
-        if (std::regex_search(response, match, data_regex)) {
-            // Convert data from string (base 10) to uint64_t
-            uint64_t data_value = std::stoull(match[1], nullptr, 10);
-            // Store data in the buffer
-            memcpy(this->req_data_buf, &data_value, sizeof(data_value));
-        } else {
-            throw std::runtime_error("Data not found in \"*stopped\" line for write operation.");
-        }
+    // Find size and convert
+    if (std::regex_search(response, match, this->size_regex)) {
+        // Convert size from string (decimal) to unsigned int
+        req_size = (unsigned int)std::stoull(match[1], nullptr, 10);
+    } else {
+        throw std::runtime_error("Size not found in \"*stopped\" line.");
     }
 
-    return new MessyRequest((long long)addr, (unsigned int *)this->req_data_buf, is_read, nullptr, size);
+    // Prepare the request data buffer
+    free(this->req_data_buf); // Free previous buffer if any
+    this->req_data_buf = (uint8_t *)malloc(req_size);
+    if (!this->req_data_buf) {
+        throw std::runtime_error("Failed to allocate memory for request data buffer.");
+    }
+    memset(this->req_data_buf, 0, req_size); // Clear the buffer
+
+    // Find data pointer and convert
+    if (std::regex_search(response, match, this->data_regex)) {
+        // Convert data from string (hex) to uint64_t
+        data_addr = std::stoull(match[1], nullptr, 16);
+    } else {
+        throw std::runtime_error("Data pointer not found in \"*stopped\" line.");
+    }
+
+    // If it is a write operation, read the data from the target memory
+    if (!is_read) {
+        // Read the data from the target memory
+        this->gdb_server.dump_memory(data_addr, this->req_data_buf, req_size);
+    }
+    // Reads will be processed later in custom_reply()
+
+    // FIXME: Store the data address in the handler for custom_reply to work, this is a temporary solution
+    return new MessyRequest((long long)req_addr, (unsigned int *)this->req_data_buf, is_read, (unsigned int *)data_addr, req_size);
 }
 
 void AdapterCheshire::startup(void)
 {
     // Start Cheshire
     this->gdb_server.setup();
-    printf("GDB started. PID: %d\n", this->gdb_server.get_pid());
+    DEBUG_PRINT_CHESHIRE("GDB started. PID: %d\n", this->gdb_server.get_pid());
 }
 
 void AdapterCheshire::close()
@@ -321,7 +386,7 @@ void AdapterCheshire::close()
 
         closed = 1;
     }
-    printf("Cheshire adapter closed.\n");
+    DEBUG_PRINT_CHESHIRE("Cheshire adapter closed.\n");
     return;
 }
 
@@ -345,13 +410,22 @@ uint64_t AdapterCheshire::exec()
     request = this->get_messy_request_from_gdb(request_unparsed);
     add_request(request);
 
-#ifdef DEBUG
     if (request->read_req) {
-        printf("Parsed READ request: ? <-(0x%llx), %u Bytes @ %llu ms\n", request->addr, request->size, req_timestamp_ps / 1'000'000'000);
+        DEBUG_PRINT_CHESHIRE(
+            "Parsed READ request: <-(0x%llx), %u Bytes @ %llu ms\n",
+            request->addr,
+            request->size,
+            req_timestamp_ps / 1'000'000'000
+        );
     } else {
-        printf("Parsed WRITE request: %u ->(0x%llx), %u Bytes @ %llu ms\n", *request->data, request->addr, request->size, req_timestamp_ps / 1'000'000'000);
+        DEBUG_PRINT_CHESHIRE(
+            "Parsed WRITE request: %llx ->(0x%llx), %u Bytes @ %llu ms\n",
+            *request->data,
+            request->addr,
+            request->size,
+            req_timestamp_ps / 1'000'000'000
+        );
     }
-#endif
 
     // Jump over the ebreak instruction
     this->gdb_server.send_command("set $pc=$pc+2");
@@ -375,15 +449,17 @@ void AdapterCheshire::custom_reply(MessyRequest *req, uint64_t timestamp_us)
 {
     // If it was a read request, we need to send the value back to GDB
     if (req->read_req) {
-#ifdef DEBUG
-        printf("Responding to READ request: %u <-(0x%llx), %u Bytes\n", *req->data, req->addr, req->size);
-#endif
-        this->gdb_server.write_var("sensor_data", *req->data);
+        DEBUG_PRINT_CHESHIRE("Responding to READ request: <-(0x%llx), %u Bytes\n", req->addr, req->size);
+        DEBUG_PRINT_GDB("Data to send back: ");
+        for (unsigned int i = 0; i < req->size; i++) {
+            DEBUG_PRINT_GDB("%02x ", ((uint8_t*)req->data)[i]);
+        }
+        DEBUG_PRINT_GDB("\n");
+        // Restore the data to the target memory
+        this->gdb_server.restore_memory((uint64_t)req->handle_c, this->req_data_buf, req->size);
     }
 
     // Send back the new timestamp to GDB
-#ifdef DEBUG
-    printf("Sending timestamp back to GDB: %llu ms\n", timestamp_us / 1'000);
-#endif
+    DEBUG_PRINT_CHESHIRE("Sending timestamp back to GDB: %llu ms\n", timestamp_us / 1'000);
     this->gdb_server.write_var("req_timestamp", timestamp_us);
 }

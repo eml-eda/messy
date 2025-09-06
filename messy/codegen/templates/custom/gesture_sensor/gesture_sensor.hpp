@@ -103,7 +103,7 @@ SC_MODULE(Sensor_${sensor_name}_functional)
         register_memory[CONTROL_REG_BASE] = 0x00; // Sensor stopped by default
         register_memory[MODULE_REG_BASE]  = 255;  // Default MODULE value
         register_memory[STATUS_REG_BASE]  = 0x00; // No new data initially
-        register_memory[DATA_REG_BASE]    = 0x00; // Initial data value
+        register_memory[DATA_REG_BASE]    = 0xff; // Just to have some non-zero value
 
         // Open dataset file
         open_dataset();
