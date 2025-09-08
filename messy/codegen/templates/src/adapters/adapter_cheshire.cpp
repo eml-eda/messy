@@ -308,6 +308,11 @@ MessyRequest *AdapterCheshire::get_messy_request_from_gdb(const std::string &res
     // Check that it is the expected function
     if (std::regex_search(response, match, this->func_regex)) {
         if (match[1] != "__chessy_access") {
+            if (match[1] == "chessy_close") {
+                DEBUG_PRINT_CHESHIRE("Detected chessy_close function, marking adapter as finished.\n");
+                this->finished = true;
+                return nullptr;
+            }
             throw std::runtime_error("Unknown function name in \"*stopped\" line.");
         }
     } else {
@@ -401,14 +406,15 @@ uint64_t AdapterCheshire::exec()
     // Wait for a breakpoint (or an error)
     request_unparsed = this->gdb_server.wait_for_line("*stopped,reason=\"signal-received\"");
 
-    // Read the machine timer again to get the timestamp of the request
-    // TODO: This currently includes the overhead of the GDB communication.
-    //  Although the overhead **should** be negligible, this could create skewed results in long simulations.
-    uint64_t req_timestamp_ps = this->gdb_server.read_var("req_timestamp", 10) * 1'000'000; // Convert from us to ps
-
     // Parse the GDB response to get the MessyRequest
     request = this->get_messy_request_from_gdb(request_unparsed);
+    if (this->finished) {
+        return 0; // Detect chessy_close and exit
+    }
     add_request(request);
+
+    // Read the machine timer again to get the timestamp of the request
+    uint64_t req_timestamp_ps = this->gdb_server.read_var("req_timestamp", 10) * 1'000'000; // Convert from us to ps
 
     if (request->read_req) {
         DEBUG_PRINT_CHESHIRE(
@@ -460,6 +466,11 @@ void AdapterCheshire::custom_reply(MessyRequest *req, uint64_t timestamp_us)
     }
 
     // Send back the new timestamp to GDB
+    #ifndef PROFILE_CHESSY
     DEBUG_PRINT_CHESHIRE("Sending timestamp back to GDB: %llu ms\n", timestamp_us / 1'000);
     this->gdb_server.write_var("req_timestamp", timestamp_us);
+    #else
+    // In profiling mode, we do not update the timestamp to let Cheshire use mtime
+    #warning "Profiling mode enabled: not updating req_timestamp!"
+    #endif
 }

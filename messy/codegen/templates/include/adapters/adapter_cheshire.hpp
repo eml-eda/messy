@@ -26,6 +26,8 @@
 #define CHS_MTIME_REG "0204bff8" ///< Machine timer register, contains the current time in microseconds. Avoid the 0x prefix!
 #define CHESSY_TMP_FILE "/messy/messy/chessy_req_data.bin" ///< Temporary file to store request data
 
+//#define PROFILE_CHESSY ///< Enable profiling of Cheshire adapter, WILL BREAK SYNCHRONIZATION!
+
 //
 // Enable debug prints ?
 //
